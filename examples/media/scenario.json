@@ -1,0 +1,9 @@
+{
+  "title": "素材文件目录",
+  "description": "从音视频文件名提取拍摄日期和 take 编号；日期需通过日历校验。",
+  "file": "input.csv",
+  "fields": [
+    {"name":"date","labels":[{"row":0,"output":"2026-10-09"},{"row":1,"output":"2026-11-02"}],"expected":["2026-10-09","2026-11-02","2024-02-29","2026-12-31"]},
+    {"name":"take","labels":[{"row":0,"output":"03"},{"row":1,"output":"12"}],"expected":["03","12","105","01"]}
+  ]
+}

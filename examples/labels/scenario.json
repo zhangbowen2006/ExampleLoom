@@ -1,0 +1,9 @@
+{
+  "title": "活动名单标签",
+  "description": "从姓名、班级和编号生成统一标签；配方按列名重用，不依赖列的位置。",
+  "file": "input.csv",
+  "fields": [
+    {"name":"badge","labels":[{"row":0,"output":"A1 / 陈雨"},{"row":1,"output":"B12 / 王琪"}],"expected":["A1 / 陈雨","B12 / 王琪","C20 / 赵晨","D3 / 林安"]},
+    {"name":"identifier","labels":[{"row":0,"output":"0012"},{"row":1,"output":"0081"}],"expected":["0012","0081","01005","0007"]}
+  ]
+}

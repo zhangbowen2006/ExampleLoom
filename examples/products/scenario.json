@@ -1,0 +1,9 @@
+{
+  "title": "供应商编码整理",
+  "description": "把复合商品编码转换为独立的型号与大写颜色字段；保留前导零。",
+  "file": "input.csv",
+  "fields": [
+    {"name":"model","labels":[{"row":0,"output":"0012"},{"row":1,"output":"0081"}],"expected":["0012","0081","123456","0007"]},
+    {"name":"color","labels":[{"row":0,"output":"RED"},{"row":1,"output":"BLUE"}],"expected":["RED","BLUE","GREEN","BLACK"]}
+  ]
+}
