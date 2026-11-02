@@ -1,1 +1,59 @@
-<!doctype html><html lang="zh-CN"><meta charset="UTF-8"><title>ExampleLoom</title><body><h1>ExampleLoom</h1><p>工作台界面开发中。核心和 CLI 可用。</p></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="用几个样例，编织一条可检查、可重用的数据转换规则。MoonBit 开源程序合成工作台。">
+  <title>ExampleLoom · 示例织机</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="mark" aria-hidden="true">≋</span><span>ExampleLoom <small>示例织机</small></span></a>
+    <div class="topmeta"><span class="status-dot"></span>本地处理 · 无需模型 API <a href="https://github.com/zhangbowen2006/ExampleLoom" target="_blank" rel="noopener">GitHub ↗</a></div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">PROGRAMMING BY EXAMPLE / 0.1</p><h1>给出样例，<br>把重复整理交给规则。</h1><p class="lede">从表格到转换程序。检查不同解释，补充关键样例，再把选定的规则用于下一批数据。</p></div>
+      <aside class="intro-note"><span class="note-number">01 → ∞</span><p>每条规则都可查看、可导出。<br>候选排名表示简单程度，<br>不代表正确率。</p></aside>
+    </section>
+    <nav class="demo-strip" aria-label="完整示例"><span>从一个例子开始</span><button class="demo" data-demo="products">供应商编码 <b>↗</b></button><button class="demo" data-demo="labels">活动名单 <b>↗</b></button><button class="demo" data-demo="media">素材目录 <b>↗</b></button><button class="demo" data-demo="ambiguity">看看歧义 <b>↗</b></button></nav>
+    <div id="notice" class="notice" role="status" aria-live="polite">载入示例，或粘贴自己的 CSV / JSONL。</div>
+    <section class="workspace">
+      <div class="left-column">
+        <section class="panel">
+          <div class="panel-heading"><h2><span class="step">1</span> 数据与样例</h2><span id="table-stats" class="muted">尚未导入</span></div>
+          <div class="source-toolbar"><label>格式 <select id="format"><option value="csv">CSV</option><option value="jsonl">JSONL</option></select></label><label class="file-button">打开文件<input id="data-file" type="file" accept=".csv,.jsonl,.ndjson,.txt"></label></div>
+          <textarea id="source" aria-label="原始 CSV 或 JSONL" spellcheck="false" placeholder="code&#10;订单-0012&#10;订单-0081&#10;订单-123456"></textarea>
+          <div class="source-actions"><button id="parse" class="secondary">读取数据</button><span class="hint">首行为列名；每个字段以文本处理。</span></div>
+          <div class="field-bar"><label for="output-name">要生成的字段</label><input id="output-name" value="result" maxlength="80"><select id="demo-field" aria-label="示例输出字段" hidden></select></div>
+          <p class="hint">勾选已知答案的行，在右侧填写期望结果。空字符串也可作为答案。</p>
+          <div id="input-grid" class="table-wrap"><div class="empty">导入数据后，在这里标注样例。</div></div>
+          <div class="search-bar"><button id="learn" class="primary" disabled>从样例生成候选 <span>→</span></button><button id="cancel" class="plain" hidden>取消操作</button><span id="label-count" class="hint">0 个样例</span></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><h2><span class="step">3</span> 检查不同解释</h2><span id="ambiguity-count" class="muted"></span></div>
+          <p class="hint">下面是候选在真实输入行上产生的不同结果。优先补充这些行的答案，再次搜索。</p>
+          <div id="disagreements"><div class="empty">生成候选后展示分歧。没有分歧也不等于规则一定正确。</div></div>
+        </section>
+      </div>
+      <div class="right-column">
+        <section class="panel">
+          <div class="panel-heading"><h2><span class="step">2</span> 候选规则</h2><span id="candidate-count" class="muted"></span></div>
+          <div id="search-stats" class="hint"></div><div id="search-boundary" class="boundary" hidden></div>
+          <div id="candidates" class="candidate-list"><div class="empty">搜索由 MoonBit 核心执行。<br>选择规则前，请检查样例之外的行。</div></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><h2><span class="step">4</span> 保存与批量转换</h2><span class="muted">配方 v1</span></div>
+          <div id="recipe-fields"><div class="empty">选择候选后，规则会加入这里。可添加多个输出字段。</div></div>
+          <div class="recipe-actions"><button id="apply" class="primary" disabled>预览整批结果</button><button id="save-recipe" class="secondary" disabled>导出配方</button><label class="file-button">载入配方<input id="recipe-file" type="file" accept=".json"></label></div>
+          <p class="hint">配方按列名读取数据；新表的列顺序可以不同。导入下一批数据会清除样例，保留已选定的配方。</p>
+        </section>
+      </div>
+    </section>
+    <section class="panel result-panel">
+      <div class="panel-heading"><h2>转换结果 <span id="result-stats" class="muted"></span></h2><div class="result-actions"><button id="download-csv" class="secondary" disabled>下载 CSV</button><button id="download-report" class="plain" disabled>下载结果 JSON</button></div></div>
+      <div id="results" class="table-wrap"><div class="empty">选定规则并预览后，结果出现在这里。失败行保留位置，不会被丢弃。</div></div>
+      <p class="hint">CSV 导出为公式式文本添加单引号。存在失败行时停止 CSV 导出，仍可下载完整 JSON 结果查看错误。</p>
+    </section>
+    <footer><span>ExampleLoom / 开源的示例驱动程序合成</span><span>字符串转换 · 显式日期格式 · 有界搜索 · 离线可用</span></footer>
+  </main>
+</body></html>
