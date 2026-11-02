@@ -97,6 +97,7 @@ fn runs(text : String, kind : RunKind) -> Array[String] {
 ///|
 /// Evaluate one row. A malformed selector fails instead of silently padding.
 pub fn evaluate(expr : Expr, row : Array[String]) -> String raise LoomError {
+  check_tree(expr, 0, { used: 0, })
   eval_at(expr, row, 0)
 }
 

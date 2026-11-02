@@ -332,12 +332,21 @@ pub fn apply_recipe(
   }
   let rows : Array[Result[Array[String], String]] = []
   let mut failures = 0
+  let mut output_units = 0
   for row in table.rows {
     let input = indices.map(i => row[i])
     let result = Ok(recipe.outputs.map(o => evaluate(o.expression, input))) catch {
       LoomError(message) => {
         failures = failures + 1
         Err(message)
+      }
+    }
+    if result is Ok(values) {
+      for value in values {
+        output_units = output_units + value.length()
+      }
+      if output_units > 2000000 {
+        raise LoomError("batch output exceeds 2000000 UTF-16 units")
       }
     }
     rows.push(result)

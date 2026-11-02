@@ -70,18 +70,24 @@ fn offer_atom(
   pool.seen[key] = true
   pool.attempts = pool.attempts + 1
   let values : Array[Array[Char]] = []
+  let mut progresses = false
   for e in examples {
     match attempt(expression, e.input) {
       Ok(value) => {
-        if value.is_empty() || !e.output.contains(value) {
+        if !e.output.contains(value) {
           return
+        }
+        if !value.is_empty() {
+          progresses = true
         }
         values.push(value.to_array())
       }
       Err(_) => return
     }
   }
-  pool.atoms.push({ expression, values, cost, })
+  if progresses {
+    pool.atoms.push({ expression, values, cost, })
+  }
 }
 
 ///|
