@@ -24,6 +24,7 @@ pub(all) enum Expr {
   Lower(Expr)
   Upper(Expr)
   Concat(Array[Expr])
+  DateText(Expr, String, String)
 } derive(Eq, Debug)
 
 ///|
@@ -116,6 +117,8 @@ fn eval_at(
       row[i]
     }
     Literal(s) => s
+    DateText(e, source, target) =>
+      convert_date(eval_at(e, row, depth + 1), source, target)
     Slice(e, from, to) => {
       let chars = eval_at(e, row, depth + 1).to_array()
       let start = resolve(from, chars.length())
@@ -174,6 +177,7 @@ pub fn explain(expr : Expr) -> String {
   match expr {
     Field(i) => "column[\{i}]"
     Literal(s) => Json(s).stringify()
+    DateText(e, source, target) => "date(\{explain(e)}, \{source}, \{target})"
     Slice(e, a, b) =>
       "slice(\{explain(e)}, \{position_text(a)}, \{position_text(b)})"
     Token(e, s, i) => "token(\{explain(e)}, \{Json(s).stringify()}, \{i})"
