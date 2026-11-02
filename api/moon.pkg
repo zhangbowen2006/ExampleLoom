@@ -1,0 +1,10 @@
+import {
+  "zhangbowen2006/exampleloom" @loom,
+}
+
+options(
+  link: {
+    "js": { "exports": [ "handle" ], "format": "esm" },
+    "wasm-gc": { "exports": [ "handle" ] },
+  },
+)
