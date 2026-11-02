@@ -1,0 +1,8 @@
+_build/
+target/
+.mooncakes/
+dist/
+node_modules/
+artifacts/
+*.log
+.DS_Store

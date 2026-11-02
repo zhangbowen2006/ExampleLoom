@@ -1,0 +1,35 @@
+# 选题与来源核对（2026-11-02）
+
+这是技术调研记录，不是参赛申报书。实现代码由 AI 辅助编写，维护者需理解、验证并负责。
+
+## 独立价值与范围
+
+目标使用者是需要重复整理产品编号、活动名单和素材目录，但不想逐行处理或手写表达式的人。应用独立提供数据导入、样例编辑、程序搜索、分歧预览、配方保存和批量导出；不依赖旧项目、Excel、PROSE、云模型或专用服务端。可复用 MoonBit 库是同一核心的另一使用方式。
+
+第一版聚焦逐行字符串转换，不承诺关系连接、任意表格重排或自然语言编程。竞争优势需要以运行效果和后续真实用户验证建立，不能由“MoonBit 重写”或不同名字推断。
+
+## 已查证的最接近项目
+
+| 来源 | 已有能力 | 本项目范围与差别 |
+| --- | --- | --- |
+| [MoonFrame](https://github.com/ihb2032/MoonFrame) | DataFrame、显式表达式、分组与连接 | 我们关注输入输出样例到程序的搜索；不替代其表格计算覆盖范围 |
+| [moon-databridge](https://github.com/btlqql/moon-databridge) | 显式配置的导入、校验、转换、聚合 | 我们从样例推导候选，展示分歧，不以 CSV 清洗本身作为创新 |
+| [Excel Flash Fill](https://support.microsoft.com/en-gb/excel/using-flash-fill-in-excel) | 从样例推断字符串分离、组合等 | 已有成熟同类需求解决方案；我们的贡献在开放可嵌入实现、显式候选和可移植程序，不是发明自动填充 |
+| [PROSE](https://github.com/microsoft/prose) / [官方用法](https://www.microsoft.com/en-us/research/project/prose-framework/usage/) | DSL、程序集搜索、排名；Flash Fill 系列技术 | 概念参考，不调用 SDK、不复制实现，不声称程序合成或交互消歧首创 |
+| [Foofah](https://github.com/umich-dbgroup/foofah)（MIT） | 从样例合成表格转换程序，包含表格结构变换 | 已有成熟研究原型；本项目是较窄的逐行字符串 DSL、独立实现和浏览器/CLI 交付，不声称功能更全面 |
+
+2026-11-02 查询 Mooncakes `/api/v0/modules` 返回 3533 条模块记录；在名称、描述与关键词搜索 flashfill、program synthesis、programming by example、示例驱动、程序合成、exampleloom 未发现直接同类条目。该结果仅为元数据检索，不证明不存在竞品。前次 GitHub / MoonBit 社区检索亦未找到已验证的直接同类，后续仍需跟踪。
+
+## 与既有工作的关系
+
+维护者既有 WasmSlim、MoonGate、AgentCanary、MoonBitTargetParity、MoonKeyguard、MoonBVHKit、BoxRIR、NeedleRail 等项目与本项目的核心用途不同。本项目使用新目录和新历史，不导入其业务代码。AgentCanary 是策略回放/回归工具，未被当作已驳回项目。其他参赛者的 TideWeave、HarborCheck 等仅作为避免边界不完整和未披露重叠的教训。
+
+## 许可证与实现来源
+
+ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工具链附带许可证为准）。上述项目仅调研，不复制代码、测试数据、图像或品牌。合成及歧义选择采用已有领域思想，由本项目独立编写有限 DSL、搜索、解释器和工程接口。测试数据为本项目构造，不是客户数据。
+
+## 赛事口径
+
+[当前报名表](https://bxup9uklfcb.feishu.cn/share/base/form/shrcnWUMlgpbwHaXgzV7HmNhNhg) 已显示 11 月：可提交三次、重复修改；新项目季度赛道要求一页以内 Markdown、本人撰写且不要使用 AI、至少三个完整预期场景、公开仓库至少十个有效提交。提交数与既有报名的剩余名额需要本人在表单查看记录确认。
+
+[官网](https://moonbitlang.github.io/Hackathon2026/)仍显示十月日期。用户提供的十一月公告说明十一月为新季度首月，十月截止后修改转入十一月，季度为十一月至次年一月。十一月确切报名/验收截止、当前账号剩余名额、Mooncakes 发布的最新强制口径仍待官方确认。不自动提交报名，也不代写正式申报书。
