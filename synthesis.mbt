@@ -408,12 +408,12 @@ pub fn synthesize(
       transitions.push_iter(common_literals(node.positions, targets).iter())
     }
     for atom in transitions {
-      steps = steps + 1
-      if steps > options.max_steps {
+      if steps >= options.max_steps {
         truncated = true
         status = "step_limit"
         break
       }
+      steps = steps + 1
       if advance(node.positions, atom.values, targets) is Some(positions) {
         if frontier.length() >= options.max_frontier {
           truncated = true
@@ -431,7 +431,7 @@ pub fn synthesize(
         serial = serial + 1
       }
     }
-    if steps > options.max_steps {
+    if status == "step_limit" {
       break
     }
   }

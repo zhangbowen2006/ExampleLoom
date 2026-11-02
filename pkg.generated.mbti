@@ -1,0 +1,152 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "zhangbowen2006/exampleloom"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn apply_recipe(Recipe, Table) -> BatchResult raise LoomError
+
+pub fn attempt(Expr, Array[String]) -> Result[String, String]
+
+pub fn convert_date(String, String, String) -> String raise LoomError
+
+pub fn date_formats() -> Array[String]
+
+pub fn default_options() -> SearchOptions
+
+pub fn disagreements(Array[Candidate], Array[Array[String]], limit? : Int32) -> Array[Disagreement] raise LoomError
+
+pub fn evaluate(Expr, Array[String]) -> String raise LoomError
+
+pub fn explain(Expr) -> String
+
+pub fn expression_from_json(Json) -> Expr raise LoomError
+
+pub fn expression_to_json(Expr) -> Json raise LoomError
+
+pub fn handle(String) -> String
+
+pub fn parse_csv(String) -> Table raise LoomError
+
+pub fn parse_jsonl(String) -> Table raise LoomError
+
+pub fn recipe_from_json(Json) -> Recipe raise LoomError
+
+pub fn recipe_to_json(Recipe) -> Json raise LoomError
+
+pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
+
+pub fn synthesize(Array[Example], options? : SearchOptions) -> SearchReport raise LoomError
+
+pub fn validate_table(Table) -> Unit raise LoomError
+
+// Errors
+pub(all) suberror LoomError {
+  LoomError(String)
+} derive(Eq, @debug.Debug)
+pub fn LoomError::equal(Self, Self) -> Bool
+pub fn LoomError::not_equal(Self, Self) -> Bool
+pub fn LoomError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct BatchResult {
+  rows : Array[Result[Array[String], String]]
+  failures : Int32
+}
+
+pub(all) struct Candidate {
+  expression : Expr
+  cost : Int32
+}
+
+pub(all) struct Disagreement {
+  row_index : Int32
+  groups : Array[PredictionGroup]
+  score : Int32
+}
+
+pub(all) struct Example {
+  input : Array[String]
+  output : String
+} derive(Eq, @debug.Debug)
+pub fn Example::equal(Self, Self) -> Bool
+pub fn Example::not_equal(Self, Self) -> Bool
+pub fn Example::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Expr {
+  Field(Int32)
+  Literal(String)
+  Slice(Expr, Position, Position)
+  Token(Expr, String, Int32)
+  Run(Expr, RunKind, Int32)
+  Trim(Expr)
+  Lower(Expr)
+  Upper(Expr)
+  Concat(Array[Expr])
+  DateText(Expr, String, String)
+} derive(Eq, @debug.Debug)
+pub fn Expr::equal(Self, Self) -> Bool
+pub fn Expr::not_equal(Self, Self) -> Bool
+pub fn Expr::to_repr(Self) -> @debug.Repr
+
+pub(all) struct OutputField {
+  name : String
+  expression : Expr
+}
+
+pub(all) enum Position {
+  Start(Int32)
+  End(Int32)
+} derive(Eq, @debug.Debug)
+pub fn Position::equal(Self, Self) -> Bool
+pub fn Position::not_equal(Self, Self) -> Bool
+pub fn Position::to_repr(Self) -> @debug.Repr
+
+pub(all) struct PredictionGroup {
+  prediction : Result[String, String]
+  candidates : Array[Int32]
+}
+
+pub(all) struct Recipe {
+  columns : Array[String]
+  outputs : Array[OutputField]
+}
+
+pub(all) enum RunKind {
+  Digits
+  Letters
+} derive(Eq, @debug.Debug)
+pub fn RunKind::equal(Self, Self) -> Bool
+pub fn RunKind::not_equal(Self, Self) -> Bool
+pub fn RunKind::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SearchOptions {
+  max_candidates : Int32
+  max_parts : Int32
+  max_atom_evaluations : Int32
+  max_steps : Int32
+  max_frontier : Int32
+}
+
+pub(all) struct SearchReport {
+  candidates : Array[Candidate]
+  status : String
+  truncated : Bool
+  atom_evaluations : Int32
+  atoms : Int32
+  steps : Int32
+}
+
+pub(all) struct Table {
+  columns : Array[String]
+  rows : Array[Array[String]]
+} derive(Eq, @debug.Debug)
+pub fn Table::equal(Self, Self) -> Bool
+pub fn Table::not_equal(Self, Self) -> Bool
+pub fn Table::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

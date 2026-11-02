@@ -1,0 +1,68 @@
+name: Check, test and build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned MoonBit toolchain
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh -o /tmp/install-moon.sh
+          bash /tmp/install-moon.sh '0.10.17+093cb8f9c'
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Check and test all backends
+        run: |
+          moon version --all
+          moon fmt --check
+          moon check --deny-warn --target all
+          moon test --deny-warn --target wasm-gc
+          moon test --deny-warn --target js
+          moon test --deny-warn --target wasm
+          moon test --deny-warn --target native
+          moon run cmd/demo
+          moon info
+          git diff --exit-code -- '*.mbti'
+      - name: Build and test complete workflows
+        run: |
+          node scripts/build.mjs
+          node scripts/integration.mjs
+      - name: Browser workflows
+        run: |
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+          node scripts/serve.mjs > /tmp/exampleloom-server.log 2>&1 &
+          curl --retry 20 --retry-connrefused --retry-delay 1 --max-time 30 http://127.0.0.1:4173/ > /dev/null
+          node scripts/browser-test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-evidence
+          path: artifacts/
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy workbench
+        id: deployment
+        uses: actions/deploy-pages@v4
