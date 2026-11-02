@@ -1,6 +1,14 @@
 # 实际验证记录
 
-本记录是工程证据，不是赛事验收结论。日期：2026-11-02（Asia/Shanghai）。公开远程 CI 与发布状态在完成后另行更新，不以配置存在代替通过结果。
+本记录是工程证据，不是赛事验收结论。日期：2026-11-02（Asia/Shanghai）。
+
+## 已验证的公开交付
+
+- [公开仓库](https://github.com/zhangbowen2006/ExampleLoom)，默认分支 `main`。首次推送后 API 返回的提交 SHA 与本地 `3d4272afe0d514fb92645e5e9641283a392b2cf9` 一致。
+- [首次完整 CI](https://github.com/zhangbowen2006/ExampleLoom/actions/runs/41472912921) 成功：Linux 上 Wasm GC、JavaScript、Wasm、native 四个后端分别运行同一组 41 项测试；独立场景、CLI、浏览器测试均通过，随后部署成功。后续仅文档更新的提交请对照 Actions 页面查看。
+- [在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) 返回 HTTP 200；在真实部署 URL 实际操作歧义示例，4 行转换成功，未捕获页面脚本错误。
+- Mooncakes `zhangbowen2006/exampleloom@0.1.0` 发布返回 HTTP 200，公开模块索引确认版本和仓库；全新消费者模块实际下载该版本并执行提取，得到 `001234`。
+- 截至功能发布提交共有 13 个开发提交。以实际历史与内容判断有效性，不把数量当作主办方已认可的结论。
 
 ## 本地环境与命令
 
@@ -19,7 +27,7 @@ Windows，`moon 0.1.20261021 (a4f8933)`、`moonc v0.10.17+093cb8f9c`、Node.js v
 | `node scripts/integration.mjs` | 场景、CLI、CSV 往返、10000 行批处理均通过 |
 | `node scripts/browser-test.mjs` | 桌面/手机布局、多字段操作、歧义补充样例、下载、无效日期阻止导出均通过；无页面脚本异常、无外部数据请求 |
 
-`moon test --target all` 曾在 Windows 原生后端构建计划阶段因缺少 MSVC C++ 工具/Windows SDK 失败；不是原生执行通过的证据。Linux CI 配置另行运行 native，结果以实际 Actions 为准。
+`moon test --target all` 曾在 Windows 原生后端构建计划阶段因缺少 MSVC C++ 工具/Windows SDK 失败。随后 Linux CI 的 native 测试通过；这不等于 Windows 原生工具链已经安装或验证。
 
 ## 测试内容
 

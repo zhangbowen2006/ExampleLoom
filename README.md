@@ -2,6 +2,8 @@
 
 **给出几个样例，生成可检查、可重用的数据转换程序。**
 
+[在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes 0.1.0](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)
+
 ExampleLoom 是使用 MoonBit 实现的程序合成引擎、独立浏览器工作台和 CLI。它面向反复整理编号、名单、文件目录的人：导入 CSV/JSONL，标注输入输出样例，比较候选程序的不同解释，明确选择后保存配方并用于下一批数据。不依赖 Excel、云模型、PROSE 或维护者的其他项目。
 
 ![工作台运行截图](docs/assets/workbench.png)
