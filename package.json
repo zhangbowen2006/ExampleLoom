@@ -1,0 +1,12 @@
+{
+  "name": "exampleloom-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node scripts/integration.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
