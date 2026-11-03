@@ -2,7 +2,7 @@
 
 **给出几个样例，生成可检查、可重用的数据转换程序。**
 
-[在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes 0.1.0](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)
+[在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)
 
 ExampleLoom 是使用 MoonBit 实现的程序合成引擎、独立浏览器工作台和 CLI。它面向反复整理编号、名单、文件目录的人：导入 CSV/JSONL，标注输入输出样例，比较候选程序的不同解释，明确选择后保存配方并用于下一批数据。不依赖 Excel、云模型、PROSE 或维护者的其他项目。
 
@@ -33,6 +33,7 @@ node scripts/serve.mjs
 - 严格 CSV/JSONL 导入；保留前导零；批处理按行报告错误；失败时停止 CSV 导出。
 - 独立中文工作台：文件导入、样例编辑、多字段配方、预览、下载、Worker 取消、手机布局。运行期间无外部数据请求。
 - CLI 和公开 Mooncakes 库接口。实际验证与限制见 [VALIDATION.md](docs/VALIDATION.md)。
+- v0.2：样例排序/去重，标点分隔符推断及可配置文字分隔符；Token 后截取、组合 trim/case；共享输出位置的搜索转移缓存。编辑样例会使旧规则失效并阻止旧结果导出。
 
 ## 三个完整使用场景
 
@@ -50,6 +51,26 @@ node scripts/integration.mjs
 
 它验证三个场景与额外歧义演示、留出行、配方往返、列名重绑定、CLI 全流程、150 组 CSV 往返，以及 10000 行批处理，并写入 `artifacts/integration-results.json`。
 
+## 公开数据到可用目录
+
+工作台另提供三个公开数据入口，全部记录均纳入验证，不只展示几条成功数据：
+
+| 数据与使用者 | 操作与结果 | 验证范围 |
+| --- | --- | --- |
+| IANA tzdb 2025b：应用设置页开发者 | 312 个时区标识，示范区域、末级地点，生成可按区域查询的目录 | 3 个字段，每字段 3 条训练，其余 309 条逐值验证 |
+| Unicode CLDR 48：国际化开发者 | 766 个 locale，生成语言分组、资源路径和原始标识 | 3 个字段，每字段 3 条训练，其余 763 条逐值验证 |
+| github/gitignore：IDE 模板目录开发者 | 312 个多层路径，生成文件名、去扩展名的模板名称和原路径 | 模板名称先有 3 条训练，按分歧提示补 `C` 和 `C++` 两条；其余 307 条验证 |
+
+```sh
+python scripts/import-public-data.py
+node scripts/public-data-test.mjs
+python scripts/verify-sqlite.py
+```
+
+前一命令离线校验来源 SHA-256 并生成 CSV/任务；第二条实际学习、保存/重载配方和导出；第三条用 Python CSV 解析器与 SQLite 独立接收导出并查询。产物在 `artifacts/public-data/`，含可打开的 `catalogs.sqlite3`。来源与许可证见 [公开数据说明](fixtures/public/README.md)。
+
+这是公开记录上的项目自定任务，参与过开发，**不是盲测、客户试用或生产准确率证明**。初始 3 条纯字母模板样例曾导致 25 条错误；两次交互修正后留出字段值 4,141 / 4,141 通过。不要忽略分歧检查或把第一候选当作已知正确规则。
+
 ## CLI
 
 ```sh
@@ -59,6 +80,8 @@ node bin/exampleloom.mjs apply --data examples/products/input.csv --recipe produ
 ```
 
 候选编号从 0 开始，选择需要显式 `--choose`。检查报告中的其他候选与分歧后再选择；排名不表示正确率。标签文件为 `[{"row":0,"output":"0012"}, ...]`，行号不计表头。JSONL 可加 `--format jsonl`。`run request.json` 支持完整 [JSON 协议](docs/PROTOCOL.md)。
+
+可选 `--separators separators.json`（内容例如 `["来自"]`）补充文字分隔符；最多 16 个，每个 1–16 字符。标点分隔符从全部样例自动观察。
 
 ## MoonBit 库
 
@@ -77,7 +100,7 @@ API 通过 `LoomError` 报告普通输入错误；调用者需要处理异常和
 
 ## 边界与可靠性
 
-**这是有界的字符串程序合成器。**不支持任意自然语言任务、表格连接/重排、条件分支、循环、完整正则上下文或所有 Unicode 大小写规则。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。观察到的搜索语法依赖首个样例。
+**这是有界的字符串程序合成器。**不支持任意自然语言任务、表格连接/重排、条件分支、循环、完整正则上下文或所有 Unicode 大小写规则。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。搜索语法来自全部样例且经过确定性排序，但仍只覆盖有限表达式组合。
 
 默认最多 32 个样例、16 输入列、每个样例字段 128 字符、64 候选、6 个拼接片段。整表最多 20000 行、64 列；歧义检查最多前 5000 行。ASCII 词类与大小写有明确限制；日期必须指定格式，不能猜月日。全部预算、状态含义及算法见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 

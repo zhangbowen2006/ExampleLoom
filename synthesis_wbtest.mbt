@@ -231,3 +231,23 @@ test "shared suffix states retain distinct predictions with bounded work" {
     is Err(_),
   )
 }
+
+///|
+test "learn basename extraction composed with extension removal" {
+  let report = synthesize([
+    { input: ["C++.gitignore"], output: "C++", },
+    { input: ["Ada.gitignore"], output: "Ada", },
+    {
+      input: ["Global/VisualStudioCode.gitignore"],
+      output: "VisualStudioCode",
+    },
+    { input: ["community/Python/Poetry.gitignore"], output: "Poetry", },
+  ])
+  assert_true(report.candidates.length() > 0)
+  assert_eq(
+    evaluate(report.candidates[0].expression, [
+      "community/DotNet/MonoDevelop.gitignore",
+    ]),
+    "MonoDevelop",
+  )
+}

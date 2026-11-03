@@ -18,6 +18,8 @@ Success: `{ "ok": true, "table": { "columns": ["code"], "rows": [["订单-0012"]
 
 Success contains ordered `candidates` (expression, description, cost), `disagreements` (zero-based row_index, split score and outcome groups), `stats`, `status` and `truncated`. Options may override max_candidates, max_parts, max_atom_evaluations, max_steps and max_frontier within documented bounds. `exhausted_observed_grammar` refers only to the observed finite search grammar, never the universe of programs. Other statuses mark resource limits. Multiple limits may occur; the status is the most recently encountered reason and truncated remains true.
 
+Optional top-level `separators: ["来自"]` adds up to 16 nonempty separators, each at most 16 Unicode scalar values. Punctuation separators are inferred from every example. Example sorting/deduplication makes label order deterministic. v0.2 stats add `cached_states` and `cache_hits`; `steps` counts path expansions and uncached atom advances, so it is not directly comparable to v0.1.
+
 ## Validate and apply
 
 ```json

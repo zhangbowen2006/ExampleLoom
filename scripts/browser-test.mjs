@@ -83,6 +83,38 @@ try {
   await page.waitForFunction(() => !document.querySelector('#download-csv').disabled);
   assert.match(await page.locator('#results').innerText(), /000007/);
   checks.push('Ambiguous suffix vs delimiter shown; third label refines actual candidates');
+  for (const name of ['public-zones', 'public-locales', 'public-templates']) {
+    const scenario = JSON.parse(await readFile(`examples/${name}/scenario.json`, 'utf8'));
+    await page.locator(`[data-demo="${name}"]`).click();
+    await page.waitForFunction(() => !document.querySelector('#learn').disabled);
+    for (let index = 0; index < scenario.fields.length; index++) {
+      await page.locator('#demo-field').selectOption(String(index));
+      await page.locator('#learn').click();
+      await page.locator('[data-choose="0"]').waitFor();
+      for (let round = 0; round < (scenario.fields[index].refinement_rounds || 0); round++) {
+        // Actual interactive correction, using the learner's first suggestion.
+        await page.locator('.disagreement').first().locator('button').click();
+        const input = page.locator('input[type=text]:focus');
+        const row = Number((await input.locator('xpath=ancestor::tr').getAttribute('id')).replace('row-', ''));
+        await input.fill(scenario.fields[index].expected[row]);
+        await page.locator('#learn').click();
+        await page.locator('[data-choose="0"]').waitFor();
+      }
+      await page.locator('[data-choose="0"]').click();
+    }
+    await page.locator('#apply').click();
+    await page.waitForFunction(() => !document.querySelector('#download-csv').disabled);
+    const count = scenario.fields[0].expected.length;
+    assert.match(await page.locator('#result-stats').innerText(), new RegExp(`${count} 行 · 0 行失败`));
+    const wait = page.waitForEvent('download');
+    await page.locator('#download-csv').click();
+    const download = await wait;
+    await download.saveAs(`artifacts/public-data/browser-${name}.csv`);
+    // The independent Python/SQLite consumer checks every exported value.
+    assert.equal(await readFile(`artifacts/public-data/browser-${name}.csv`, 'utf8'), await readFile(`artifacts/public-data/${name}.csv`, 'utf8'));
+    checks.push(`${name}: all ${count} rows downloaded; browser export equals verified API/SQLite input`);
+    if (name === 'public-templates') await page.screenshot({ path: 'artifacts/workbench-public-data.png', fullPage: true });
+  }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: 'artifacts/workbench-mobile.png', fullPage: true });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, 'Mobile page overflows');

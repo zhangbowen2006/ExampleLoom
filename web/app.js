@@ -110,7 +110,7 @@ for (const button of document.querySelectorAll('[data-demo]')) button.onclick = 
   $('demo-field').replaceChildren(...demo.fields.map((f, i) => { const option = el('option', f.name); option.value = String(i); return option; }));
   $('demo-field').hidden = demo.fields.length < 2; useDemoField(0);
   for (const b of document.querySelectorAll('[data-demo]')) b.classList.toggle('active', b === button);
-  notice(`${scenario.title}：${scenario.description} 已填入两个样例；其他行为留出验证数据。`);
+  notice(`${scenario.title}：${scenario.description} 已填入 ${scenario.fields[0].labels.length} 个样例；其他行为留出验证数据。${scenario.source ? ` 数据来源：${scenario.source}。` : ''}`);
 });
 $('demo-field').onchange = () => useDemoField(Number($('demo-field').value));
 $('output-name').oninput = () => resetSearch();

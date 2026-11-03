@@ -1,0 +1,42 @@
+{
+  "retrieved": "2026-11-03",
+  "gitignore_commit": "6bb5af7a1b050e5add3a71b6e6365c93498822ac",
+  "files": [
+    {
+      "name": "iana-zone1970.tab",
+      "url": "https://raw.githubusercontent.com/eggert/tz/2025b/zone1970.tab",
+      "license": "public-domain",
+      "sha256": "57194e43b001b8f832987b21b82953d997aeeaebeb53a8520140bc12d7d8cfcc"
+    },
+    {
+      "name": "iana-LICENSE",
+      "url": "https://raw.githubusercontent.com/eggert/tz/2025b/LICENSE",
+      "license": "public-domain",
+      "sha256": "0613408568889f5739e5ae252b722a2659c02002839ad970a63dc5e9174b27cf"
+    },
+    {
+      "name": "cldr-locales.json",
+      "url": "https://raw.githubusercontent.com/unicode-org/cldr-json/48.0.0/cldr-json/cldr-core/availableLocales.json",
+      "license": "Unicode-3.0",
+      "sha256": "2961ccc06b437a732c689ad59e891b563e6618546b4c4cda7216549d8a0b4528"
+    },
+    {
+      "name": "cldr-LICENSE",
+      "url": "https://raw.githubusercontent.com/unicode-org/cldr-json/48.0.0/LICENSE",
+      "license": "Unicode-3.0",
+      "sha256": "220ba0e1c43b99530d2d5bdb892a99dca0989414f51ab695ecd90163eaa1ec3b"
+    },
+    {
+      "name": "gitignore-tree.json",
+      "url": "https://api.github.com/repos/github/gitignore/git/trees/6bb5af7a1b050e5add3a71b6e6365c93498822ac?recursive=1",
+      "license": "CC0-1.0",
+      "sha256": "62c4a1d3d8dea9206ce855ae8229ffe34c6c5b84b31c2d3b662b55d2d145f767"
+    },
+    {
+      "name": "gitignore-LICENSE",
+      "url": "https://raw.githubusercontent.com/github/gitignore/6bb5af7a1b050e5add3a71b6e6365c93498822ac/LICENSE",
+      "license": "CC0-1.0",
+      "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673"
+    }
+  ]
+}

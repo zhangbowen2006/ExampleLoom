@@ -257,6 +257,34 @@ fn build_atoms(
           }
         }
       }
+      // A structural field may itself carry a fixed prefix/suffix, such as
+      // the extension of a basename. Keep this composition bounded and put
+      // it before unrestricted whole-input positional slices.
+      if expr is Token(_, _, _) {
+        let mut length = 128
+        for e in examples {
+          match attempt(expr, e.input) {
+            Ok(value) => length = Int32::min(length, value.char_length())
+            Err(_) => length = 0
+          }
+        }
+        for cut in 1..<length {
+          offer_variants(
+            pool,
+            Slice(expr, Start(0), End(cut)),
+            cost + 9,
+            examples,
+            options,
+          )
+          offer_variants(
+            pool,
+            Slice(expr, Start(cut), End(0)),
+            cost + 9,
+            examples,
+            options,
+          )
+        }
+      }
     }
   }
   for col in 0..<examples[0].input.length() {
