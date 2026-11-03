@@ -83,7 +83,11 @@ fn dispatch(request : Json) -> Json raise LoomError {
         Some(v) => j_array(v).map(r => j_array(r).map(j_text))
         None => []
       }
-      let report = synthesize(examples, options~)
+      let separators = match obj.get("separators") {
+        Some(v) => j_array(v).map(j_text)
+        None => []
+      }
+      let report = synthesize(examples, options~, separators~)
       let suggestions = disagreements(report.candidates, rows)
       Json::object({
         "ok": Json(true),
@@ -93,6 +97,8 @@ fn dispatch(request : Json) -> Json raise LoomError {
           "atom_evaluations": Json(report.atom_evaluations),
           "atoms": Json(report.atoms),
           "steps": Json(report.steps),
+          "cached_states": Json(report.cached_states),
+          "cache_hits": Json(report.cache_hits),
         }),
         "candidates": Json::array(
           report.candidates.map(c => {

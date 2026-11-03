@@ -110,3 +110,124 @@ test "deterministic search produces stable ordered candidates" {
     synthesize(examples).candidates.map(c => explain(c.expression)),
   )
 }
+
+///|
+test "all example permutations learn the same case and trim rule" {
+  let samples : Array[Example] = [
+    { input: ["x-abc"], output: "abc", },
+    { input: ["x-DeF"], output: "def", },
+    { input: ["xx- GhiJ "], output: "ghij", },
+  ]
+  let reference = synthesize(samples)
+  assert_true(reference.candidates.length() > 0)
+  assert_eq(
+    evaluate(reference.candidates[0].expression, ["long- KlMnO "]),
+    "klmno",
+  )
+  for
+    order in [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] {
+    let actual = synthesize(order.map(i => samples[i]))
+    assert_eq(
+      actual.candidates.map(c => explain(c.expression)),
+      reference.candidates.map(c => explain(c.expression)),
+    )
+    assert_eq(actual.steps, reference.steps)
+    assert_eq(actual.status, reference.status)
+  }
+}
+
+///|
+test "duplicate observations do not change a bounded search" {
+  let a : Example = { input: ["x-abc"], output: "abc", }
+  let b : Example = { input: ["x-DeF"], output: "def", }
+  let first = synthesize([a, b])
+  let second = synthesize([b, a, b, a])
+  assert_eq(
+    first.candidates.map(c => explain(c.expression)),
+    second.candidates.map(c => explain(c.expression)),
+  )
+  assert_eq(first.atom_evaluations, second.atom_evaluations)
+}
+
+///|
+test "observed punctuation generalizes variable width fields" {
+  for separator in ["#", "；", "=>", "::", " / "] {
+    let report = synthesize([
+      {
+        input: ["东区" + separator + "张三" + separator + "一班"],
+        output: "张三",
+      },
+      {
+        input: [
+          "华北新区" + separator + "李小明" + separator + "实验班",
+        ],
+        output: "李小明",
+      },
+    ])
+    assert_true(report.candidates.length() > 0)
+    assert_eq(
+      evaluate(report.candidates[0].expression, [
+        "西南" + separator + "赵晓晨" + separator + "毕业班",
+      ]),
+      "赵晓晨",
+    )
+  }
+}
+
+///|
+test "explicit textual separators are available to library callers" {
+  let report = synthesize(
+    [
+      { input: ["张三来自东区"], output: "东区", },
+      { input: ["李小明来自华北新区"], output: "华北新区", },
+    ],
+    separators=["来自"],
+  )
+  assert_true(report.candidates.length() > 0)
+  assert_eq(
+    evaluate(report.candidates[0].expression, ["赵晨来自西南"]),
+    "西南",
+  )
+}
+
+///|
+test "extra separators validate their resource bounds" {
+  for separators in [[""], ["abcdefghijklmnopq"], Array::make(17, "#")] {
+    let failed = try {
+      ignore(synthesize([{ input: ["x#y"], output: "y", }], separators~))
+      false
+    } catch {
+      _ => true
+    }
+    assert_true(failed)
+  }
+}
+
+///|
+test "tokens can exist only in later observations without order dependence" {
+  let report = synthesize([
+    { input: ["en"], output: "en", },
+    { input: ["zh-Hans-CN"], output: "zh", },
+  ])
+  assert_true(report.candidates.length() > 0)
+  assert_eq(evaluate(report.candidates[0].expression, ["fil-PH"]), "fil")
+}
+
+///|
+test "shared suffix states retain distinct predictions with bounded work" {
+  let report = synthesize([
+    { input: ["采访_20261009_take03.wav"], output: "2026-10-09", },
+    { input: ["讲座_20261102_take12.wav"], output: "2026-11-02", },
+  ])
+  assert_true(report.cache_hits > 0)
+  assert_true(report.cached_states > 0 && report.cached_states <= 1024)
+  assert_true(report.steps < 200000)
+  assert_eq(
+    evaluate(report.candidates[0].expression, ["纪录片_20240229_take105.wav"]),
+    "2024-02-29",
+  )
+  assert_true(
+    attempt(report.candidates[0].expression, ["采访_20260229_take03.wav"])
+    is Err(_),
+  )
+}

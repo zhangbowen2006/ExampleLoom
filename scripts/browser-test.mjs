@@ -5,13 +5,14 @@ const moduleName = process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLA
 const { chromium } = await import(moduleName);
 const browser = await chromium.launch({ headless: true, ...(process.env.BROWSER_EXECUTABLE ? { executablePath: process.env.BROWSER_EXECUTABLE } : {}) });
 const issues = [], checks = [];
+const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:4173';
 await mkdir('artifacts', { recursive: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1080 }, locale: 'zh-CN', acceptDownloads: true });
   page.on('pageerror', e => issues.push(e.message));
   const remoteRequests = [];
-  page.on('request', request => { if (!request.url().startsWith('http://127.0.0.1:4173')) remoteRequests.push(request.url()); });
-  await page.goto('http://127.0.0.1:4173/');
+  page.on('request', request => { if (new URL(request.url()).origin !== new URL(baseUrl).origin) remoteRequests.push(request.url()); });
+  await page.goto(baseUrl + '/');
   for (const scenario of ['products', 'labels', 'media']) {
     await page.locator(`[data-demo="${scenario}"]`).click();
     await page.waitForFunction(() => !document.querySelector('#learn').disabled);
@@ -34,6 +35,27 @@ try {
       const download = await downloadWait; await download.saveAs('artifacts/browser.recipe.json');
       assert.equal(JSON.parse(await readFile('artifacts/browser.recipe.json', 'utf8')).outputs.length, 2);
       await page.screenshot({ path: 'artifacts/workbench-desktop.png', fullPage: true });
+      await page.locator('#demo-field').selectOption('0');
+      await page.locator('#row-0 input[type=text]').fill('0012X');
+      assert.equal(await page.locator('#download-csv').isDisabled(), true);
+      assert.equal(await page.locator('#download-report').isDisabled(), true);
+      assert.equal(await page.locator('#apply').isDisabled(), true);
+      assert.equal(await page.locator('#save-recipe').isDisabled(), true);
+      assert.match(await page.locator('#recipe-fields').innerText(), /样例已修改/);
+      assert.equal(await page.locator('.recipe-field').count(), 2, 'Other field must be retained');
+      await page.locator('#demo-field').selectOption('1');
+      assert.equal(await page.locator('#apply').isDisabled(), true, 'Field switching must not bypass stale rules');
+      await page.locator('#demo-field').selectOption('0');
+      assert.equal(await page.locator('#row-0 input[type=text]').inputValue(), '0012X', 'Edited labels survive field switching');
+      await page.locator('#row-0 input[type=text]').fill('0012');
+      assert.equal(await page.locator('#apply').isDisabled(), true, 'Reselection is explicit');
+      await page.locator('#learn').click();
+      await page.locator('[data-choose="0"]').waitFor();
+      await page.locator('[data-choose="0"]').click();
+      await page.locator('#apply').click();
+      await page.waitForFunction(() => !document.querySelector('#download-csv').disabled);
+      assert.equal(await page.locator('.recipe-field').count(), 2);
+      checks.push('Editing labels invalidates exports and the selected field; field switching preserves edits; explicit relearning restores multi-field export');
     }
     if (scenario === 'media') {
       await page.locator('#source').fill(await readFile('examples/media/invalid.csv', 'utf8'));

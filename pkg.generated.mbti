@@ -38,7 +38,7 @@ pub fn recipe_to_json(Recipe) -> Json raise LoomError
 
 pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
 
-pub fn synthesize(Array[Example], options? : SearchOptions) -> SearchReport raise LoomError
+pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String]) -> SearchReport raise LoomError
 
 pub fn validate_table(Table) -> Unit raise LoomError
 
@@ -137,6 +137,8 @@ pub(all) struct SearchReport {
   atom_evaluations : Int32
   atoms : Int32
   steps : Int32
+  cached_states : Int32
+  cache_hits : Int32
 }
 
 pub(all) struct Table {

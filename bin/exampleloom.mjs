@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const help = `ExampleLoom 0.1.0 — examples to portable string programs
+const help = `ExampleLoom 0.2.0 — examples to portable string programs
 
-Build once: npm run build
+Build once: node scripts/build.mjs
 node bin/exampleloom.mjs learn --data input.csv --examples examples.json --out candidates.json
 node bin/exampleloom.mjs recipe --report candidates.json --choose 0 --name normalized --out recipe.json
 node bin/exampleloom.mjs apply --data next.csv --recipe recipe.json --out result.csv
@@ -32,7 +32,7 @@ try {
       if (!/^--[a-z]+$/.test(args[i]) || args[i + 1] == null || args[i + 1].startsWith('--')) throw new Error('Expected --flag value pairs');
       const key = args[i].slice(2);
       if (Object.hasOwn(flags, key)) throw new Error(`Duplicate flag: ${key}`);
-      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format'].includes(key)) throw new Error(`Unknown flag: ${key}`);
+      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators'].includes(key)) throw new Error(`Unknown flag: ${key}`);
       flags[key] = args[i + 1];
     }
   }
@@ -55,7 +55,8 @@ try {
       if (!Number.isInteger(e.row) || e.row < 0 || e.row >= table.rows.length || typeof e.output !== 'string') throw new Error('Invalid row label');
       return { input: table.rows[e.row], output: e.output };
     });
-    const result = request({ op: 'synthesize', examples, rows: table.rows.slice(0, 5000) });
+    const separators = flags.separators ? await readJson(flags.separators) : [];
+    const result = request({ op: 'synthesize', examples, rows: table.rows.slice(0, 5000), separators });
     await emit({ ...result, columns: table.columns, probe_rows: Math.min(table.rows.length, 5000), total_rows: table.rows.length });
   } else if (command === 'recipe') {
     const report = await readJson(requireFlag('report'));
@@ -73,6 +74,6 @@ try {
   } else throw new Error(`Unknown command: ${command}`);
 } catch (error) {
   console.error(`ExampleLoom: ${error.message}`);
-  if (error.code === 'ERR_MODULE_NOT_FOUND') console.error(`Build the engine first: cd ${root} && npm run build`);
+  if (error.code === 'ERR_MODULE_NOT_FOUND') console.error(`Build the engine first in ${root}: node scripts/build.mjs`);
   process.exitCode = 1;
 }

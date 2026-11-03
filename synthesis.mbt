@@ -34,6 +34,8 @@ pub(all) struct SearchReport {
   atom_evaluations : Int32
   atoms : Int32
   steps : Int32
+  cached_states : Int32
+  cache_hits : Int32
 }
 
 ///|
@@ -99,45 +101,124 @@ fn offer_variants(
   options : SearchOptions,
 ) -> Unit {
   offer_atom(pool, expression, cost, examples, options)
-  // Identity variants are omitted from the observed grammar when their first
-  // example does not change. This is a search restriction, not equivalence.
-  match attempt(expression, examples[0].input) {
-    Ok(text) => {
-      if text.trim().to_owned() != text {
-        offer_atom(pool, Trim(expression), cost + 1, examples, options)
+  let mut trim = false
+  let mut lower = false
+  let mut upper = false
+  for example in examples {
+    match attempt(expression, example.input) {
+      Ok(text) => {
+        trim = trim || text.trim().to_owned() != text
+        lower = lower || text.any(c => c.is_ascii_uppercase())
+        upper = upper || text.any(c => c.is_ascii_lowercase())
       }
-      if text.any(c => c.is_ascii_uppercase()) {
-        offer_atom(pool, Lower(expression), cost + 2, examples, options)
-      }
-      if text.any(c => c.is_ascii_lowercase()) {
-        offer_atom(pool, Upper(expression), cost + 2, examples, options)
-      }
+      Err(_) => return
     }
-    Err(_) => ()
+  }
+  if trim {
+    offer_atom(pool, Trim(expression), cost + 1, examples, options)
+  }
+  if lower {
+    offer_atom(pool, Lower(expression), cost + 2, examples, options)
+    if trim {
+      offer_atom(pool, Lower(Trim(expression)), cost + 3, examples, options)
+    }
+  }
+  if upper {
+    offer_atom(pool, Upper(expression), cost + 2, examples, options)
+    if trim {
+      offer_atom(pool, Upper(Trim(expression)), cost + 3, examples, options)
+    }
   }
 }
 
 ///|
-fn build_atoms(examples : Array[Example], options : SearchOptions) -> Pool {
+fn observed_separators(
+  examples : Array[Example],
+  col : Int32,
+  extra : Array[String],
+) -> Array[String] {
+  let seen : Map[String, Bool] = Map([])
+  let separators : Array[String] = []
+  let add = (s : String) => {
+    if !s.is_empty() && s.char_length() <= 16 && !seen.contains(s) {
+      seen[s] = true
+      separators.push(s)
+    }
+  }
+  for s in extra {
+    add(s)
+  }
+  let punctuation = "-_ /.:|,;#@\\=+()[]{}<>!?&%~^*，；：、·\t"
+  for e in examples {
+    let mut run = ""
+    for c in e.input[col] {
+      let s = String::from_array([c])
+      if punctuation.contains(s) {
+        add(s)
+        run = run + s
+      } else {
+        add(run)
+        run = ""
+      }
+    }
+    add(run)
+  }
+  separators.sort()
+  separators
+}
+
+///|
+fn canonical_examples(examples : Array[Example]) -> Array[Example] {
+  let ordered = examples.copy()
+  ordered.sort_by((a, b) => {
+    for i in 0..<a.input.length() {
+      let order = a.input[i].compare(b.input[i])
+      if order != 0 {
+        return order
+      }
+    }
+    a.output.compare(b.output)
+  })
+  let unique : Array[Example] = []
+  for e in ordered {
+    if unique.is_empty() || unique[unique.length() - 1].input != e.input {
+      unique.push(e)
+    }
+  }
+  unique
+}
+
+///|
+fn build_atoms(
+  examples : Array[Example],
+  options : SearchOptions,
+  extra_separators : Array[String],
+) -> Pool {
   let pool = { atoms: [], seen: Map([]), attempts: 0, truncated: false, }
   // Structural selectors before positional slices prevents the latter from
   // exhausting the atom budget before the more general selectors are tried.
   for col in 0..<examples[0].input.length() {
     let base = Field(col)
-    let text = examples[0].input[col]
-    let structural : Array[(Expr, Int32)] = [(base, 2), (Trim(base), 3)]
-    for separator in ["-", "_", " ", "/", ".", ":", "|", ",", "::", " / "] {
-      let parts = text.split(separator).collect()
-      if parts.length() <= 1 {
-        continue
+    let structural : Array[(Expr, Int32)] = [(base, 2)]
+    let separators = observed_separators(examples, col, extra_separators)
+    if separators.length() > 64 {
+      pool.truncated = true
+    }
+    for separator in separators[:Int32::min(64, separators.length())] {
+      let mut count = 129
+      for e in examples {
+        count = Int32::min(count, e.input[col].split(separator).count())
       }
-      for k in 0..<parts.length() {
+      for k in 0..<count {
         structural.push((Token(base, separator, k), 5))
-        structural.push((Token(base, separator, k - parts.length()), 5))
+        structural.push((Token(base, separator, k - count), 5))
       }
     }
     for kind in [Digits, Letters] {
-      let count = runs(text, kind).length()
+      let mut count = 129
+      for e in examples {
+        count = Int32::min(count, runs(e.input[col], kind).length())
+      }
       for k in 0..<count {
         structural.push((Run(base, kind, k), 6))
         structural.push((Run(base, kind, k - count), 6))
@@ -146,27 +227,32 @@ fn build_atoms(examples : Array[Example], options : SearchOptions) -> Pool {
     for pair in structural {
       let (expr, cost) = pair
       offer_variants(pool, expr, cost, examples, options)
-      for source in date_formats() {
-        // Date validation is attempted explicitly; never infer debug-like
-        // claims from a proxy. Invalid calendar inputs cannot yield programs.
-        let valid = try {
-          ignore(
-            convert_date(evaluate(expr, examples[0].input), source, "YYYYMMDD"),
-          )
-          true
-        } catch {
-          _ => false
-        }
-        if valid {
-          for target in date_formats() {
-            if source != target {
-              offer_atom(
-                pool,
-                DateText(expr, source, target),
-                cost + 4,
-                examples,
-                options,
-              )
+      let date_inputs = [expr, Trim(expr)]
+      for date_input in date_inputs {
+        for source in date_formats() {
+          let valid = try {
+            ignore(
+              convert_date(
+                evaluate(date_input, examples[0].input),
+                source,
+                "YYYYMMDD",
+              ),
+            )
+            true
+          } catch {
+            _ => false
+          }
+          if valid {
+            for target in date_formats() {
+              if source != target {
+                offer_atom(
+                  pool,
+                  DateText(date_input, source, target),
+                  cost + 4,
+                  examples,
+                  options,
+                )
+              }
             }
           }
         }
@@ -174,7 +260,10 @@ fn build_atoms(examples : Array[Example], options : SearchOptions) -> Pool {
     }
   }
   for col in 0..<examples[0].input.length() {
-    let n = examples[0].input[col].char_length()
+    let mut n = 128
+    for e in examples {
+      n = Int32::min(n, e.input[col].char_length())
+    }
     for a in 0..<n {
       for b = a + 1; b <= n; b = b + 1 {
         if pool.attempts >= options.max_atom_evaluations {
@@ -204,6 +293,13 @@ priv struct SearchNode {
   parts : Array[Expr]
   cost : Int32
   serial : Int32
+}
+
+///|
+priv struct Transition {
+  positions : Array[Int32]
+  expression : Expr
+  cost : Int32
 }
 
 ///|
@@ -313,6 +409,7 @@ fn common_literals(
 pub fn synthesize(
   examples : Array[Example],
   options~ : SearchOptions = default_options(),
+  separators~ : Array[String] = [],
 ) -> SearchReport raise LoomError {
   if examples.is_empty() || examples.length() > 32 {
     raise LoomError("expected 1..32 examples")
@@ -353,7 +450,12 @@ pub fn synthesize(
       }
     }
   }
-  let pool = build_atoms(examples, options)
+  if separators.length() > 16 ||
+    separators.any(s => s.is_empty() || s.char_length() > 16) {
+    raise LoomError("expected at most 16 extra separators of 1..16 characters")
+  }
+  let examples = canonical_examples(examples)
+  let pool = build_atoms(examples, options, separators)
   let targets = examples.map(e => e.output.to_array())
   let frontier : Array[SearchNode] = [
     {
@@ -366,6 +468,8 @@ pub fn synthesize(
   let candidates : Array[Candidate] = []
   let seen : Map[String, Bool] = Map([])
   let mut steps = 0
+  let cache : Map[String, Array[Transition]] = Map([])
+  let mut cache_hits = 0
   let mut serial = 1
   let mut truncated = pool.truncated
   let mut status = if pool.truncated {
@@ -374,6 +478,14 @@ pub fn synthesize(
     "exhausted_observed_grammar"
   }
   while !frontier.is_empty() {
+    if steps >= options.max_steps {
+      truncated = true
+      status = "step_limit"
+      break
+    }
+    // Charge path expansion even on cache hits: shared states do not remove
+    // the resource bound on the number of distinct candidate paths.
+    steps = steps + 1
     let node = heap_pop(frontier)
     if finished(node.positions, targets) {
       let expression = if node.parts.is_empty() {
@@ -400,39 +512,62 @@ pub fn synthesize(
     if node.parts.length() >= options.max_parts {
       continue
     }
-    let transitions = pool.atoms.copy()
-    // Adjacent literals have a canonical merged spelling; don't enumerate
-    // their exponentially many equivalent segmentations.
-    if node.parts.is_empty() ||
-      !(node.parts[node.parts.length() - 1] is Literal(_)) {
-      transitions.push_iter(common_literals(node.positions, targets).iter())
-    }
-    for atom in transitions {
-      if steps >= options.max_steps {
-        truncated = true
-        status = "step_limit"
-        break
+    let key = Json(node.positions).stringify()
+    let transitions = match cache.get(key) {
+      Some(transitions) => {
+        cache_hits = cache_hits + 1
+        transitions
       }
-      steps = steps + 1
-      if advance(node.positions, atom.values, targets) is Some(positions) {
-        if frontier.length() >= options.max_frontier {
-          truncated = true
-          status = "frontier_limit"
-          continue
+      None => {
+        let atoms = pool.atoms.copy()
+        atoms.push_iter(common_literals(node.positions, targets).iter())
+        let transitions : Array[Transition] = []
+        for atom in atoms {
+          if steps >= options.max_steps {
+            truncated = true
+            status = "step_limit"
+            break
+          }
+          steps = steps + 1
+          if advance(node.positions, atom.values, targets) is Some(positions) {
+            transitions.push({
+              positions,
+              expression: atom.expression,
+              cost: atom.cost,
+            })
+          }
         }
-        let parts = node.parts.copy()
-        parts.push(atom.expression)
-        heap_push(frontier, {
-          positions,
-          parts,
-          cost: node.cost + atom.cost,
-          serial,
-        })
-        serial = serial + 1
+        // A shared output-position DAG caches suffix transitions, not whole
+        // programs. Distinct prefixes remain available for disambiguation.
+        if cache.length() < 1024 && status != "step_limit" {
+          cache[key] = transitions
+        }
+        transitions
       }
     }
     if status == "step_limit" {
       break
+    }
+    for transition in transitions {
+      if !node.parts.is_empty() &&
+        node.parts[node.parts.length() - 1] is Literal(_) &&
+        transition.expression is Literal(_) {
+        continue
+      }
+      if frontier.length() >= options.max_frontier {
+        truncated = true
+        status = "frontier_limit"
+        continue
+      }
+      let parts = node.parts.copy()
+      parts.push(transition.expression)
+      heap_push(frontier, {
+        positions: transition.positions,
+        parts,
+        cost: node.cost + transition.cost,
+        serial,
+      })
+      serial = serial + 1
     }
   }
   {
@@ -442,5 +577,7 @@ pub fn synthesize(
     atom_evaluations: pool.attempts,
     atoms: pool.atoms.length(),
     steps,
+    cached_states: cache.length(),
+    cache_hits,
   }
 }

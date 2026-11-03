@@ -2,6 +2,7 @@ const $ = id => document.getElementById(id);
 let worker, serial = 0, pending = new Map();
 let table = null, labels = new Map(), report = null, recipe = null, batch = null, demo = null;
 let busy = false, sourceDirty = false;
+let staleFields = new Set(), labelsByField = new Map();
 function startWorker() {
   worker = new Worker('./worker.js', { type: 'module' });
   worker.onmessage = ({ data: { id, result } }) => {
@@ -10,7 +11,7 @@ function startWorker() {
     if (result.ok) pair.resolve(result); else pair.reject(new Error(result.error));
   };
   worker.onerror = () => {
-    for (const p of pending.values()) p.reject(new Error('核心加载失败，请先运行 npm run build，并通过本地 HTTP 地址打开。'));
+    for (const p of pending.values()) p.reject(new Error('核心加载失败，请先运行 node scripts/build.mjs，并通过本地 HTTP 地址打开。'));
     pending.clear();
   };
 }
@@ -32,10 +33,19 @@ function resetSearch() {
 function updateControls() {
   $('label-count').textContent = `${labels.size} 个样例`;
   $('learn').disabled = !table || !labels.size || busy || sourceDirty;
-  $('apply').disabled = !table || !recipe?.outputs.length || busy || sourceDirty;
-  $('save-recipe').disabled = !recipe?.outputs.length || busy;
-  $('download-csv').disabled = !batch || batch.failures > 0 || busy;
-  $('download-report').disabled = !batch || busy;
+  $('apply').disabled = !table || !recipe?.outputs.length || busy || sourceDirty || staleFields.size > 0;
+  $('save-recipe').disabled = !recipe?.outputs.length || busy || staleFields.size > 0;
+  $('download-csv').disabled = !batch || batch.failures > 0 || busy || staleFields.size > 0;
+  $('download-report').disabled = !batch || busy || staleFields.size > 0;
+}
+function labelsChanged() {
+  const name = $('output-name').value.trim();
+  labelsByField.set(name, new Map(labels));
+  if (recipe?.outputs.some(f => f.name === name)) {
+    staleFields.add(name);
+    notice(`字段 ${name} 的样例已修改，请重新生成候选并选定规则。其他字段已保留。`, true);
+  }
+  resetSearch(); resetResults(); renderRecipe();
 }
 async function task(fn) {
   if (busy) return;
@@ -61,7 +71,7 @@ function dataGrid() {
     const tr = el('tr'); tr.id = `row-${i}`; tr.classList.toggle('labelled', labels.has(i));
     const check = el('input'); check.type = 'checkbox'; check.checked = labels.has(i); check.setAttribute('aria-label', `第 ${i + 1} 行用作样例`);
     const answer = el('input'); answer.type = 'text'; answer.value = labels.get(i) ?? ''; answer.setAttribute('aria-label', `第 ${i + 1} 行期望输出`);
-    const changed = () => { if (check.checked) labels.set(i, answer.value); else labels.delete(i); tr.classList.toggle('labelled', check.checked); updateControls(); resetSearch(); };
+    const changed = () => { if (check.checked) labels.set(i, answer.value); else labels.delete(i); tr.classList.toggle('labelled', check.checked); labelsChanged(); };
     check.onchange = changed; answer.oninput = () => { check.checked = true; changed(); };
     const checkCell = el('td'); checkCell.append(check); tr.append(checkCell, el('td', String(i + 1), 'row-no'));
     for (const value of table.rows[i]) tr.append(el('td', value));
@@ -73,7 +83,7 @@ function dataGrid() {
 }
 async function parseSource() {
   const parsed = await call({ op: 'parse', format: $('format').value, text: $('source').value });
-  table = parsed.table; sourceDirty = false; labels = new Map(); resetSearch(); resetResults();
+  table = parsed.table; sourceDirty = false; labels = new Map(); labelsByField = new Map(); resetSearch(); resetResults();
   $('table-stats').textContent = `${table.rows.length} 行 · ${table.columns.length} 列`;
   dataGrid(); renderRecipe(); notice(`已导入 ${table.rows.length} 行。标注几个输出样例，或载入之前保存的配方。`);
 }
@@ -88,14 +98,14 @@ $('data-file').onchange = e => task(async () => {
 });
 function useDemoField(index) {
   const field = demo.fields[index]; $('output-name').value = field.name;
-  labels = new Map(field.labels.map(e => [e.row, e.output])); resetSearch(); dataGrid();
+  labels = new Map(labelsByField.get(field.name) ?? field.labels.map(e => [e.row, e.output])); resetSearch(); dataGrid();
 }
 for (const button of document.querySelectorAll('[data-demo]')) button.onclick = () => task(async () => {
   const name = button.dataset.demo;
   const response = await fetch(`./examples/${name}/scenario.json`); if (!response.ok) throw new Error('示例加载失败');
   const scenario = await response.json();
   const source = await fetch(`./examples/${name}/${scenario.file}`); if (!source.ok) throw new Error('示例数据加载失败');
-  $('source').value = await source.text(); $('format').value = 'csv'; recipe = null;
+  $('source').value = await source.text(); $('format').value = 'csv'; recipe = null; staleFields.clear();
   await parseSource(); demo = scenario;
   $('demo-field').replaceChildren(...demo.fields.map((f, i) => { const option = el('option', f.name); option.value = String(i); return option; }));
   $('demo-field').hidden = demo.fields.length < 2; useDemoField(0);
@@ -128,6 +138,7 @@ function renderCandidates() {
       if (recipe?.outputs.length && JSON.stringify(recipe.columns) !== JSON.stringify(table.columns)) { notice('当前配方基于另一组输入列。请移除已有输出字段，再为这组列建立新配方。', true); return; }
       if (!recipe?.outputs.length) recipe = { version: 1, columns: [...table.columns], outputs: [] };
       recipe.outputs = [...recipe.outputs.filter(f => f.name !== name), { name, expression: candidate.expression }];
+      staleFields.delete(name);
       renderRecipe(); resetResults(); notice(`已将候选 ${i + 1} 加入字段 ${name}。请预览整批结果，也可以再添加一个输出字段。`);
     };
     head.append(el('span', `候选 ${String(i + 1).padStart(2, '0')} · 复杂度 ${candidate.cost}`), choose);
@@ -146,7 +157,7 @@ function renderDisagreements() {
     for (const g of d.groups) predictions.append(el('span', `${g.prediction.ok ? JSON.stringify(g.prediction.value) : '失败：' + g.prediction.error} · ${g.candidates.length} 个候选`, 'prediction'));
     const annotate = el('button', '↑ 标注这一行并重新搜索');
     annotate.onclick = () => {
-      labels.set(d.row_index, labels.get(d.row_index) ?? ''); dataGrid();
+      labels.set(d.row_index, labels.get(d.row_index) ?? ''); labelsChanged(); dataGrid();
       const row = $(`row-${d.row_index}`); row.classList.add('highlight'); row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.querySelector('input[type=text]').focus();
       resetSearch(); notice('请填写这一行的正确输出，再次生成候选。');
     };
@@ -160,22 +171,26 @@ function renderRecipe() {
   for (const output of recipe.outputs) {
     const row = el('div', null, 'recipe-field'), text = el('div');
     text.append(el('strong', output.name), el('code', JSON.stringify(output.expression)));
+    if (staleFields.has(output.name)) text.append(el('span', '样例已修改：需要重新选定规则', 'error-cell'));
     const remove = el('button', '×'); remove.setAttribute('aria-label', `移除字段 ${output.name}`);
-    remove.onclick = () => { recipe.outputs = recipe.outputs.filter(o => o !== output); renderRecipe(); resetResults(); };
+    remove.onclick = () => { recipe.outputs = recipe.outputs.filter(o => o !== output); staleFields.delete(output.name); renderRecipe(); resetResults(); };
     row.append(text, remove); $('recipe-fields').append(row);
   }
 }
 function download(text, name, type) {
   const url = URL.createObjectURL(new Blob([text], { type })), anchor = el('a'); anchor.href = url; anchor.download = name; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-$('save-recipe').onclick = () => task(async () => { const validated = await call({ op: 'validate_recipe', recipe }); download(JSON.stringify(validated.recipe, null, 2), 'exampleloom.recipe.json', 'application/json'); });
+$('save-recipe').onclick = () => task(async () => { if (staleFields.size) throw new Error('请先重新选定已修改字段的规则。'); const validated = await call({ op: 'validate_recipe', recipe }); download(JSON.stringify(validated.recipe, null, 2), 'exampleloom.recipe.json', 'application/json'); });
 $('recipe-file').onchange = e => task(async () => {
   const file = e.target.files[0]; if (!file) return;
   if (file.size > 1000000) throw new Error('配方文件过大。');
   const validated = await call({ op: 'validate_recipe', recipe: JSON.parse(await file.text()) });
-  recipe = validated.recipe; renderRecipe(); resetResults(); notice(`已载入 ${recipe.outputs.length} 个输出字段。导入下一批数据后可直接应用。`); e.target.value = '';
+  recipe = validated.recipe;
+  staleFields = new Set(recipe.outputs.filter(f => (labelsByField.get(f.name)?.size ?? 0) > 0 || (f.name === $('output-name').value.trim() && labels.size > 0)).map(f => f.name));
+  renderRecipe(); resetResults(); notice(staleFields.size ? '配方已载入，存在当前样例的字段需要重新生成候选并选定规则。' : `已载入 ${recipe.outputs.length} 个输出字段。导入下一批数据后可直接应用。`); e.target.value = '';
 });
 $('apply').onclick = () => task(async () => {
+  if (staleFields.size) throw new Error('请先重新选定已修改字段的规则。');
   batch = await call({ op: 'apply', table, recipe });
   const grid = el('table'), head = el('tr'), body = el('tbody');
   for (const name of ['#', ...batch.columns, '状态']) head.append(el('th', name));
