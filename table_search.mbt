@@ -457,7 +457,9 @@ pub fn synthesize_table(
       continue
     }
     let neighbors : Array[TableStep] = []
-    neighbors.push_iter(aggregate_witnesses(state.tables[0], targets[0]).iter())
+    let (aggregates, clipped) = aggregate_witnesses(state.tables, targets)
+    truncated = truncated || clipped
+    neighbors.push_iter(aggregates.iter())
     if projection_step(state.tables, targets) is Some(step) {
       neighbors.push(step)
     }

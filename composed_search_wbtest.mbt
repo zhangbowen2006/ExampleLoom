@@ -193,3 +193,38 @@ test "learn count and sum together from two tables including a new group on repl
     ["Y", "2", "5"],
   ])
 }
+
+///|
+test "align every demonstration before clipping indistinguishable group measures" {
+  let one : Table = {
+    columns: ["k", "x", "y", "z"],
+    rows: [["A", "1", "1", "1"]],
+  }
+  let one_out : Table = {
+    columns: ["k", "floor", "ceiling"],
+    rows: [["A", "1", "1"]],
+  }
+  let many : Table = {
+    ..one,
+    rows: [["B", "3", "7", "-3"], ["B", "8", "6", "2"], ["B", "1", "4", "9"]],
+  }
+  let many_out : Table = { ..one_out, rows: [["B", "-3", "9"]], }
+  let pairs : Array[TableExample] = [
+    { before: one, after: one_out, },
+    { before: many, after: many_out, },
+  ]
+  let unseen : Table = {
+    ..one,
+    rows: [["X", "8", "2", "55"], ["X", "4", "3", "4"]],
+  }
+  for examples in [pairs, [pairs[1], pairs[0]]] {
+    let r = synthesize_table(examples, options={
+      ..default_table_options(),
+      max_depth: 1,
+    })
+    assert_true(
+      !r.candidates.is_empty() && r.candidates[0].steps is [Aggregate(_, _)],
+    )
+    assert_eq(apply_pipeline(r.candidates[0], unseen).rows, [["X", "4", "55"]])
+  }
+}

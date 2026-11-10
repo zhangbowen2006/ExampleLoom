@@ -123,13 +123,24 @@ fn aggregate_rows(
 ///|
 /// Infer ordered key columns from the output schema. Keep bounded alternative
 /// metrics when one demonstration cannot distinguish e.g. count and sum.
-fn aggregate_witnesses(table : Table, target : Table) -> Array[TableStep] {
+fn aggregate_witnesses(
+  tables : Array[Table],
+  targets : Array[Table],
+) -> (Array[TableStep], Bool) {
   let result : Array[TableStep] = []
+  let mut contracted = None
+  for i, t in tables {
+    if !targets[i].rows.is_empty() && t.rows.length() > targets[i].rows.length() {
+      contracted = Some(i)
+      break
+    }
+  }
+  guard contracted is Some(index) else { return (result, false) }
+  let table = tables[index]
+  let target = targets[index]
   let width = target.columns.length()
-  if target.rows.is_empty() ||
-    table.rows.length() <= target.rows.length() ||
-    width > 16 {
-    return result
+  if width > 16 || targets.any(t => t.columns != target.columns) {
+    return (result, false)
   }
   // Every supported numeric result has a canonical base-ten representation.
   if !target.rows.all(r => {
@@ -138,8 +149,9 @@ fn aggregate_witnesses(table : Table, target : Table) -> Array[TableStep] {
         _ => false
       }
     }) {
-    return result
+    return (result, false)
   }
+  let mut clipped = false
   for k in 0..<width {
     if k > 0 && !table.columns.contains(target.columns[k - 1]) {
       break
@@ -148,14 +160,15 @@ fn aggregate_witnesses(table : Table, target : Table) -> Array[TableStep] {
       continue
     }
     let keys = target.columns[:k].to_owned()
-    let groups = key_groups(table, keys) catch { _ => continue }
-    if groups.keys.length() != target.rows.length() {
-      continue
+    let layouts : Array[Groups] = []
+    for i, t in tables {
+      let groups = key_groups(t, keys) catch { _ => break }
+      if groups.keys != targets[i].rows.map(row => row[:k].to_owned()) {
+        break
+      }
+      layouts.push(groups)
     }
-    let aligned = groups.keys.mapi((i, key) => {
-      key == target.rows[i][:k].to_owned()
-    })
-    if !aligned.all(x => x) {
+    if layouts.length() != tables.length() {
       continue
     }
     let pool : Array[GroupMetric] = [RowCount]
@@ -165,16 +178,29 @@ fn aggregate_witnesses(table : Table, target : Table) -> Array[TableStep] {
       }
     }
     let fits : Array[Array[Measure]] = Array::makei(width - k, _ => [])
+    let expected = Array::makei(width - k, offset => {
+      targets.map(t => t.rows.map(row => row[k + offset]))
+    })
     for metric in pool {
-      let values = group_values(table, groups, metric) catch { _ => continue }
+      let values : Array[Array[String]] = []
+      for i, t in tables {
+        let column = group_values(t, layouts[i], metric) catch { _ => break }
+        values.push(column)
+      }
+      if values.length() != tables.length() {
+        continue
+      }
       for j in k..<width {
-        if values == target.rows.map(r => r[j]) {
+        if values == expected[j - k] {
           fits[j - k].push({ name: target.columns[j], metric, })
         }
       }
     }
     let mut combinations : Array[Array[Measure]] = [[]]
     for choices in fits {
+      if choices.length() * combinations.length() > 8 {
+        clipped = true
+      }
       let next : Array[Array[Measure]] = []
       for prefix in combinations {
         for choice in choices {
@@ -190,5 +216,5 @@ fn aggregate_witnesses(table : Table, target : Table) -> Array[TableStep] {
       result.push(Aggregate(keys, measures))
     }
   }
-  result
+  (result, clipped)
 }
