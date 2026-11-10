@@ -64,7 +64,7 @@ def main():
               "heldout_zone_rows": len(held), "heldout_territories": len(expected),
               "territory_zone_memberships": sum(int(count) for _, count in expected),
               "pipeline": pipeline, "matches_all_cells_and_order": True}
-    (OUT / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    (OUT / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(report))
 
 

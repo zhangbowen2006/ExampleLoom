@@ -4,9 +4,15 @@
 
 [在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)
 
-ExampleLoom 是使用 MoonBit 实现的程序合成引擎、独立浏览器工作台和 CLI。它面向反复整理编号、名单、文件目录的人：导入 CSV/JSONL，标注输入输出样例，比较候选程序的不同解释，明确选择后保存配方并用于下一批数据。不依赖 Excel、云模型、PROSE 或维护者的其他项目。
+ExampleLoom 是使用 MoonBit 实现的程序合成引擎、独立浏览器工作台和 CLI。使用者可以整理编号、名单和按地区汇总的记录。导入 CSV/JSONL，标注输入输出样例，比较候选程序的不同解释，明确选择后保存配方并用于下一批数据。浏览器 Worker 在本机执行合成和转换。
 
 ![工作台运行截图](docs/assets/workbench.png)
+
+## 从样例学到可复用的表格程序
+
+v0.5 可以从混用两种格式的编号学出条件分支，从样例推导捕获组的重排和重复，并把它们用于结构管道。表格工作台和 CLI 都接受 1–8 对训练表。打开「混合编号展开」，选第一条候选，再在下一批数据上预览，可见 `ZZ9530` 生成 `IN/9530`，两个标签展开为两行。打开「地区订单汇总」可试同一管道里的分组计数与有符号整数求和。[表格工作台](https://zhangbowen2006.github.io/ExampleLoom/structure.html)
+
+在公开 IANA 时区数据上，前两批共 30 行用于演示，另外 282 行作为新输入。学得的管道先拆分地区代码，再按地区计数。导出的 236 行与 SQLite 对照逐格、逐行序一致。[可复现验证](scripts/verify-grouping.py) · [外部任务的成功率与耗时](docs/BENCHMARKS.md) · [与 PROSE、Foofah 的功能对比](docs/CAPABILITIES.md)
 
 ## 快速体验
 
@@ -127,7 +133,7 @@ API 通过 `LoomError` 报告普通输入错误；调用者需要处理异常和
 
 ## 边界与可靠性
 
-**这是有界的字符串与表格程序合成器。**不支持任意自然语言任务、多表连接、数值聚合、循环或所有 Unicode 大小写规则。正则遵循 MoonBit 方言，不支持 PCRE 反向引用、前后查找或 `\d` 等简写；使用 POSIX 词类。捕获学习支持提示模式与共享上下文推断；部分固定分隔符替换可学习，任意替换模板及复合布尔条件仍需显式编写。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。解释器可执行的程序范围大于当前学习器可搜索的范围。
+**ExampleLoom 的学习范围由内置语法和搜索预算共同决定。** 数值分组支持计数和有符号 64 位整数的求和与极值。多表连接、任意数值计算、循环和自由脚本仍超出实现范围。正则使用 MoonBit core 方言，数字可用 `[0-9]` 或 `[[:digit:]]`。支持整串匹配、捕获组重排和全局替换。前后查找和模式内反向引用超出该方言能力。未见数据应另行验证，`truncated=true` 表示搜索被剪枝。
 
 默认最多 32 个样例、16 输入列、每个样例字段 128 字符、64 候选、6 个拼接片段。整表最多 20000 行、64 列；歧义检查最多前 5000 行。ASCII 词类与大小写有明确限制；日期必须指定格式，不能猜月日。全部预算、状态含义及算法见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 

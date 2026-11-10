@@ -1,5 +1,12 @@
 # Changes
 
+## 0.5.0 — 2026-11-10
+
+- Learn whole-cell capture rewrites with reordered and repeated references. Infer regex shape predicates for mixed formats and conditional row maps inside table pipelines.
+- Add stable group counts, checked Int64 sums and extrema. Match candidate measures against all training batches before pruning combinations.
+- Accept up to eight CSV training pairs in the workbench and CLI. Replay exported programs on new batches and verify a territory-count workflow on the public IANA zone database against SQLite.
+- Add a pinned external SyGuS string-task evaluation with duplicate-aware scoring and rerun the complete Foofah workload against the immutable v0.4.0 engine. See the [benchmarks](docs/BENCHMARKS.md).
+
 ## 0.4.0 — 2026-11-10
 
 - Add dynamic pivot grids, column combination, variable record segmentation and context propagation (21 structural operations).

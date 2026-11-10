@@ -1,25 +1,19 @@
-# v0.4 功能对比与实现范围
+# 功能范围与参照系统
 
-这是工程事实与差距说明，不是通过初审或获奖承诺。ExampleLoom 延续原仓库和开发历史，修正上一轮驳回指出的能力缺失，不作为换名的新作品。
+## v0.5 初审意见对应的实现
 
-| 能力 | 本次可执行实现 | 当前自动学习范围 |
+| 评审关注点 | 从样例能学到什么 | 可复现证据与边界 |
 | --- | --- | --- |
-| 条件分支 | `If`、相等、空值、正则谓词、Not/All/Any；短路执行 | 平直规则无解后，按空值、提供的模式、低基数字段值划分，最多 3 层；两侧各至少 2 样例；不学习任意复合谓词 |
-| 正则上下文 | MoonBit core 的动态模式、搜索/整串匹配、捕获和全局替换；Unicode、空匹配正常推进 | 用户最多 16 模式提示；枚举组 0–4、出现位置 0/1/-1；新增共享字面上下文 + ASCII 类捕获推断及固定分隔符替换见证；仍不推断任意模式或模板 |
-| 表格结构 | 选择/重命名、过滤、行映射、拆列、单元格展开、Unpivot/Fold/Melt/Pivot、连续行打包、分组展开、转置、表头升降、向下填充、去重、丢弃前行，另增动态网格透视、列合并、记录分段及表头传播，共 21 类操作 | 多对完整小表约束下的有界结构搜索；默认 4 步/128 状态/2000 次原始算子预算；最佳优先、8 路局部保留和有限组合见证，不是完备搜索。键列主要枚举前缀组合；不能穷举全部列子集 |
-| 数据导出 | v1 逐行配方、v2 结构管道、CSV/JSONL、命名列重绑定、浏览器 Worker 与 CLI | 人工明确选择候选；排名是启发式，不表示置信度 |
-| 外部评估 | 完整上游 250 个 Foofah 任务，50 类任务族；训练表与上游测试表分开 | 25 个测试答案占位任务单列；225 个有答案任务计成功率，全部 250 个保留在总表，错误和超时不按结果删除 |
+| 条件分支 | 空值、枚举值、用户提示的正则或反复出现的字段形状都可用于划分。逐行搜索最多三层，表格行映射支持一层。两侧至少各有两个训练观察 | 工作台「混合编号展开」从训练数据学到展开标签、判断编号形状、抽取数字和拼接前缀。新输入 `ZZ9530`、`8042-NEW` 分别输出 `IN/9530`、`OUT/8042`。[示例](../examples/structures/mixed-tags.json) |
+| 正则语义与学习 | 使用 MoonBit core 正则执行整串和局部匹配、捕获及全局替换。学习器从 ASCII 字母/数字段及字面分隔符生成模式，也可接受最多 16 个显式模式。在训练输出上同时匹配各捕获组，允许重排、重用组及转义字面 `$` | 「重排批次编号」在新输入 `PQR-00097/Q` 上得到 `Q:$00097/PQR`。530 项共同语法对照覆盖捕获、匹配与替换。PCRE 前后查找、模式内反向引用和任意正则生成超出当前范围。[示例](../examples/rewrite/scenario.json) |
+| 表格结构与计算 | 22 类结构操作。新增按一个或多个键执行计数及 Int64 求和、最小值、最大值。可从多对输入输出一起学习多个指标，生成的 v2 管道能在新数据上重放 | 两批订单上学到按地区计数和汇总净额。在公开 IANA 数据上还学到了展开列表后再计数。十进制小数、自由编写的聚合函数和跨表连接仍在范围之外。[订单示例](../examples/structures/regional-totals.json) · [SQLite 对照](evidence/iana-counts-v0.5.0.json) |
+| 外部工作负载 | 表格使用 Foofah 原测试集，字符串使用 SyGuS 公开 PBE 赛题。训练一致、首候选留出全对、事后候选上界和耗时分别计量 | 公开逐题成功、失败、截断、排除原因和引擎哈希。Foofah 任务已用于迭代开发。SyGuS 重复输入和相同拆分另计。[基准与复现命令](BENCHMARKS.md) |
 
-## 与参考系统比较
+Microsoft PROSE 提供面向自定义 DSL 的通用合成框架，允许实现者定义语义、逆向约束推导和排名。ExampleLoom 提供固定的 MoonBit 行表达式、结构算子和面向这些算子的学习算法。两者的功能交集包括从样例推导文本转换，当前 ExampleLoom 的公开接口只允许组合内置算子。[Microsoft 官方教程](https://www.microsoft.com/en-us/research/project/prose-framework/tutorial/)
 
-| 系统与一手来源 | 核心能力、运行约束 | ExampleLoom 已验证的区别与不足 |
-| --- | --- | --- |
-| [PROSE SDK](https://github.com/microsoft/prose)、[官方技术教程](https://www.microsoft.com/en-us/research/project/prose-framework/tutorial/) | 可自定义 DSL、语义、witness functions 和排名的程序合成框架；SDK 与示例使用 .NET/C# | 本项目独立实现 MoonBit 解释器和有界搜索，浏览器不需要 SDK/.NET；未实现通用 witness-function 框架、完整 VSA 或 PROSE 的日期/数值/语义合成覆盖，不能声称性能或能力超过 PROSE |
-| [Foofah 主仓库](https://github.com/umich-dbgroup/foofah)（MIT） | 以表格输入输出为约束合成结构转换程序；原仓库列出 Linux、Python 2.7、g++/Boost.Python 等要求 | 本项目可在浏览器 Worker 本地搜索并导出可重用 JSON 程序，Node 无 npm 运行依赖；独立实现且实际运行上游测试数据，但仍不支持完整操作/参数空间，也没有运行 Foofah 本体的同机性能对照 |
-| [MoonBit core 正则](https://github.com/moonbitlang/core/tree/main/string)、[lexmatch 规格](https://github.com/moonbitlang/lexmatch_spec)（Apache-2.0） | 提供现成匹配引擎与语法 | 本项目复用官方引擎，不把正则引擎算作原创；新增工作是 AST/配方集成、捕获候选枚举、分支谓词、错误与资源边界以及工作台 |
-| [MoonFrame](https://github.com/ihb2032/MoonFrame)、[moon-databridge](https://github.com/btlqql/moon-databridge) | MoonBit 生态已有显式表格计算、转换或数据处理项目，具体覆盖见其当前文档 | 本项目以输入输出约束到程序搜索为主；CSV 和表格算子本身不是独有创新，不宣称这些项目没有同类能力 |
+Foofah 在整表输入输出上搜索清洗程序。其源码提供按列拼接、填充、按固定行数重组等操作，ExampleLoom 与它在这些任务上有实质重叠。这里可核验的交付包括独立浏览器工作台、按名称绑定的 JSON 管道、结构化的正则行映射和多指标分组。两套上游系统的整机速度没有在本次环境中同机测量。[Foofah 算子源码](https://github.com/umich-dbgroup/foofah/blob/970864cd53b4c774a3dbdf4589d207f57ec63208/foofah_libs/operators.py) · [ExampleLoom 协议](PROTOCOL.md)
 
-只进行了功能、部署方式和源码文档层面的比较。没有安装运行 PROSE/Foofah 本体，不能据此填写二者的成功率、耗时、迁移收益或排名。
+本项目沿用 ExampleLoom 的仓库和历史，核心搜索与运算由 MoonBit 实现。其他相邻项目及依赖来源见[项目调研](RESEARCH.md)。
 
 ## 可以复现的三个完整场景
 

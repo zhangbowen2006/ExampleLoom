@@ -1,0 +1,43 @@
+{
+  "source": {
+    "name": "iana-zone1970.tab",
+    "url": "https://raw.githubusercontent.com/eggert/tz/2025b/zone1970.tab",
+    "license": "public-domain",
+    "sha256": "57194e43b001b8f832987b21b82953d997aeeaebeb53a8520140bc12d7d8cfcc"
+  },
+  "sqlite": "3.50.4",
+  "training_rows": [
+    12,
+    18
+  ],
+  "heldout_zone_rows": 282,
+  "heldout_territories": 236,
+  "territory_zone_memberships": 388,
+  "pipeline": {
+    "version": 2,
+    "columns": [
+      "territory",
+      "zone"
+    ],
+    "steps": [
+      [
+        "explode",
+        "territory",
+        ","
+      ],
+      [
+        "aggregate",
+        [
+          "territory"
+        ],
+        [
+          [
+            "count",
+            "count"
+          ]
+        ]
+      ]
+    ]
+  },
+  "matches_all_cells_and_order": true
+}

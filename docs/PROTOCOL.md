@@ -113,3 +113,19 @@ All cells remain strings. Transpose/PackRows/GroupRows/DemoteHeaders produce gen
 `select` now permits repeated source names with distinct output names. Output names must remain unique. Dynamic pivot accepts blank data labels and produces a new schema from observed categories; closed-schema `pivot` retains its previous unknown-level error behavior. Neither operator implicitly aggregates duplicate cells.
 
 Flat synthesis also tries shared literal regex contexts and a finite literal-separator normalization grammar. Arbitrary regex and replacement synthesis remain unsupported. Table macro witnesses charge the normal primitive/depth budgets and do not inspect testing tables or expected test answers.
+
+## v0.5 group measures and example-driven row learning
+
+The v2 pipeline adds a group operation. Each measure has its own output name.
+
+```json
+["aggregate",["region"],[["orders","count"],["net","sum","cents"],["low","min","cents"],["high","max","cents"]]]
+```
+
+Groups follow first occurrence of the complete key tuple. An empty key list groups the entire table. On empty input an unkeyed count is `"0"` and unkeyed numeric measures yield an empty cell. With keys there are zero groups. Counts include every row. Numeric inputs accept an optional sign and ASCII decimal digits. Blanks, fractions, malformed values and Int64 overflow (including intermediate sums) produce a step error. Numeric output uses canonical decimal strings. A failing transform returns an error for the entire table.
+
+The learner uses one or more input/output pairs. At least one training pair must reduce the row count for automatic aggregation inference. Put the original key names first in the output schema, followed by up to eight measures. Distinct keys can occur anywhere in the input schema. Candidate measures must match all training pairs before the learner combines alternatives. Ambiguous combinations have a bounded search.
+
+The table workbench supports up to eight pairs and optional regex hints. The CLI accepts `learn-table --pairs batches.json --out report.json`. The manifest is an array such as `[{"data":"a.csv","target":"a-out.csv"},{"data":"b.csv","target":"b-out.csv"}]`. File paths are relative to the manifest. Both the single-pair and multiple-pair forms support `--patterns` and `--separators` JSON files. `--depth` sets the structural search depth.
+
+Row learning can emit a whole-cell capture replacement with reordered or repeated groups. Learned templates require at least two nonconstant capture references. Unmatched whole-cell substitutions preserve the input. A full-match predicate can explicitly check a format before selecting a branch. Predicates and replacements continue to use the MoonBit core regex dialect.
