@@ -10,7 +10,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
   await page.goto(base+'/');
   await page.locator('details').evaluate(e=>{e.open=true;});
-  for(const name of ['conditional','regex','rewrite']){
+  for(const name of ['conditional','regex','rewrite','initials']){
     const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
     await page.locator(`[data-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-choose="0"]').waitFor();

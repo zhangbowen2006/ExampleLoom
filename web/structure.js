@@ -4,9 +4,29 @@ let worker, serial=0, pending=new Map(), busy=false, chosen=false, output=null, 
 const notice = (message,bad=false) => {$('notice').textContent=message;$('notice').classList.toggle('error',bad);};
 const resetOutput=()=>{output=null;$('export').disabled=true;$('results').replaceChildren();$('result-stats').textContent='';};
 const controls=()=>{$('learn').disabled=busy;$('apply').disabled=busy||!chosen;$('save').disabled=busy||!chosen;$('cancel').hidden=!busy;};
-function startWorker(){worker=new Worker('worker.js',{type:'module'});worker.onmessage=({data})=>{const p=pending.get(data.id);if(!p)return;pending.delete(data.id);data.result.ok?p.resolve(data.result):p.reject(new Error(data.result.error));};worker.onerror=()=>{for(const p of pending.values())p.reject(new Error('MoonBit Worker 加载或运行失败'));pending.clear();};}
+function startWorker(){
+  const active = new Worker('worker.js',{type:'module'});
+  worker = active;
+  active.onmessage=({data})=>{
+    if(worker!==active)return;
+    const p=pending.get(data.id);if(!p)return;
+    pending.delete(data.id);
+    data.result.ok?p.resolve(data.result):p.reject(new Error(data.result.error));
+  };
+  active.onerror=event=>{
+    event.preventDefault();
+    if(worker!==active)return;
+    active.terminate();worker=null;
+    for(const p of pending.values())p.reject(new Error('MoonBit Worker 加载或运行失败，请重试。'));
+    pending.clear();
+  };
+}
 startWorker();
-const call=request=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});worker.postMessage({id,request});});
+const call=request=>new Promise((resolve,reject)=>{
+  if(!worker)startWorker();
+  const id=++serial;pending.set(id,{resolve,reject});
+  try{worker.postMessage({id,request});}catch(error){pending.delete(id);reject(error);}
+});
 async function task(action){if(busy)return;busy=true;controls();try{await action();}catch(error){resetOutput();notice(error.message,true);}finally{busy=false;controls();}}
 const invalidate=()=>{revision++;chosen=false;$('pipeline').value='';$('candidates').replaceChildren();$('stats').textContent='';resetOutput();controls();};
 for(const id of ['training','target','table-patterns'])$(id).oninput=invalidate;
@@ -35,7 +55,7 @@ function addPair(input = '', target = '') {
 $('add-pair').onclick = () => { addPair(); invalidate(); };
 $('next').oninput=()=>{revision++;resetOutput();};
 $('pipeline').oninput=()=>{revision++;chosen=Boolean($('pipeline').value.trim());resetOutput();controls();};
-$('cancel').onclick=()=>{revision++;worker.terminate();for(const p of pending.values())p.reject(new Error('操作已取消'));pending.clear();startWorker();};
+$('cancel').onclick=()=>{revision++;worker?.terminate();for(const p of pending.values())p.reject(new Error('操作已取消'));pending.clear();worker=null;};
 const parse=async text=>(await call({op:'parse',format:'csv',text})).table;
 function download(content,name,type){const link=el('a');const url=URL.createObjectURL(new Blob([content],{type}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 for(const button of document.querySelectorAll('[data-table-demo]'))button.onclick=()=>task(async()=>{
@@ -46,6 +66,7 @@ for(const button of document.querySelectorAll('[data-table-demo]'))button.onclic
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;notice(`${demo.title}：${demo.description}`);
 });
 $('learn').onclick=()=>task(async()=>{
+  invalidate();
   const generation = revision;
   const pairs = [[$('training').value, $('target').value],
     ...[...extraPairs.children].map(pair => [...pair.querySelectorAll('textarea')].map(x => x.value))];
@@ -72,7 +93,27 @@ $('apply').onclick=()=>task(async()=>{
   for(const row of result.table.rows.slice(0,200)){const tr=el('tr');for(const value of row)tr.append(el('td',value));body.append(tr);}grid.append(body);$('results').replaceChildren(grid);
   $('result-stats').textContent=`${result.table.rows.length} 行 · ${result.table.columns.length} 列；预览前 200 行，下载包含全部记录。`;$('export').disabled=false;notice('转换完成，请核对结果后下载。');
 });
-$('save').onclick=()=>task(async()=>{const r=await call({op:'validate_pipeline',pipeline:JSON.parse($('pipeline').value)});download(JSON.stringify(r.pipeline,null,2),'exampleloom.pipeline.json','application/json');});
+$('save').onclick=()=>task(async()=>{
+  const generation=revision;
+  const r=await call({op:'validate_pipeline',pipeline:JSON.parse($('pipeline').value)});
+  if(revision!==generation){notice('数据或管道已修改，请重新选用后保存。');return;}
+  download(JSON.stringify(r.pipeline,null,2),'exampleloom.pipeline.json','application/json');
+});
 $('export').onclick=()=>output&&download(output.csv,'exampleloom.structure.csv','text/csv;charset=utf-8');
-$('load').onchange=e=>task(async()=>{const file=e.target.files[0];if(!file)return;if(file.size>262144)throw new Error('管道文件过大');const r=await call({op:'validate_pipeline',pipeline:JSON.parse(await file.text())});invalidate();$('pipeline').value=JSON.stringify(r.pipeline,null,2);chosen=true;e.target.value='';notice('已载入管道，请在下一批数据上预览。');});
-$('next-file').onchange=e=>task(async()=>{const file=e.target.files[0];if(!file)return;if(file.size>4000000)throw new Error('CSV 文件过大');revision++;resetOutput();$('next').value=await file.text();e.target.value='';});
+$('load').onchange=e=>task(async()=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  if(file.size>262144)throw new Error('管道文件过大');
+  const generation=revision;
+  const r=await call({op:'validate_pipeline',pipeline:JSON.parse(await file.text())});
+  if(revision!==generation){notice('数据或管道已修改，请重新载入。');return;}
+  invalidate();$('pipeline').value=JSON.stringify(r.pipeline,null,2);chosen=true;
+  notice('已载入管道，请在下一批数据上预览。');
+});
+$('next-file').onchange=e=>task(async()=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  if(file.size>4000000)throw new Error('CSV 文件过大');
+  revision++;resetOutput();const generation=revision;
+  const text=await file.text();
+  if(revision!==generation){notice('数据已修改，请重新打开 CSV。');return;}
+  $('next').value=text;
+});

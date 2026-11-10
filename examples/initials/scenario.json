@@ -1,0 +1,10 @@
+{
+  "title":"参会名单缩写",
+  "description":"名单负责人示范姓和名的首字母，学习按空格分隔后取首字的规则。后两行为新输入。",
+  "file":"input.csv",
+  "fields":[{
+    "name":"initials",
+    "labels":[{"row":0,"output":"M.W."},{"row":1,"output":"C.W."},{"row":2,"output":"L.H."}],
+    "expected":["M.W.","C.W.","L.H.","A.S.","N.M."]
+  }]
+}

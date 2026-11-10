@@ -62,6 +62,7 @@ jobs:
           curl --retry 20 --retry-connrefused --retry-delay 1 --max-time 30 http://127.0.0.1:4173/ > /dev/null
           node scripts/browser-test.mjs
           node scripts/advanced-browser-test.mjs
+          node scripts/browser-recovery-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

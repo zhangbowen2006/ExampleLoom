@@ -6,7 +6,7 @@ const run=r=>{const out=JSON.parse(handle(JSON.stringify(r)));assert.equal(out.o
 const parse=text=>run({op:'parse',format:'csv',text}).table;
 const evidence={date:new Date().toISOString(),scenarios:[],checks:[]};
 await mkdir('artifacts/advanced',{recursive:true});
-for(const name of ['conditional','regex','rewrite']){
+for(const name of ['conditional','regex','rewrite','initials']){
   const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
   const table=parse(await readFile(`examples/${name}/input.csv`,'utf8'));
   const field=scenario.fields[0];
