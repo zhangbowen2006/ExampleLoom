@@ -9,7 +9,30 @@ startWorker();
 const call=request=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});worker.postMessage({id,request});});
 async function task(action){if(busy)return;busy=true;controls();try{await action();}catch(error){resetOutput();notice(error.message,true);}finally{busy=false;controls();}}
 const invalidate=()=>{revision++;chosen=false;$('pipeline').value='';$('candidates').replaceChildren();$('stats').textContent='';resetOutput();controls();};
-for(const id of ['training','target'])$(id).oninput=invalidate;
+for(const id of ['training','target','table-patterns'])$(id).oninput=invalidate;
+const extraPairs = $('extra-pairs');
+function addPair(input = '', target = '') {
+  if (extraPairs.children.length >= 7) return;
+  const pair = el('fieldset');
+  pair.append(el('legend', '补充训练表对'));
+  for (const [title, value] of [['输入 CSV', input], ['期望输出 CSV', target]]) {
+    const label = el('label', title);
+    const area = el('textarea');
+    area.rows = 3;
+    area.spellcheck = false;
+    area.value = value;
+    area.oninput = invalidate;
+    label.append(area);
+    pair.append(label);
+  }
+  const remove = el('button', '移除此对');
+  remove.className = 'secondary';
+  remove.onclick = () => { pair.remove(); $('add-pair').disabled = false; invalidate(); };
+  pair.append(remove);
+  extraPairs.append(pair);
+  $('add-pair').disabled = extraPairs.children.length === 7;
+}
+$('add-pair').onclick = () => { addPair(); invalidate(); };
 $('next').oninput=()=>{revision++;resetOutput();};
 $('pipeline').oninput=()=>{revision++;chosen=Boolean($('pipeline').value.trim());resetOutput();controls();};
 $('cancel').onclick=()=>{revision++;worker.terminate();for(const p of pending.values())p.reject(new Error('操作已取消'));pending.clear();startWorker();};
@@ -17,11 +40,22 @@ const parse=async text=>(await call({op:'parse',format:'csv',text})).table;
 function download(content,name,type){const link=el('a');const url=URL.createObjectURL(new Blob([content],{type}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 for(const button of document.querySelectorAll('[data-table-demo]'))button.onclick=()=>task(async()=>{
   const response=await fetch(`examples/structures/${button.dataset.tableDemo}.json`);if(!response.ok)throw new Error('示例加载失败');const demo=await response.json();
+  extraPairs.replaceChildren();$('add-pair').disabled=false;
+  for (const pair of demo.additional ?? []) addPair(pair.input, pair.target);
+  $('table-patterns').value=(demo.patterns ?? []).join('\n');
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;notice(`${demo.title}：${demo.description}`);
 });
 $('learn').onclick=()=>task(async()=>{
-  const generation=revision;const input=await parse($('training').value), target=await parse($('target').value);
-  const start=performance.now();const report=await call({op:'synthesize_table',examples:[{input,output:target}]});
+  const generation = revision;
+  const pairs = [[$('training').value, $('target').value],
+    ...[...extraPairs.children].map(pair => [...pair.querySelectorAll('textarea')].map(x => x.value))];
+  const patterns = $('table-patterns').value.split(/\r?\n/).filter(Boolean);
+  const examples = [];
+  for (const [input, target] of pairs) {
+    if (!input.trim() || !target.trim()) throw new Error('请为每对训练表填写输入和期望输出。');
+    examples.push({input: await parse(input), output: await parse(target)});
+  }
+  const start=performance.now();const report=await call({op:'synthesize_table',examples,patterns});
   if(revision!==generation){notice('数据已修改，请重新搜索。');return;}
   chosen=false;$('pipeline').value='';resetOutput();$('candidates').replaceChildren();
   $('stats').textContent=`${Math.round(performance.now()-start)} ms · ${report.stats.states} 状态 · ${report.stats.evaluations} 次结构尝试 · ${report.stats.row_searches} 次行学习 · ${report.status}`;

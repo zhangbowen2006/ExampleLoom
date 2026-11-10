@@ -1,0 +1,10 @@
+{
+  "title": "重排批次编号",
+  "description": "将批次编号的地区、流水号与系列重新排序，保留流水号前导零与字面美元符号。",
+  "file": "input.csv",
+  "fields": [{
+    "name": "external_id",
+    "labels": [{"row":0,"output":"XY:$001/AB"},{"row":1,"output":"KLM:$82/L"},{"row":2,"output":"QR:$7/XYZ"}],
+    "expected": ["XY:$001/AB","KLM:$82/L","QR:$7/XYZ","Q:$00097/PQR","END:$42/S"]
+  }]
+}

@@ -1,0 +1,9 @@
+{
+  "title": "按地区汇总订单",
+  "description": "运营人员从两个批次示范每个地区的订单数和净额，在新批次核对退款和跨行累计。",
+  "input": "amount,region\n12,N\n3,S\n-4,N\n",
+  "target": "region,orders,net\nN,2,8\nS,1,3\n",
+  "additional": [{"input":"amount,region\n8,E\n9,E\n","target":"region,orders,net\nE,2,17\n"}],
+  "next": "region,amount\nX,9\nY,8\nY,-3\nX,2\n",
+  "expected": {"columns":["region","orders","net"],"rows":[["X","2","11"],["Y","2","5"]]}
+}

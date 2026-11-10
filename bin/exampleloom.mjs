@@ -4,13 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const help = `ExampleLoom 0.4.0 — examples to portable string and table programs
+const help = `ExampleLoom — examples to portable string and table programs
 
 Build once: node scripts/build.mjs
 node bin/exampleloom.mjs learn --data input.csv --examples examples.json --out candidates.json
 node bin/exampleloom.mjs recipe --report candidates.json --choose 0 --name normalized --out recipe.json
 node bin/exampleloom.mjs apply --data next.csv --recipe recipe.json --out result.csv
 node bin/exampleloom.mjs learn-table --data input.csv --target target.csv --out candidates.json
+node bin/exampleloom.mjs learn-table --pairs batches.json --out candidates.json
 node bin/exampleloom.mjs pipeline --report candidates.json --choose 0 --out pipeline.json
 node bin/exampleloom.mjs transform --data next.csv --pipeline pipeline.json --out result.csv
 node bin/exampleloom.mjs run request.json
@@ -35,13 +36,14 @@ try {
       if (!/^--[a-z]+$/.test(args[i]) || args[i + 1] == null || args[i + 1].startsWith('--')) throw new Error('Expected --flag value pairs');
       const key = args[i].slice(2);
       if (Object.hasOwn(flags, key)) throw new Error(`Duplicate flag: ${key}`);
-      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline'].includes(key)) throw new Error(`Unknown flag: ${key}`);
+      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs'].includes(key)) throw new Error(`Unknown flag: ${key}`);
       flags[key] = args[i + 1];
     }
   }
   const requireFlag = key => { if (!flags[key]) throw new Error(`Missing --${key}`); return flags[key]; };
   const readJson = async path => JSON.parse(await readFile(path, 'utf8'));
-  const readTable = async (key='data') => request({ op: 'parse', format: flags.format || (requireFlag(key).endsWith('.jsonl') ? 'jsonl' : 'csv'), text: await readFile(flags[key], 'utf8') }).table;
+  const readTableFile = async path => request({op:'parse', format:flags.format || (path.endsWith('.jsonl')?'jsonl':'csv'), text:await readFile(path,'utf8')}).table;
+  const readTable = (key='data') => readTableFile(requireFlag(key));
   const emit = async value => {
     const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2) + '\n';
     if (flags.out) { await writeFile(flags.out, text, 'utf8'); console.error(`Wrote ${resolve(flags.out)}`); }
@@ -69,8 +71,24 @@ try {
     const recipe = { version: 1, columns: report.columns, outputs: [{ name: requireFlag('name'), expression: report.candidates[choice].expression }] };
     await emit(request({ op: 'validate_recipe', recipe }).recipe);
   } else if(command==='learn-table') {
-    const input=await readTable(), output=await readTable('target');
-    await emit(request({op:'synthesize_table',examples:[{input,output}]}));
+    const examples = [];
+    if (flags.pairs) {
+      if (flags.data || flags.target) throw new Error('Choose --pairs or the --data/--target pair');
+      const pairs = await readJson(flags.pairs);
+      if (!Array.isArray(pairs) || pairs.length < 1 || pairs.length > 8) throw new Error('--pairs requires 1..8 pairs');
+      const directory = dirname(resolve(flags.pairs));
+      for (const pair of pairs) {
+        if (typeof pair?.data !== 'string' || !pair.data || typeof pair.target !== 'string' || !pair.target) throw new Error('Each pair requires data and target file paths');
+        examples.push({input:await readTableFile(resolve(directory,pair.data)),output:await readTableFile(resolve(directory,pair.target))});
+      }
+    } else {
+      examples.push({input:await readTable(),output:await readTable('target')});
+    }
+    const query = {op:'synthesize_table',examples};
+    if (flags.separators) query.separators = await readJson(flags.separators);
+    if (flags.patterns) query.patterns = await readJson(flags.patterns);
+    if (flags.depth) query.options = {max_depth:Number(flags.depth)};
+    await emit(request(query));
   } else if(command==='pipeline') {
     const report=await readJson(requireFlag('report')), choice=Number(requireFlag('choose'));
     if(!Number.isInteger(choice)||choice<0||!report.candidates?.[choice]?.pipeline)throw new Error('Invalid table candidate index');

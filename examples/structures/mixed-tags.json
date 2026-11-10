@@ -1,0 +1,8 @@
+{
+  "title": "两种设备编号与多值标签",
+  "description": "运维人员把批量上报的标签拆为独立记录，并按编号的字母和数字结构派生设备类别。",
+  "input": "raw,tag\nA17,red;cyan\nB839,teal\n405-xy,olive\n71-z,blue;gold\n",
+  "target": "kind,tag\nIN/17,red\nIN/17,cyan\nIN/839,teal\nOUT/405,olive\nOUT/71,blue\nOUT/71,gold\n",
+  "next": "tag,raw\nalpha;beta,ZZ9530\nk,8042-NEW\n",
+  "expected": {"columns":["kind","tag"],"rows":[["IN/9530","alpha"],["IN/9530","beta"],["OUT/8042","k"]]}
+}

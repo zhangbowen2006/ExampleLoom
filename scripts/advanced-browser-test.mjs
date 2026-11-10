@@ -10,10 +10,11 @@ try{
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
   await page.goto(base+'/');
   await page.locator('details').evaluate(e=>{e.open=true;});
-  for(const name of ['conditional','regex']){
+  for(const name of ['conditional','regex','rewrite']){
     const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
     await page.locator(`[data-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-choose="0"]').waitFor();
+    if(name==='rewrite')assert.match(await page.locator('.candidate').first().innerText(),/replace/);
     if(name==='regex')assert.match(await page.locator('.candidate').first().innerText(),/capture/);
     if(name==='conditional')assert.match(await page.locator('.candidate').first().innerText(),/if\(/);
     await page.locator('[data-choose="0"]').click();await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#download-csv').disabled);
@@ -25,7 +26,7 @@ try{
     checks.push(`${name}: real Worker learning, top1 program, all held-out rows and stale-hint invalidation`);
   }
   await page.goto(base+'/structure.html');
-  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid']){
+  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals']){
     const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
     await page.locator(`[data-table-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-table-choose="0"]').waitFor();await page.locator('[data-table-choose="0"]').click();
@@ -41,6 +42,19 @@ try{
     if(name==='melt'){
       await page.screenshot({path:'artifacts/advanced/table-workbench.png',fullPage:true});
       await page.locator('#target').fill(demo.target+'X,Qual 1,9\n');assert.equal(await page.locator('#apply').isDisabled(),true);assert.equal(await page.locator('#save').isDisabled(),true);assert.equal(await page.locator('#export').isDisabled(),true);
+    }
+    if(name==='regional-totals'){
+      assert.equal(await page.locator('#extra-pairs fieldset').count(),1);
+      await page.locator('#extra-pairs textarea').last().fill(demo.additional[0].target+'X,1,1\n');
+      assert.equal(await page.locator('#export').isDisabled(),true);
+      assert.equal(await page.locator('#apply').isDisabled(),true);
+      await page.locator('#extra-pairs button').click();
+      for(let i=0;i<7;i++)await page.locator('#add-pair').click();
+      assert.equal(await page.locator('#add-pair').isDisabled(),true);
+      await page.locator('#learn').click();
+      await page.waitForFunction(()=>document.querySelector('#notice').textContent.includes('每对训练表'));
+      await page.locator('#extra-pairs button').last().click();
+      assert.equal(await page.locator('#add-pair').isEnabled(),true);
     }
     checks.push(`${name}: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export`);
   }

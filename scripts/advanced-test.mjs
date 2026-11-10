@@ -6,12 +6,13 @@ const run=r=>{const out=JSON.parse(handle(JSON.stringify(r)));assert.equal(out.o
 const parse=text=>run({op:'parse',format:'csv',text}).table;
 const evidence={date:new Date().toISOString(),scenarios:[],checks:[]};
 await mkdir('artifacts/advanced',{recursive:true});
-for(const name of ['conditional','regex']){
+for(const name of ['conditional','regex','rewrite']){
   const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
   const table=parse(await readFile(`examples/${name}/input.csv`,'utf8'));
   const field=scenario.fields[0];
   const report=run({op:'synthesize',patterns:scenario.patterns??[],examples:field.labels.map(e=>({input:table.rows[e.row],output:e.output})),rows:table.rows});
   assert.ok(report.candidates.length>0,name);
+  if(name==='rewrite')assert.equal(report.candidates[0].expression[0],'replace');
   if(name==='regex')assert.equal(report.candidates[0].expression[0],'capture','Regex scenario must actually learn regex semantics');
   const recipe={version:1,columns:table.columns,outputs:[{name:field.name,expression:report.candidates[0].expression}]};
   const applied=run({op:'apply',table,recipe});
@@ -19,13 +20,15 @@ for(const name of ['conditional','regex']){
   assert.deepEqual(applied.rows.map(r=>r.values[0]),field.expected,name);
   evidence.scenarios.push({name,selected:report.candidates[0].description,training:field.labels.length,heldout:table.rows.length-field.labels.length,all_values_match:true});
 }
-for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid']){
+for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals']){
   const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
   const input=parse(demo.input), output=parse(demo.target);
-  const report=run({op:'synthesize_table',examples:[{input,output}]});
+  const extra=(demo.additional??[]).map(pair=>({input:parse(pair.input),output:parse(pair.target)}));
+  const report=run({op:'synthesize_table',examples:[{input,output},...extra]});
   assert.ok(report.candidates.length>0,name);
   const pipeline=report.candidates[0].pipeline;
   assert.deepEqual(run({op:'transform',pipeline,table:input}).table,output,`${name} training`);
+  for (const pair of extra) assert.deepEqual(run({op:'transform',pipeline,table:pair.input}).table,pair.output);
   const actual=run({op:'transform',pipeline,table:parse(demo.next)});
   assert.deepEqual(actual.table,demo.expected,`${name} unseen table`);
   await writeFile(`artifacts/advanced/${name}.pipeline.json`,JSON.stringify(pipeline,null,2));
@@ -55,5 +58,27 @@ for(const [moon,js]of cases)for(const text of texts)for(const occurrence of [0,-
   comparisons++;
 }
 evidence.checks.push(`${comparisons} regex captures checked against JavaScript shared-syntax oracle, including Unicode/empty matches and no-match failures`);
+let predicatesAndRewrites = 0;
+for (const [moon, js] of cases) {
+  for (const text of [...texts, 'a\n']) {
+    const yes = ['literal','yes'], no = ['literal','no'], field = ['field',0];
+    const recipe = {version:1,columns:['x'],outputs:[
+      {name:'full',expression:['if',['matches',field,moon,true],yes,no]},
+      {name:'search',expression:['if',['matches',field,moon,false],yes,no]},
+      {name:'rewrite',expression:['replace',field,moon,'<$0>|$1|$$']},
+    ]};
+    // The final negative assertion forces the actual end including a trailing newline.
+    const full = new RegExp('^(?:'+js+')(?![\\s\\S])','su').test(text);
+    const search = new RegExp(js,'su').test(text);
+    const replacement = text.replace(new RegExp(js,'gsu'),(...args) =>
+      '<'+args[0]+'>|'+(args.length>3 ? args[1]??'' : '')+'|$');
+    const actual = run({op:'apply',recipe,table:{columns:['x'],rows:[[text]]}});
+    assert.equal(actual.failures,0);
+    assert.deepEqual(actual.rows[0].values,[full?'yes':'no',search?'yes':'no',replacement],
+      'Shared regex semantics: '+moon+' / '+JSON.stringify(text));
+    predicatesAndRewrites += 3;
+  }
+}
+evidence.checks.push(`${predicatesAndRewrites} full-match, substring-match and global group replacement results checked against JavaScript on the common dialect`);
 await writeFile('artifacts/advanced-results.json',JSON.stringify(evidence,null,2)+'\n');
 console.log(JSON.stringify(evidence,null,2));
