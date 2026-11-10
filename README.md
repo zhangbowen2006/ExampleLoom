@@ -34,6 +34,25 @@ node scripts/serve.mjs
 - 独立中文工作台：文件导入、样例编辑、多字段配方、预览、下载、Worker 取消、手机布局。运行期间无外部数据请求。
 - CLI 和公开 Mooncakes 库接口。实际验证与限制见 [VALIDATION.md](docs/VALIDATION.md)。
 - v0.2：样例排序/去重，标点分隔符推断及可配置文字分隔符；Token 后截取、组合 trim/case；共享输出位置的搜索转移缓存。编辑样例会使旧规则失效并阻止旧结果导出。
+- v0.3：条件分支学习、MoonBit 正则捕获/替换与布尔谓词；17 类表格操作及结构程序搜索；新增[表格结构工作台](https://zhangbowen2006.github.io/ExampleLoom/structure.html)、CLI 管道和完整 Foofah 外部任务评估。支持范围与成熟系统差距见 [功能对比](docs/CAPABILITIES.md)。
+
+## 条件、正则与表格结构（v0.3）
+
+逐行工作台展开“条件与正则搜索”，可运行条件供应商编码、带上下文的 ref 捕获示例。条件学习至少需要分支两侧各两个样例；正则提示采用 MoonBit core 的 lexmatch 语法，如 `ref=([[:digit:]]+)`。不是自动发明任意正则表达式。
+
+结构工作台输入训练表和期望输出表，搜索后明确选择一条管道，再对下一批表预览、下载。它真实改变表的行列结构，支持宽长表、连续行打包、分组、重排、拆列、展开、筛选等。重复透视单元格、不完整打包和不规则拆列报错，不静默丢弃记录。
+
+```sh
+node scripts/build.mjs
+node scripts/advanced-test.mjs
+python scripts/import-foofah.py
+node scripts/benchmark.mjs
+node scripts/serve.mjs
+```
+
+本地打开 <http://127.0.0.1:4173/structure.html>。三个完整结构场景的数据、下一批输入与预期输出位于 `examples/structures/`。条件与正则场景分别在 `examples/conditional/`、`examples/regex/`。以上演示是构造数据；外部评估使用上游原有任务，完整成功、失败和限额记录见 [BENCHMARKS.md](docs/BENCHMARKS.md)。
+
+结构 CLI 在 `learn-table --data input.csv --target target.csv --out report.json` 后，使用 `pipeline --report report.json --choose 0 --out pipeline.json` 明确选择，再执行 `transform --data next.csv --pipeline pipeline.json --out result.csv`；命令均以 `node bin/exampleloom.mjs` 开头。逐行 `learn` 可选 `--patterns patterns.json` 和 `--depth 0..3`。
 
 ## 三个完整使用场景
 
@@ -100,9 +119,11 @@ API 通过 `LoomError` 报告普通输入错误；调用者需要处理异常和
 
 ## 边界与可靠性
 
-**这是有界的字符串程序合成器。**不支持任意自然语言任务、表格连接/重排、条件分支、循环、完整正则上下文或所有 Unicode 大小写规则。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。搜索语法来自全部样例且经过确定性排序，但仍只覆盖有限表达式组合。
+**这是有界的字符串与表格程序合成器。**不支持任意自然语言任务、多表连接、数值聚合、循环或所有 Unicode 大小写规则。正则遵循 MoonBit 方言，不支持 PCRE 反向引用、前后查找或 `\d` 等简写；使用 POSIX 词类。捕获学习需要模式提示，替换和复合布尔条件可显式编写，尚不自动学习。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。解释器可执行的程序范围大于当前学习器可搜索的范围。
 
 默认最多 32 个样例、16 输入列、每个样例字段 128 字符、64 候选、6 个拼接片段。整表最多 20000 行、64 列；歧义检查最多前 5000 行。ASCII 词类与大小写有明确限制；日期必须指定格式，不能猜月日。全部预算、状态含义及算法见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+
+结构学习默认最多 4 步、128 状态、2000 次结构尝试；训练最多 8 对表、每对 128 输入行/512 输出行、16 输入列/32 输出列。执行管道最多 16 步、20 万单元格；未声明的透视类别会报错。更复杂表格仍可能超出语法、搜索或部署边界，不能把“通用数据转换引擎”理解为全面覆盖 PROSE/Foofah。
 
 ## 工程验证
 
@@ -115,11 +136,13 @@ moon test --deny-warn --target wasm
 moon info
 ```
 
-原生后端另需 C 编译器；Windows 需要 MSVC C++ 工具与 SDK。CI 在 Linux 同时测试 native。可选浏览器回归：安装 Playwright 1.62.1 和 Chromium，启动本地服务后运行 `node scripts/browser-test.mjs`；它生成桌面/手机截图和 JSON 证据。也支持通过 `PLAYWRIGHT_MODULE` / `BROWSER_EXECUTABLE` 指定已安装环境。
+原生后端另需 C 编译器；Windows 需要 MSVC C++ 工具与 SDK。CI 在 Linux 同时测试 native。可选浏览器回归：安装 Playwright 1.62.1 和 Chromium，启动本地服务后运行 `node scripts/browser-test.mjs`、`node scripts/advanced-browser-test.mjs`；它们生成桌面/手机截图和 JSON 证据。也支持通过 `PLAYWRIGHT_MODULE` / `BROWSER_EXECUTABLE` 指定已安装环境。
 
 ## 来源与维护
 
 MIT 开源。仅依赖工具链 `moonbitlang/core`（Apache-2.0）；浏览器回归使用 Playwright（Apache-2.0，开发期依赖）。交付的静态 JS 包含编译的 core 代码，分发其许可证与版权声明。
+
+v0.3 另外再分发 Foofah 主仓库 MIT 许可下的全部 250 个 `tests/data/exp0_*.txt` 任务，仅作离线基准，不进入浏览器运行包；固定提交、文件哈希和完整许可见 [fixtures/foofah](fixtures/foofah/README.md)。这不是 Foofah 源码移植，不继承其功能覆盖或性能结论。
 
 该项目由维护者在 AI 辅助下从新目录实现，没有复制旧项目业务代码。算法思想参考既有 PBE 研究；明确对比 Flash Fill、PROSE、Foofah、MoonFrame 和 moon-databridge，见 [调研与来源](docs/RESEARCH.md)。不声称全球唯一，也不保证通过竞赛审核或获奖。
 

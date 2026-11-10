@@ -1,0 +1,5 @@
+record
+ref=009;note=77
+noise 12 ref=4812;note=5 extra=6
+noise 89 ref=70004;note=5 extra=6 more=7
+ref=001234;note=8 extra=9

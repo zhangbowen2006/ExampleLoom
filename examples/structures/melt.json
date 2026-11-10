@@ -1,0 +1,1 @@
+{"title":"含空表头的宽表","description":"数据整理人员处理原始网格，第一条记录是含空单元格的标签行；示范忽略空值，但保留数值零。","input":"c0,c1,c2\n,Qual 1,Qual 2\nA,1,\nB,,0\n","target":"c0,qualification,value\nA,Qual 1,1\nB,Qual 2,0\n","next":"c0,c1,c2\n,Qual 1,Qual 2\nC,9,0\nD,,4\n","expected":{"columns":["c0","qualification","value"],"rows":[["C","Qual 1","9"],["C","Qual 2","0"],["D","Qual 2","4"]]}}

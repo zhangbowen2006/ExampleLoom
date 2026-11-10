@@ -13,7 +13,18 @@ pub(all) enum RunKind {
 } derive(Eq, Debug)
 
 ///|
-/// Pure, finite-data expressions. No eval, I/O, regex execution or host calls.
+/// Predicates are pure and short circuit; only the selected branch is evaluated.
+pub(all) enum Condition {
+  Equals(Expr, Expr)
+  Matches(Expr, String, Bool)
+  Empty(Expr)
+  Not(Condition)
+  All(Array[Condition])
+  Any(Array[Condition])
+} derive(Eq, Debug)
+
+///|
+/// Pure, finite-data expressions. No host eval, I/O or executable recipe code.
 pub(all) enum Expr {
   Field(Int32)
   Literal(String)
@@ -25,6 +36,9 @@ pub(all) enum Expr {
   Upper(Expr)
   Concat(Array[Expr])
   DateText(Expr, String, String)
+  If(Condition, Expr, Expr)
+  RegexCapture(Expr, String, Int32, Int32)
+  RegexReplace(Expr, String, String)
 } derive(Eq, Debug)
 
 ///|
@@ -120,6 +134,16 @@ fn eval_at(
     Literal(s) => s
     DateText(e, source, target) =>
       convert_date(eval_at(e, row, depth + 1), source, target)
+    If(condition, yes, no) =>
+      if condition_at(condition, row, depth + 1) {
+        eval_at(yes, row, depth + 1)
+      } else {
+        eval_at(no, row, depth + 1)
+      }
+    RegexCapture(e, pattern, group, occurrence) =>
+      regex_capture(eval_at(e, row, depth + 1), pattern, group, occurrence)
+    RegexReplace(e, pattern, replacement) =>
+      regex_replace(eval_at(e, row, depth + 1), pattern, replacement)
     Slice(e, from, to) => {
       let chars = eval_at(e, row, depth + 1).to_array()
       let start = resolve(from, chars.length())
@@ -179,6 +203,12 @@ pub fn explain(expr : Expr) -> String {
     Field(i) => "column[\{i}]"
     Literal(s) => Json(s).stringify()
     DateText(e, source, target) => "date(\{explain(e)}, \{source}, \{target})"
+    If(c, yes, no) =>
+      "if(\{explain_condition(c)}, \{explain(yes)}, \{explain(no)})"
+    RegexCapture(e, pattern, group, occurrence) =>
+      "capture(\{explain(e)}, \{Json(pattern).stringify()}, \{group}, \{occurrence})"
+    RegexReplace(e, pattern, replacement) =>
+      "replace(\{explain(e)}, \{Json(pattern).stringify()}, \{Json(replacement).stringify()})"
     Slice(e, a, b) =>
       "slice(\{explain(e)}, \{position_text(a)}, \{position_text(b)})"
     Token(e, s, i) => "token(\{explain(e)}, \{Json(s).stringify()}, \{i})"
@@ -198,6 +228,12 @@ pub extend RunKind with Eq::{equal, not_equal}
 
 ///|
 pub extend Expr with Eq::{equal, not_equal}
+
+///|
+pub extend Condition with Eq::{equal, not_equal}
+
+///|
+pub extend Condition with @debug.Debug::{to_repr}
 
 ///|
 pub extend LoomError with Eq::{equal, not_equal}

@@ -1,4 +1,4 @@
-# 选题与来源核对（2026-11-02）
+# 选题与来源核对（2026-11-10 更新）
 
 这是技术调研记录，不是参赛申报书。实现代码由 AI 辅助编写，维护者需理解、验证并负责。
 
@@ -6,7 +6,7 @@
 
 目标使用者是需要重复整理产品编号、活动名单和素材目录，但不想逐行处理或手写表达式的人。应用独立提供数据导入、样例编辑、程序搜索、分歧预览、配方保存和批量导出；不依赖旧项目、Excel、PROSE、云模型或专用服务端。可复用 MoonBit 库是同一核心的另一使用方式。
 
-第一版聚焦逐行字符串转换，不承诺关系连接、任意表格重排或自然语言编程。竞争优势需要以运行效果和后续真实用户验证建立，不能由“MoonBit 重写”或不同名字推断。
+第一版聚焦逐行字符串转换。v0.3 在同一仓库补充条件、正则和有界表格结构合成，具体执行/学习范围与成熟系统差距见 [CAPABILITIES.md](CAPABILITIES.md)。不承诺任意转换或自然语言编程。竞争优势需要以运行效果和后续真实用户验证建立，不能由“MoonBit 重写”或不同名字推断。
 
 ## 已查证的最接近项目
 
@@ -16,7 +16,7 @@
 | [moon-databridge](https://github.com/btlqql/moon-databridge) | 显式配置的导入、校验、转换、聚合 | 我们从样例推导候选，展示分歧，不以 CSV 清洗本身作为创新 |
 | [Excel Flash Fill](https://support.microsoft.com/en-gb/excel/using-flash-fill-in-excel) | 从样例推断字符串分离、组合等 | 已有成熟同类需求解决方案；我们的贡献在开放可嵌入实现、显式候选和可移植程序，不是发明自动填充 |
 | [PROSE](https://github.com/microsoft/prose) / [官方用法](https://www.microsoft.com/en-us/research/project/prose-framework/usage/) | DSL、程序集搜索、排名；Flash Fill 系列技术 | 概念参考，不调用 SDK、不复制实现，不声称程序合成或交互消歧首创 |
-| [Foofah](https://github.com/umich-dbgroup/foofah)（MIT） | 从样例合成表格转换程序，包含表格结构变换 | 已有成熟研究原型；本项目是较窄的逐行字符串 DSL、独立实现和浏览器/CLI 交付，不声称功能更全面 |
+| [Foofah](https://github.com/umich-dbgroup/foofah)（MIT） | 从样例合成表格转换程序，包含表格结构变换 | v0.3 新增独立 MoonBit 表格算子和搜索，复用其许可内的全部 250 个任务做评估；仍未覆盖其完整操作与搜索空间，不声称功能或性能更全面 |
 
 2026-11-02 查询 Mooncakes `/api/v0/modules` 返回 3533 条模块记录；在名称、描述与关键词搜索 flashfill、program synthesis、programming by example、示例驱动、程序合成、exampleloom 未发现直接同类条目。该结果仅为元数据检索，不证明不存在竞品。前次 GitHub / MoonBit 社区检索亦未找到已验证的直接同类，后续仍需跟踪。
 
@@ -26,7 +26,7 @@
 
 ## 许可证与实现来源
 
-ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工具链附带许可证为准）。上述项目仅调研，不复制代码、测试数据、图像或品牌。合成及歧义选择采用已有领域思想，由本项目独立编写有限 DSL、搜索、解释器和工程接口。v0.1 测试数据为构造数据；v0.2 增加 IANA、Unicode CLDR、github/gitignore 公开记录，分别为公共领域、Unicode-3.0、CC0-1.0，详见 fixtures/public/README.md。它们不是客户采用证据。
+ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工具链附带许可证为准），v0.3 正则调用官方 core/string 引擎。合成及歧义选择采用已有领域思想，由本项目独立编写有限 DSL、搜索、解释器和工程接口；未移植 PROSE/Foofah 源码。v0.1 测试数据为构造数据；v0.2 增加 IANA、Unicode CLDR、github/gitignore 公开记录，分别为公共领域、Unicode-3.0、CC0-1.0，详见 fixtures/public/README.md。v0.3 新增 Foofah 主仓库 MIT 许可范围内的 250 个上游原始任务，详见 fixtures/foofah/README.md 与文件哈希清单。均不是客户采用证据。
 
 ## 赛事口径
 

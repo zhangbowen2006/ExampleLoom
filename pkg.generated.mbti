@@ -6,9 +6,15 @@ import {
 }
 
 // Values
+pub fn apply_pipeline(Pipeline, Table) -> Table raise LoomError
+
 pub fn apply_recipe(Recipe, Table) -> BatchResult raise LoomError
 
 pub fn attempt(Expr, Array[String]) -> Result[String, String]
+
+pub fn condition_from_json(Json) -> Condition raise LoomError
+
+pub fn condition_to_json(Condition) -> Json raise LoomError
 
 pub fn convert_date(String, String, String) -> String raise LoomError
 
@@ -16,11 +22,15 @@ pub fn date_formats() -> Array[String]
 
 pub fn default_options() -> SearchOptions
 
+pub fn default_table_options() -> TableSearchOptions
+
 pub fn disagreements(Array[Candidate], Array[Array[String]], limit? : Int32) -> Array[Disagreement] raise LoomError
 
 pub fn evaluate(Expr, Array[String]) -> String raise LoomError
 
 pub fn explain(Expr) -> String
+
+pub fn explain_condition(Condition) -> String
 
 pub fn expression_from_json(Json) -> Expr raise LoomError
 
@@ -32,13 +42,27 @@ pub fn parse_csv(String) -> Table raise LoomError
 
 pub fn parse_jsonl(String) -> Table raise LoomError
 
+pub fn pipeline_from_json(Json) -> Pipeline raise LoomError
+
+pub fn pipeline_to_json(Pipeline) -> Json raise LoomError
+
 pub fn recipe_from_json(Json) -> Recipe raise LoomError
 
 pub fn recipe_to_json(Recipe) -> Json raise LoomError
 
 pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
 
-pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String]) -> SearchReport raise LoomError
+pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String], patterns? : Array[String], branch_depth? : Int32) -> SearchReport raise LoomError
+
+pub fn synthesize_table(Array[TableExample], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String]) -> TableSearchReport raise LoomError
+
+pub fn table_step_from_json(Json) -> TableStep raise LoomError
+
+pub fn table_step_to_json(TableStep) -> Json raise LoomError
+
+pub fn test_condition(Condition, Array[String]) -> Bool raise LoomError
+
+pub fn transform_table(Table, Array[TableStep]) -> Table raise LoomError
 
 pub fn validate_table(Table) -> Unit raise LoomError
 
@@ -60,6 +84,18 @@ pub(all) struct Candidate {
   expression : Expr
   cost : Int32
 }
+
+pub(all) enum Condition {
+  Equals(Expr, Expr)
+  Matches(Expr, String, Bool)
+  Empty(Expr)
+  Not(Condition)
+  All(Array[Condition])
+  Any(Array[Condition])
+} derive(Eq, @debug.Debug)
+pub fn Condition::equal(Self, Self) -> Bool
+pub fn Condition::not_equal(Self, Self) -> Bool
+pub fn Condition::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Disagreement {
   row_index : Int32
@@ -86,6 +122,9 @@ pub(all) enum Expr {
   Upper(Expr)
   Concat(Array[Expr])
   DateText(Expr, String, String)
+  If(Condition, Expr, Expr)
+  RegexCapture(Expr, String, Int32, Int32)
+  RegexReplace(Expr, String, String)
 } derive(Eq, @debug.Debug)
 pub fn Expr::equal(Self, Self) -> Bool
 pub fn Expr::not_equal(Self, Self) -> Bool
@@ -94,6 +133,11 @@ pub fn Expr::to_repr(Self) -> @debug.Repr
 pub(all) struct OutputField {
   name : String
   expression : Expr
+}
+
+pub(all) struct Pipeline {
+  columns : Array[String]
+  steps : Array[TableStep]
 }
 
 pub(all) enum Position {
@@ -148,6 +192,48 @@ pub(all) struct Table {
 pub fn Table::equal(Self, Self) -> Bool
 pub fn Table::not_equal(Self, Self) -> Bool
 pub fn Table::to_repr(Self) -> @debug.Repr
+
+pub(all) struct TableExample {
+  before : Table
+  after : Table
+}
+
+pub(all) struct TableSearchOptions {
+  max_depth : Int32
+  max_states : Int32
+  max_evaluations : Int32
+  max_candidates : Int32
+}
+
+pub(all) struct TableSearchReport {
+  candidates : Array[Pipeline]
+  truncated : Bool
+  status : String
+  states : Int32
+  evaluations : Int32
+  rejected : Int32
+  row_searches : Int32
+}
+
+pub(all) enum TableStep {
+  Select(Array[String], Array[String])
+  Filter(Condition)
+  MapRows(Recipe)
+  SplitColumn(String, String, Array[String])
+  Explode(String, String)
+  Unpivot(Array[String], Array[String], String, String)
+  Fold(Array[String], Array[String], String)
+  Melt(Array[String], Array[String], String, String, Bool)
+  PackRows(Int32, Bool)
+  GroupRows(Array[String], Array[String])
+  Pivot(Array[String], String, String, Array[String])
+  Transpose
+  PromoteHeaders
+  DemoteHeaders
+  FillDown(Array[String])
+  Deduplicate(Array[String])
+  DropRows(Int32)
+}
 
 // Type aliases
 

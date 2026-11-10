@@ -12,7 +12,7 @@
   </header>
   <main>
     <section class="intro">
-      <div><p class="eyebrow">PROGRAMMING BY EXAMPLE / 0.2</p><h1>给出样例，<br>把重复整理交给规则。</h1><p class="lede">从表格到转换程序。检查不同解释，补充关键样例，再把选定的规则用于下一批数据。</p></div>
+      <div><p class="eyebrow">PROGRAMMING BY EXAMPLE / 0.3</p><h1>给出样例，<br>把重复整理交给规则。</h1><p class="lede">从表格到转换程序。检查不同解释，补充关键样例，再把选定的规则用于下一批数据。<a href="structure.html">进入表格结构工作台 →</a></p></div>
       <aside class="intro-note"><span class="note-number">01 → ∞</span><p>每条规则都可查看、可导出。<br>候选排名表示简单程度，<br>不代表正确率。</p></aside>
     </section>
     <nav class="demo-strip" aria-label="完整示例"><span>从一个例子开始</span><button class="demo" data-demo="products">供应商编码 <b>↗</b></button><button class="demo" data-demo="labels">活动名单 <b>↗</b></button><button class="demo" data-demo="media">素材目录 <b>↗</b></button><button class="demo" data-demo="ambiguity">看看歧义 <b>↗</b></button><button class="demo" data-demo="public-zones">公开时区数据 <b>↗</b></button><button class="demo" data-demo="public-locales">公开语言数据 <b>↗</b></button><button class="demo" data-demo="public-templates">公开模板数据 <b>↗</b></button></nav>
@@ -28,6 +28,7 @@
           <p class="hint">勾选已知答案的行，在右侧填写期望结果。空字符串也可作为答案。</p>
           <div id="input-grid" class="table-wrap"><div class="empty">导入数据后，在这里标注样例。</div></div>
           <div class="search-bar"><button id="learn" class="primary" disabled>从样例生成候选 <span>→</span></button><button id="cancel" class="plain" hidden>取消操作</button><span id="label-count" class="hint">0 个样例</span></div>
+          <details><summary>条件与正则搜索</summary><label for="regex-hints">正则提示，每行一个（MoonBit 语法，最多 16 个）</label><textarea id="regex-hints" rows="2" aria-label="正则提示" placeholder="ref=([[:digit:]]+)"></textarea><label for="branch-depth">条件分支深度</label><select id="branch-depth"><option value="2">最多两层（找不到平直规则时尝试）</option><option value="0">关闭条件分支</option><option value="3">最多三层</option></select><p class="hint">分支两侧至少各两个样例；正则使用 POSIX 词类，支持捕获、量词、锚点和交替，不支持反向引用或前后查找。提示修改会使当前字段的旧规则失效。</p><button class="demo secondary" data-demo="conditional">条件编码示例</button> <button class="demo secondary" data-demo="regex">正则捕获示例</button></details>
         </section>
         <section class="panel">
           <div class="panel-heading"><h2><span class="step">3</span> 检查不同解释</h2><span id="ambiguity-count" class="muted"></span></div>

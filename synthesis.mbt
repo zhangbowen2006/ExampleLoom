@@ -193,6 +193,7 @@ fn build_atoms(
   examples : Array[Example],
   options : SearchOptions,
   extra_separators : Array[String],
+  patterns : Array[String],
 ) -> Pool {
   let pool = { atoms: [], seen: Map([]), attempts: 0, truncated: false, }
   // Structural selectors before positional slices prevents the latter from
@@ -200,6 +201,13 @@ fn build_atoms(
   for col in 0..<examples[0].input.length() {
     let base = Field(col)
     let structural : Array[(Expr, Int32)] = [(base, 2)]
+    for pattern in patterns {
+      for group in 0..<5 {
+        for occurrence in [0, 1, -1] {
+          structural.push((RegexCapture(base, pattern, group, occurrence), 7))
+        }
+      }
+    }
     let separators = observed_separators(examples, col, extra_separators)
     if separators.length() > 64 {
       pool.truncated = true
@@ -434,10 +442,11 @@ fn common_literals(
 ///|
 /// Enumerate a ranked subset of programs consistent with every example.
 /// Ranking is a simplicity preference, never a statistical confidence score.
-pub fn synthesize(
+fn synthesize_flat(
   examples : Array[Example],
   options~ : SearchOptions = default_options(),
   separators~ : Array[String] = [],
+  patterns~ : Array[String] = [],
 ) -> SearchReport raise LoomError {
   if examples.is_empty() || examples.length() > 32 {
     raise LoomError("expected 1..32 examples")
@@ -483,7 +492,7 @@ pub fn synthesize(
     raise LoomError("expected at most 16 extra separators of 1..16 characters")
   }
   let examples = canonical_examples(examples)
-  let pool = build_atoms(examples, options, separators)
+  let pool = build_atoms(examples, options, separators, patterns)
   let targets = examples.map(e => e.output.to_array())
   let frontier : Array[SearchNode] = [
     {

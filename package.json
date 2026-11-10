@@ -1,12 +1,13 @@
 {
   "name": "exampleloom-workbench",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "start": "node scripts/serve.mjs",
-    "test": "node scripts/integration.mjs"
+    "test": "node scripts/integration.mjs && node scripts/advanced-test.mjs",
+    "benchmark": "node scripts/benchmark.mjs"
   },
   "engines": { "node": ">=20" }
 }

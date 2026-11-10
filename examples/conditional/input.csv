@@ -1,0 +1,7 @@
+mode,code
+local,订单-001
+local,订单-0482
+global,sku:98
+global,sku:601
+local,订单-0777
+global,sku:45001

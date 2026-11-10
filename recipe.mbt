@@ -101,6 +101,17 @@ fn read_position(value : Json) -> Position raise LoomError {
 ///|
 fn encode_expr(e : Expr) -> Json {
   match e {
+    If(c, yes, no) =>
+      Json::array([
+        Json("if"),
+        encode_condition(c),
+        encode_expr(yes),
+        encode_expr(no),
+      ])
+    RegexCapture(e, p, g, i) =>
+      Json::array([Json("capture"), encode_expr(e), Json(p), Json(g), Json(i)])
+    RegexReplace(e, p, r) =>
+      Json::array([Json("replace"), encode_expr(e), Json(p), Json(r)])
     Field(i) => Json::array([Json("field"), Json(i)])
     Literal(s) => Json::array([Json("literal"), Json(s)])
     Trim(e) => Json::array([Json("trim"), encode_expr(e)])
@@ -144,11 +155,39 @@ fn decode_expr(
     raise LoomError("expression requires an operator and arguments")
   }
   let op = j_text(a[0])
-  let arity = if ["slice", "token", "run", "date"].contains(op) { 4 } else { 2 }
+  let arity = if op == "capture" {
+    5
+  } else if ["slice", "token", "run", "date", "if", "replace"].contains(op) {
+    4
+  } else {
+    2
+  }
   if a.length() != arity {
     raise LoomError("wrong expression arity")
   }
   match op {
+    "if" =>
+      If(
+        decode_condition(a[1], depth + 1, budget),
+        decode_expr(a[2], depth + 1, budget),
+        decode_expr(a[3], depth + 1, budget),
+      )
+    "capture" => {
+      let p = j_text(a[2])
+      ignore(compiled_regex(p))
+      let g = j_int(a[3])
+      let i = j_int(a[4])
+      if g < 0 || g > 32 || i < -4096 || i >= 4096 {
+        raise LoomError("regex group/occurrence outside limits")
+      }
+      RegexCapture(decode_expr(a[1], depth + 1, budget), p, g, i)
+    }
+    "replace" => {
+      let p = j_text(a[2])
+      let r = j_text(a[3])
+      ignore(regex_replace("", p, r))
+      RegexReplace(decode_expr(a[1], depth + 1, budget), p, r)
+    }
     "field" => {
       let i = j_int(a[1])
       if i < 0 || i >= 64 {
@@ -223,6 +262,11 @@ fn check_tree(
     raise LoomError("expression exceeds depth/node limits")
   }
   match e {
+    If(c, yes, no) => {
+      check_condition(c, depth + 1, budget)
+      check_tree(yes, depth + 1, budget)
+      check_tree(no, depth + 1, budget)
+    }
     Field(_) | Literal(_) => ()
     Slice(e, _, _)
     | Token(e, _, _)
@@ -231,6 +275,8 @@ fn check_tree(
     | Lower(e)
     | Upper(e)
     | DateText(e, _, _) => check_tree(e, depth + 1, budget)
+    RegexCapture(e, _, _, _) | RegexReplace(e, _, _) =>
+      check_tree(e, depth + 1, budget)
     Concat(parts) =>
       for part in parts {
         check_tree(part, depth + 1, budget)
@@ -249,6 +295,11 @@ pub fn expression_to_json(e : Expr) -> Json raise LoomError {
 ///|
 fn check_fields(e : Expr, width : Int32) -> Unit raise LoomError {
   match e {
+    If(c, yes, no) => {
+      condition_fields(c, width)
+      check_fields(yes, width)
+      check_fields(no, width)
+    }
     Field(i) =>
       if i >= width {
         raise LoomError("expression refers to undeclared input column")
@@ -261,6 +312,7 @@ fn check_fields(e : Expr, width : Int32) -> Unit raise LoomError {
     | Lower(e)
     | Upper(e)
     | DateText(e, _, _) => check_fields(e, width)
+    RegexCapture(e, _, _, _) | RegexReplace(e, _, _) => check_fields(e, width)
     Concat(parts) =>
       for part in parts {
         check_fields(part, width)

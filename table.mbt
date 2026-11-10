@@ -5,8 +5,10 @@ fn validate_columns(columns : Array[String]) -> Unit raise LoomError {
   }
   let seen : Map[String, Bool] = Map([])
   for name in columns {
-    if name.trim().is_empty() || seen.contains(name) {
-      raise LoomError("column names must be nonempty and unique")
+    if name.length() > 256 || name.trim().is_empty() || seen.contains(name) {
+      raise LoomError(
+        "column names must be nonempty, unique and at most 256 UTF-16 units",
+      )
     }
     seen[name] = true
   }

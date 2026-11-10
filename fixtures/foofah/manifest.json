@@ -1,0 +1,1265 @@
+{
+  "repository": "https://github.com/umich-dbgroup/foofah",
+  "revision": "970864cd53b4c774a3dbdf4589d207f57ec63208",
+  "archive_url": "https://codeload.github.com/umich-dbgroup/foofah/zip/970864cd53b4c774a3dbdf4589d207f57ec63208",
+  "archive_sha256": "bedde0fcbe673b5fc356f10e28b7f55927ca250d77c47953189cb7621f94cde6",
+  "selection": "Every tests/data/exp0_*.txt file in this revision; no success-based exclusions.",
+  "license": "MIT, Copyright (c) 2017 University of Michigan",
+  "files": [
+    {
+      "name": "LICENSE.md",
+      "upstream_path": "LICENSE.md",
+      "sha256": "b55b9a056e83ccaf485a783e91074c075c5a78ebf105524c9a9249d34f8bcf27"
+    },
+    {
+      "name": "exp0_10_1.txt",
+      "upstream_path": "tests/data/exp0_10_1.txt",
+      "sha256": "500b1083ae44d6b60f7f67034ff89c87c1b6c937769e96a8e5b16619f1562f48"
+    },
+    {
+      "name": "exp0_10_2.txt",
+      "upstream_path": "tests/data/exp0_10_2.txt",
+      "sha256": "820f5b7b25878084e4263620bdb1fb6182060f70de3f36561f62fbbe86a17b3d"
+    },
+    {
+      "name": "exp0_10_3.txt",
+      "upstream_path": "tests/data/exp0_10_3.txt",
+      "sha256": "51d85666200e9ed94c5f592d80b60598d0638804c33b92406609684b3764deb8"
+    },
+    {
+      "name": "exp0_10_4.txt",
+      "upstream_path": "tests/data/exp0_10_4.txt",
+      "sha256": "342db76139be322cb0e04c23e598b8ddf853f89223a78432be0adf3c2b71c851"
+    },
+    {
+      "name": "exp0_10_5.txt",
+      "upstream_path": "tests/data/exp0_10_5.txt",
+      "sha256": "7d22a40a5374b738fe3355e26179caadde1e2184c6947801ef96a5065dfae449"
+    },
+    {
+      "name": "exp0_11_1.txt",
+      "upstream_path": "tests/data/exp0_11_1.txt",
+      "sha256": "e48582c4826c8bbccaf3adeef013c3de488f5388951a809a437358b83bc32bae"
+    },
+    {
+      "name": "exp0_11_2.txt",
+      "upstream_path": "tests/data/exp0_11_2.txt",
+      "sha256": "8433639b55d5cff4951762985375e9c440052a956e2918120f8952715999ebbc"
+    },
+    {
+      "name": "exp0_11_3.txt",
+      "upstream_path": "tests/data/exp0_11_3.txt",
+      "sha256": "80e18fad8a7f61908e2079cc52a568bd1a22e21702cb201a0e79e82468a42df0"
+    },
+    {
+      "name": "exp0_11_4.txt",
+      "upstream_path": "tests/data/exp0_11_4.txt",
+      "sha256": "bf15a9533102d0f9ade4558f16376cc516edf818dda184421e749df2e7d43dee"
+    },
+    {
+      "name": "exp0_11_5.txt",
+      "upstream_path": "tests/data/exp0_11_5.txt",
+      "sha256": "522dee5d742abafb21a904ebd1a7826e85f91bf07861d02e385623a9038b0caf"
+    },
+    {
+      "name": "exp0_12_1.txt",
+      "upstream_path": "tests/data/exp0_12_1.txt",
+      "sha256": "5a272947fd41af0ca3079919b110b9019b67510647d390bde0220b7de859206a"
+    },
+    {
+      "name": "exp0_12_2.txt",
+      "upstream_path": "tests/data/exp0_12_2.txt",
+      "sha256": "e13cf7eafac23966f5948080dd099531cc9f7083978f8bc725e7d5460d126ca7"
+    },
+    {
+      "name": "exp0_12_3.txt",
+      "upstream_path": "tests/data/exp0_12_3.txt",
+      "sha256": "b60ad3338b78b7773435cca2658e7d3389f327968e0c4bf6c24c3ab973a3a33a"
+    },
+    {
+      "name": "exp0_12_4.txt",
+      "upstream_path": "tests/data/exp0_12_4.txt",
+      "sha256": "74612cdd630405beb3f85b4e5092d4f60218be1ce2e0140878802ee6ae374633"
+    },
+    {
+      "name": "exp0_12_5.txt",
+      "upstream_path": "tests/data/exp0_12_5.txt",
+      "sha256": "8e0a9d8f5075ec5cf9263908bb8d10e9e9630139e60147efde5f143a16ce0acf"
+    },
+    {
+      "name": "exp0_13_1.txt",
+      "upstream_path": "tests/data/exp0_13_1.txt",
+      "sha256": "2b6b9fb8fbc3e6c774d1705f821ca4669968763945603048b27f9ae30de85e97"
+    },
+    {
+      "name": "exp0_13_2.txt",
+      "upstream_path": "tests/data/exp0_13_2.txt",
+      "sha256": "ba495b9dee8226dc4801130037917dde6aee93d5e5f50e4d1f741fa314dd3033"
+    },
+    {
+      "name": "exp0_13_3.txt",
+      "upstream_path": "tests/data/exp0_13_3.txt",
+      "sha256": "4bec3bb3fbbe742391daeb073d70a8c25ed82541aa6eec99684923e876a4feae"
+    },
+    {
+      "name": "exp0_13_4.txt",
+      "upstream_path": "tests/data/exp0_13_4.txt",
+      "sha256": "327b027b6a752590d979cf0f6cab361d001a3dbe4fae515123da939029911b8a"
+    },
+    {
+      "name": "exp0_13_5.txt",
+      "upstream_path": "tests/data/exp0_13_5.txt",
+      "sha256": "eb1caa14d48cbbb82f78655f05fb0ffc8958fb41c4e38b5375ce90d806b14a75"
+    },
+    {
+      "name": "exp0_15_1.txt",
+      "upstream_path": "tests/data/exp0_15_1.txt",
+      "sha256": "c85808ee3332ec0f3476f2ae15a85c1a0e6b7b55b6e0f754ebfb5c20228630c0"
+    },
+    {
+      "name": "exp0_15_2.txt",
+      "upstream_path": "tests/data/exp0_15_2.txt",
+      "sha256": "6da4ed6251c9bb43fa1c0d69f98c874c997b122c6aaf62598e0beb31f83554cd"
+    },
+    {
+      "name": "exp0_15_3.txt",
+      "upstream_path": "tests/data/exp0_15_3.txt",
+      "sha256": "38f4b3851733facb292a316e1dbf42b04eb4b3c210f4f1aceebc284d1a550568"
+    },
+    {
+      "name": "exp0_15_4.txt",
+      "upstream_path": "tests/data/exp0_15_4.txt",
+      "sha256": "c5d73ae166db61f819a326544bc040c89e90ea50181ccda2619d3d9115e85bf3"
+    },
+    {
+      "name": "exp0_15_5.txt",
+      "upstream_path": "tests/data/exp0_15_5.txt",
+      "sha256": "9f92e69e3aa29f0cd6ceb9ca38ed19a9f07a31d0ad36068ad58e4e02206605ee"
+    },
+    {
+      "name": "exp0_17_1.txt",
+      "upstream_path": "tests/data/exp0_17_1.txt",
+      "sha256": "1b4fc1131ce69dcc5807ac658793344d0a7ddd4ad19861732947ed85e06578b3"
+    },
+    {
+      "name": "exp0_17_2.txt",
+      "upstream_path": "tests/data/exp0_17_2.txt",
+      "sha256": "14164a417de9e92b458a38ce2ae2f66e9cfde9d738784f2ff1ff10042409787c"
+    },
+    {
+      "name": "exp0_17_3.txt",
+      "upstream_path": "tests/data/exp0_17_3.txt",
+      "sha256": "dcd0f5b30a37564bfea843dbed3a2574dfec434dfb31a5840d22931b7ae6f712"
+    },
+    {
+      "name": "exp0_17_4.txt",
+      "upstream_path": "tests/data/exp0_17_4.txt",
+      "sha256": "c910ca453fc1863da7c4e204e26c5fbf75aefd5e4da38f8eefa0bf98bea31047"
+    },
+    {
+      "name": "exp0_17_5.txt",
+      "upstream_path": "tests/data/exp0_17_5.txt",
+      "sha256": "9eceb576d1e19e9fbf2dca92a4264a9e300436c014b4dc872a21377a948de5b2"
+    },
+    {
+      "name": "exp0_18_1.txt",
+      "upstream_path": "tests/data/exp0_18_1.txt",
+      "sha256": "a90ac175b2d45657e0eb7ec9b06c242282086bb7a1cfa2e5b4d83e1f948199ef"
+    },
+    {
+      "name": "exp0_18_2.txt",
+      "upstream_path": "tests/data/exp0_18_2.txt",
+      "sha256": "7ee8b66fce289679d0d72c674bdf37fcb00d9cd010360c8302909d1c254ef6d0"
+    },
+    {
+      "name": "exp0_18_3.txt",
+      "upstream_path": "tests/data/exp0_18_3.txt",
+      "sha256": "45c1ce532214c500ae55cfff2ba1a6617e67f22f7a332e7032e51b0a8916bc45"
+    },
+    {
+      "name": "exp0_18_4.txt",
+      "upstream_path": "tests/data/exp0_18_4.txt",
+      "sha256": "e5cfc94419d1381cb4741301b24b69346545b2d57403c50141b2884f7ea6d595"
+    },
+    {
+      "name": "exp0_18_5.txt",
+      "upstream_path": "tests/data/exp0_18_5.txt",
+      "sha256": "437e33f5268cdbb375d41e1aae235bedbc9c860506cda0b401617a97167b66b4"
+    },
+    {
+      "name": "exp0_19_1.txt",
+      "upstream_path": "tests/data/exp0_19_1.txt",
+      "sha256": "1e082f440db0206d5250915956a3c8ae742b4f3aa7a99a16258e111d5f316981"
+    },
+    {
+      "name": "exp0_19_2.txt",
+      "upstream_path": "tests/data/exp0_19_2.txt",
+      "sha256": "71713495f898c9900c94451363dcf0b1392db355b35e0abf6043e19f6e7bea43"
+    },
+    {
+      "name": "exp0_19_3.txt",
+      "upstream_path": "tests/data/exp0_19_3.txt",
+      "sha256": "fc80dec5b12e3672cd32a4682879b99f82ac3ac51855f6d92da32cbdd8fb70ec"
+    },
+    {
+      "name": "exp0_19_4.txt",
+      "upstream_path": "tests/data/exp0_19_4.txt",
+      "sha256": "a12e1e17403298cc9f512666061acb210bda767d7b6b40f1300935a078c683b7"
+    },
+    {
+      "name": "exp0_19_5.txt",
+      "upstream_path": "tests/data/exp0_19_5.txt",
+      "sha256": "8b298bc239e1b6233e376cdebef9ecfa177fda12e594e3d0214bc8198f3a02cc"
+    },
+    {
+      "name": "exp0_22_1.txt",
+      "upstream_path": "tests/data/exp0_22_1.txt",
+      "sha256": "b06b646925760e24f50ed94f888ce955be5a774664d00d73640abd8f3af28188"
+    },
+    {
+      "name": "exp0_22_2.txt",
+      "upstream_path": "tests/data/exp0_22_2.txt",
+      "sha256": "22cd79d1c4d1d424054ff2d873c0ae87246d0991b624ef712dec4c35c2966611"
+    },
+    {
+      "name": "exp0_22_3.txt",
+      "upstream_path": "tests/data/exp0_22_3.txt",
+      "sha256": "69a757ab40709dfa394f1368aacf279e3f46ba58a427d1ef8db12cc57589432a"
+    },
+    {
+      "name": "exp0_22_4.txt",
+      "upstream_path": "tests/data/exp0_22_4.txt",
+      "sha256": "20b180e74ffdacfb5aec19ce8520c928d40eb0db82a63cf6c1c44526c244474f"
+    },
+    {
+      "name": "exp0_22_5.txt",
+      "upstream_path": "tests/data/exp0_22_5.txt",
+      "sha256": "73ce4d0522d14b826a291de81253741c7c7abeeba84df6c373b55b022a37b8d8"
+    },
+    {
+      "name": "exp0_24_1.txt",
+      "upstream_path": "tests/data/exp0_24_1.txt",
+      "sha256": "a0d5cc58cbf349caef1b650d9bf24c8153a36f7b9bdd95d190ac892629d4cb57"
+    },
+    {
+      "name": "exp0_24_2.txt",
+      "upstream_path": "tests/data/exp0_24_2.txt",
+      "sha256": "b94faeafe8bc8baebb5c5319ecc904a9f15b2e354531589d84864082b1cb691e"
+    },
+    {
+      "name": "exp0_24_3.txt",
+      "upstream_path": "tests/data/exp0_24_3.txt",
+      "sha256": "cd2ed9384d881ec8c047939efedd7e4643d2bf926328c24c8e7c4694c2440405"
+    },
+    {
+      "name": "exp0_24_4.txt",
+      "upstream_path": "tests/data/exp0_24_4.txt",
+      "sha256": "ca039204852c7fdef1d9c5c2d9565615990e5f310ac68496bddcbaebc91b764b"
+    },
+    {
+      "name": "exp0_24_5.txt",
+      "upstream_path": "tests/data/exp0_24_5.txt",
+      "sha256": "dc8b57e89cd0f13c6b9753f4e373b81bff8b8c2322fd16b60c4aad7c6290fb79"
+    },
+    {
+      "name": "exp0_25_1.txt",
+      "upstream_path": "tests/data/exp0_25_1.txt",
+      "sha256": "687ec331f34e7845791e549f6435c123e9be748c188fdef60e18fc22b0e28df4"
+    },
+    {
+      "name": "exp0_25_2.txt",
+      "upstream_path": "tests/data/exp0_25_2.txt",
+      "sha256": "385c520140bc30414e1d71f5ea5b6e43c863398e2aa76e964f3321b26818de05"
+    },
+    {
+      "name": "exp0_25_3.txt",
+      "upstream_path": "tests/data/exp0_25_3.txt",
+      "sha256": "f0fbf0f1723b3fdfc57ff59f26a2c3a1d2ee3f3415d38be1aea5cc916d86765e"
+    },
+    {
+      "name": "exp0_25_4.txt",
+      "upstream_path": "tests/data/exp0_25_4.txt",
+      "sha256": "6666586dae53f1370251d4400837a0fd34a5f8bd568a20740f2e4fae19c2283a"
+    },
+    {
+      "name": "exp0_25_5.txt",
+      "upstream_path": "tests/data/exp0_25_5.txt",
+      "sha256": "86d91a2e47c6ac6e4e9a0d5ca185078fdae4dca692f857e2ca80e35b3e1c9de1"
+    },
+    {
+      "name": "exp0_26_1.txt",
+      "upstream_path": "tests/data/exp0_26_1.txt",
+      "sha256": "7a781887b4b19ab5b52ff17dce9d455a3a532a7010b2b99ac353d0335f4cd75c"
+    },
+    {
+      "name": "exp0_26_2.txt",
+      "upstream_path": "tests/data/exp0_26_2.txt",
+      "sha256": "4223d303018e680a5b23f9220c3bf27df954300da6e7b68f8fca08a18184ee23"
+    },
+    {
+      "name": "exp0_26_3.txt",
+      "upstream_path": "tests/data/exp0_26_3.txt",
+      "sha256": "c0bee6c710fd73f24821d1327a23a20ed2b49ade1e8ce8bfe1ae18252b9355d3"
+    },
+    {
+      "name": "exp0_26_4.txt",
+      "upstream_path": "tests/data/exp0_26_4.txt",
+      "sha256": "3cd2b310a5e613e4722d12bf1888ea8d1d8b1615ecc17f1d42518582878ac6ff"
+    },
+    {
+      "name": "exp0_26_5.txt",
+      "upstream_path": "tests/data/exp0_26_5.txt",
+      "sha256": "bd08157441ab8e2f5260e8cc08ae6826a09f4da3d89f9680d18bb97299dd323c"
+    },
+    {
+      "name": "exp0_27_1.txt",
+      "upstream_path": "tests/data/exp0_27_1.txt",
+      "sha256": "5e47dbcef23cfed48656607c7fbc1adc08e9fee8b4f293d8dab68fb181b13a33"
+    },
+    {
+      "name": "exp0_27_2.txt",
+      "upstream_path": "tests/data/exp0_27_2.txt",
+      "sha256": "58a23b046672f9515e5baf9c507e7e1288c15b5c284c48dcdb5fa2927a1fa859"
+    },
+    {
+      "name": "exp0_27_3.txt",
+      "upstream_path": "tests/data/exp0_27_3.txt",
+      "sha256": "afe541cd3d3e7227d4f3f62de9dde70d349767674209e524cceacaacce4a9928"
+    },
+    {
+      "name": "exp0_27_4.txt",
+      "upstream_path": "tests/data/exp0_27_4.txt",
+      "sha256": "be681677cd8fe7ff46ccceb3ac10d7ecd6af355aed7d580d7b72dc090132ce7d"
+    },
+    {
+      "name": "exp0_27_5.txt",
+      "upstream_path": "tests/data/exp0_27_5.txt",
+      "sha256": "ec86e8d7bd8d98af2867e6546d461d6e909ef9e4fa2e95779828d5c45c172723"
+    },
+    {
+      "name": "exp0_28_1.txt",
+      "upstream_path": "tests/data/exp0_28_1.txt",
+      "sha256": "5ff909cdea48ded955b15f3385913507b9201331f5b1dddd16f0864e29b2cae1"
+    },
+    {
+      "name": "exp0_28_2.txt",
+      "upstream_path": "tests/data/exp0_28_2.txt",
+      "sha256": "e5732756c01034ccc03400a8ece7e1e68473eb115430353cde44169a1747c4d1"
+    },
+    {
+      "name": "exp0_28_3.txt",
+      "upstream_path": "tests/data/exp0_28_3.txt",
+      "sha256": "afc36cd959fb415e3f77100be4b3d24769fea5cb13b1031c87d5a5e7f93513be"
+    },
+    {
+      "name": "exp0_28_4.txt",
+      "upstream_path": "tests/data/exp0_28_4.txt",
+      "sha256": "5f23675a0a3492c3b3c3f9336385fea5e52cf823b0aa3e81474577a150c04ecc"
+    },
+    {
+      "name": "exp0_28_5.txt",
+      "upstream_path": "tests/data/exp0_28_5.txt",
+      "sha256": "f55848cc5453c995b73bfc5be79d25d3cdd03cd2c5077fa58be7d0262fcc3a2e"
+    },
+    {
+      "name": "exp0_29_1.txt",
+      "upstream_path": "tests/data/exp0_29_1.txt",
+      "sha256": "41de7f635e9e9eac827742f882c016eafcf4fb3c97af8902d43ab89d10046b2f"
+    },
+    {
+      "name": "exp0_29_2.txt",
+      "upstream_path": "tests/data/exp0_29_2.txt",
+      "sha256": "8195b6655cb53585cc76a7765ee215cc0c8806da1630a98fafb4596dc2ad9976"
+    },
+    {
+      "name": "exp0_29_3.txt",
+      "upstream_path": "tests/data/exp0_29_3.txt",
+      "sha256": "e5a904315376774c6e12a1b0fd90262fc7fc3b9544362112ec6beebd8a44ce6f"
+    },
+    {
+      "name": "exp0_29_4.txt",
+      "upstream_path": "tests/data/exp0_29_4.txt",
+      "sha256": "ea477d19b7818188193e5b7698c21ef94c17f2824e95165cbefb5698ac3381f2"
+    },
+    {
+      "name": "exp0_29_5.txt",
+      "upstream_path": "tests/data/exp0_29_5.txt",
+      "sha256": "54034b7c654c185344b4884b7c78aa320dbebfc990ae123da4cb323260684fbe"
+    },
+    {
+      "name": "exp0_2_1.txt",
+      "upstream_path": "tests/data/exp0_2_1.txt",
+      "sha256": "cf302a5336567652953686e91f9b84cf77d254cd78ef8f00ec452ea209eec18a"
+    },
+    {
+      "name": "exp0_2_2.txt",
+      "upstream_path": "tests/data/exp0_2_2.txt",
+      "sha256": "451ea93068f7035ea8a87e4e17c7f5dd3a53f5b18a7fc98a4422ef18c66f9f6b"
+    },
+    {
+      "name": "exp0_2_3.txt",
+      "upstream_path": "tests/data/exp0_2_3.txt",
+      "sha256": "f1b46b0d249d40e1df8b0e508762e0c597a751ddfcbb1719b44014138c7df293"
+    },
+    {
+      "name": "exp0_2_4.txt",
+      "upstream_path": "tests/data/exp0_2_4.txt",
+      "sha256": "8fda37e711c8ff7baaf6de3e1363a819a4b2a1939c60e3c295f6b234a856f137"
+    },
+    {
+      "name": "exp0_2_5.txt",
+      "upstream_path": "tests/data/exp0_2_5.txt",
+      "sha256": "4b29c109a1b1127e0bea294fcf8a8b4edd91af3ec4eb97921f8c9373e42415b9"
+    },
+    {
+      "name": "exp0_30_1.txt",
+      "upstream_path": "tests/data/exp0_30_1.txt",
+      "sha256": "c08c1ba687369a51be9603e7fbe709c47c5c238ea94fb847ba26b0e20d759762"
+    },
+    {
+      "name": "exp0_30_2.txt",
+      "upstream_path": "tests/data/exp0_30_2.txt",
+      "sha256": "90af5b84fba9bda593501644c261ba261f8e600d965f77b470d0d6e65d80f590"
+    },
+    {
+      "name": "exp0_30_3.txt",
+      "upstream_path": "tests/data/exp0_30_3.txt",
+      "sha256": "28aecef1387be01f07085c42e0fa941ea537336bce1247ad5890771468913111"
+    },
+    {
+      "name": "exp0_30_4.txt",
+      "upstream_path": "tests/data/exp0_30_4.txt",
+      "sha256": "202507d04fca77b076bd67b15e7f4648cc05a642f7e848aaab3f02b6815cc5da"
+    },
+    {
+      "name": "exp0_30_5.txt",
+      "upstream_path": "tests/data/exp0_30_5.txt",
+      "sha256": "3d4b7ef87867c86b1a50d1e16a9cb8ef587ca8892b0037981ef9fb7694299df6"
+    },
+    {
+      "name": "exp0_33_1.txt",
+      "upstream_path": "tests/data/exp0_33_1.txt",
+      "sha256": "acf405eecb40222e657f552065dbed1777dcf7f25ae57827f762bef07f37c168"
+    },
+    {
+      "name": "exp0_33_2.txt",
+      "upstream_path": "tests/data/exp0_33_2.txt",
+      "sha256": "cdbf8249b2f4668c0d495fd54bd436cd0626cee88194b9c2f3d8b378c4ee02d2"
+    },
+    {
+      "name": "exp0_33_3.txt",
+      "upstream_path": "tests/data/exp0_33_3.txt",
+      "sha256": "c1d401a095d7df88ddc500d8152cbbe819f9bd7505e9a792d4ba720b4b1fc969"
+    },
+    {
+      "name": "exp0_33_4.txt",
+      "upstream_path": "tests/data/exp0_33_4.txt",
+      "sha256": "6fe064c5a144ca57536fd6c1ef375f307f9aefcf5e0aaf24c49f7eb7b9b9822d"
+    },
+    {
+      "name": "exp0_33_5.txt",
+      "upstream_path": "tests/data/exp0_33_5.txt",
+      "sha256": "1362ee8602d44305eb33da5f32e8f893567c1a54b795738498d28489dcba4741"
+    },
+    {
+      "name": "exp0_34_1.txt",
+      "upstream_path": "tests/data/exp0_34_1.txt",
+      "sha256": "1dfd2954ad57593279aa952cd56ccf6b3975db2e990080ab56a7eba80be6ecfa"
+    },
+    {
+      "name": "exp0_34_2.txt",
+      "upstream_path": "tests/data/exp0_34_2.txt",
+      "sha256": "6fc293ea2bbde6387e7a6ae29d9b2dc805bb027fc78d69394957d147c4b57ee6"
+    },
+    {
+      "name": "exp0_34_3.txt",
+      "upstream_path": "tests/data/exp0_34_3.txt",
+      "sha256": "f5ed2d17b7d5014355edb819d7ec3615f097db754356fec751b641a7c93b316b"
+    },
+    {
+      "name": "exp0_34_4.txt",
+      "upstream_path": "tests/data/exp0_34_4.txt",
+      "sha256": "ebeafb6a2a7a299b41147412c8339c0f258e76c7be4e6fa5ffe0f738e458a211"
+    },
+    {
+      "name": "exp0_34_5.txt",
+      "upstream_path": "tests/data/exp0_34_5.txt",
+      "sha256": "1f00ccb45b80491282bd8f6f9ee63ab3eeba419d8df672bab2680d2eddae8c2b"
+    },
+    {
+      "name": "exp0_36_1.txt",
+      "upstream_path": "tests/data/exp0_36_1.txt",
+      "sha256": "fa83bed246d2565cc084369fab18605c81ca883996d06f71a7fbc20e16bf79c9"
+    },
+    {
+      "name": "exp0_36_2.txt",
+      "upstream_path": "tests/data/exp0_36_2.txt",
+      "sha256": "b77f0e8e4b174954d121ea81f44f511001aaf6ae67f64042e20b29d3a3c91d19"
+    },
+    {
+      "name": "exp0_36_3.txt",
+      "upstream_path": "tests/data/exp0_36_3.txt",
+      "sha256": "f83a005a4909b5688b93d4258d08c5965fa467619eb129cb2ed1fb389c594d1b"
+    },
+    {
+      "name": "exp0_36_4.txt",
+      "upstream_path": "tests/data/exp0_36_4.txt",
+      "sha256": "37785e1f1005e291a89d1f0696c06d6ba91c4f9f7233700c743dfd5a1ee5c202"
+    },
+    {
+      "name": "exp0_36_5.txt",
+      "upstream_path": "tests/data/exp0_36_5.txt",
+      "sha256": "f6ee29ed7bc2a0209b4c13d0e30afca77c773454142ea513b2d4958664f0cf36"
+    },
+    {
+      "name": "exp0_37_1.txt",
+      "upstream_path": "tests/data/exp0_37_1.txt",
+      "sha256": "28c623a7d0a85596287c8c407e34b8d24955a1c0b57246fb611b28a10a612aa9"
+    },
+    {
+      "name": "exp0_37_2.txt",
+      "upstream_path": "tests/data/exp0_37_2.txt",
+      "sha256": "07b79d3a144e06d56f30ad0d8ecdd3899ee6f8f86bfa82983c44f871cd89df8b"
+    },
+    {
+      "name": "exp0_37_3.txt",
+      "upstream_path": "tests/data/exp0_37_3.txt",
+      "sha256": "61abaca8c0bee449ebd6d778a2ef9624f3095aa17d1bc2b8e662101873b2df3c"
+    },
+    {
+      "name": "exp0_37_4.txt",
+      "upstream_path": "tests/data/exp0_37_4.txt",
+      "sha256": "8d2d2f9cdadc4ad0dd4ca7222e5efbf72581e224c5adba6ede941fcbe5236132"
+    },
+    {
+      "name": "exp0_37_5.txt",
+      "upstream_path": "tests/data/exp0_37_5.txt",
+      "sha256": "91cb5183a132c51e5a0260459c4a3d09a99fb19d06dfeaf7afb0b38c7cee3781"
+    },
+    {
+      "name": "exp0_3_1.txt",
+      "upstream_path": "tests/data/exp0_3_1.txt",
+      "sha256": "0750acd3dd83a7b924a479e53381338f10df665d65d3763e75f724d4ae44a000"
+    },
+    {
+      "name": "exp0_3_2.txt",
+      "upstream_path": "tests/data/exp0_3_2.txt",
+      "sha256": "1799757d4db444d442087ec62e16df1f33cc5f07dee1c87d0435656c69714d31"
+    },
+    {
+      "name": "exp0_3_3.txt",
+      "upstream_path": "tests/data/exp0_3_3.txt",
+      "sha256": "1aaecdfb0fbc59658a5c97dc10994d4688c9650e73cefad42b0bfff1a1dbfac0"
+    },
+    {
+      "name": "exp0_3_4.txt",
+      "upstream_path": "tests/data/exp0_3_4.txt",
+      "sha256": "fa933d7f129fad2eeadf9bb65fc56753387b870fb17e1e3c11321d030335d496"
+    },
+    {
+      "name": "exp0_3_5.txt",
+      "upstream_path": "tests/data/exp0_3_5.txt",
+      "sha256": "ba3fbfa70a8502007b32b41bf05a64b0bc3780515363694020ba812757e3e48d"
+    },
+    {
+      "name": "exp0_40_1.txt",
+      "upstream_path": "tests/data/exp0_40_1.txt",
+      "sha256": "a34ea031d2d0a1f2f52df64e6bf455d4fc67d93e81446841629cbe04586efa4b"
+    },
+    {
+      "name": "exp0_40_2.txt",
+      "upstream_path": "tests/data/exp0_40_2.txt",
+      "sha256": "24cc2ae49e7cf4f63337efac328e461ab9f162712cff0a360799815e4fda79c6"
+    },
+    {
+      "name": "exp0_40_3.txt",
+      "upstream_path": "tests/data/exp0_40_3.txt",
+      "sha256": "51a0db61e5b474ff810024241e213d5b2b0ecf8d4a0759c62a919c33010efc54"
+    },
+    {
+      "name": "exp0_40_4.txt",
+      "upstream_path": "tests/data/exp0_40_4.txt",
+      "sha256": "cae8fce0da69cfd973d5d55c50d7525eabd73e2755e81a2054d0547767c00306"
+    },
+    {
+      "name": "exp0_40_5.txt",
+      "upstream_path": "tests/data/exp0_40_5.txt",
+      "sha256": "5e0e2db8545557bb90397f256b57ce1293323247705e7c8678791db28f10258b"
+    },
+    {
+      "name": "exp0_41_1.txt",
+      "upstream_path": "tests/data/exp0_41_1.txt",
+      "sha256": "53753909edd4371a16a000c76f87dfbc5c8f8df0ba0d55ff96a86ce04d393940"
+    },
+    {
+      "name": "exp0_41_2.txt",
+      "upstream_path": "tests/data/exp0_41_2.txt",
+      "sha256": "450238087f547cd41715828226367de945442b934b14b1d33a87f31e0fdd93f1"
+    },
+    {
+      "name": "exp0_41_3.txt",
+      "upstream_path": "tests/data/exp0_41_3.txt",
+      "sha256": "dbf4a80f5d15e81229b026606f1267d8ed4ad78321ccc09244249931a0743bff"
+    },
+    {
+      "name": "exp0_41_4.txt",
+      "upstream_path": "tests/data/exp0_41_4.txt",
+      "sha256": "ef576d52f268c1aebde9c44f610c6acad19ad8cabdf091425fcba42ab6904c9a"
+    },
+    {
+      "name": "exp0_41_5.txt",
+      "upstream_path": "tests/data/exp0_41_5.txt",
+      "sha256": "5f2d3484ef66a4677dbcc88ecc0ce21b5eb1a29016e24b918f2aedc1f0911a94"
+    },
+    {
+      "name": "exp0_43_1.txt",
+      "upstream_path": "tests/data/exp0_43_1.txt",
+      "sha256": "eb334e133c1aca7a6369a211d0a982f787d22f659845220ce90fa79befd64bd5"
+    },
+    {
+      "name": "exp0_43_2.txt",
+      "upstream_path": "tests/data/exp0_43_2.txt",
+      "sha256": "a97fa2411f44f00b07b835e31aa4629ad6432d28a117218b210332d9cf2fabda"
+    },
+    {
+      "name": "exp0_43_3.txt",
+      "upstream_path": "tests/data/exp0_43_3.txt",
+      "sha256": "ee88744c59ac84efd793744731a9189312fd727fda16e9ff072892ce9d297388"
+    },
+    {
+      "name": "exp0_43_4.txt",
+      "upstream_path": "tests/data/exp0_43_4.txt",
+      "sha256": "f3c7fd424977a60d327409dc8a388f37e77a5e85f529bbd65fbaf99ce8f045ab"
+    },
+    {
+      "name": "exp0_43_5.txt",
+      "upstream_path": "tests/data/exp0_43_5.txt",
+      "sha256": "c7add6480a133650ebe6a3cecbb689205bdeed0fd2d525f1310f42ff32677a75"
+    },
+    {
+      "name": "exp0_44_1.txt",
+      "upstream_path": "tests/data/exp0_44_1.txt",
+      "sha256": "a06e905080b1a7ec98c7bf1bfaf1d1fefdf4d24e99778286e1b6c4032594f6e4"
+    },
+    {
+      "name": "exp0_44_2.txt",
+      "upstream_path": "tests/data/exp0_44_2.txt",
+      "sha256": "265f6fc6c041c0be85d2587376f81df066e6e2af06f19c35c97ab46a3265efd6"
+    },
+    {
+      "name": "exp0_44_3.txt",
+      "upstream_path": "tests/data/exp0_44_3.txt",
+      "sha256": "2d86b67eb9df4e8456e8aebf0f9db8ef30df21fa1e65dd930fac64ba9ec9c159"
+    },
+    {
+      "name": "exp0_44_4.txt",
+      "upstream_path": "tests/data/exp0_44_4.txt",
+      "sha256": "a35f3b8d54cd06c126c24735ef4de7518810daae0cb8abf044dcf2745f2b10b9"
+    },
+    {
+      "name": "exp0_44_5.txt",
+      "upstream_path": "tests/data/exp0_44_5.txt",
+      "sha256": "9ab6c70eda9f9fe6d1913d7f026ace5d9d8bdb55e65791d8b4959ebaf4edc061"
+    },
+    {
+      "name": "exp0_45_1.txt",
+      "upstream_path": "tests/data/exp0_45_1.txt",
+      "sha256": "e003e877cb851630f7d7d276f72bcb8a2851b5cfac6ad33d83791e1f5562dd8d"
+    },
+    {
+      "name": "exp0_45_2.txt",
+      "upstream_path": "tests/data/exp0_45_2.txt",
+      "sha256": "50798294542e0b932b74bfac9be7a7588dee4814d58ec0eecdcdd792b95346ef"
+    },
+    {
+      "name": "exp0_45_3.txt",
+      "upstream_path": "tests/data/exp0_45_3.txt",
+      "sha256": "18423fd59d4dd3b1b99fa34844c73073f5365469623aa94cd12f78c64067471c"
+    },
+    {
+      "name": "exp0_45_4.txt",
+      "upstream_path": "tests/data/exp0_45_4.txt",
+      "sha256": "00e533e682e6de26007078fcc43a34901bcdc05270eba697264203456188c8b8"
+    },
+    {
+      "name": "exp0_45_5.txt",
+      "upstream_path": "tests/data/exp0_45_5.txt",
+      "sha256": "87d39c456600cc1fd00ca162459e2418f5d7be512a91e663335a5ef7e23330ad"
+    },
+    {
+      "name": "exp0_46_1.txt",
+      "upstream_path": "tests/data/exp0_46_1.txt",
+      "sha256": "43b04d4f6e8991f6b6315ce0f735130e65bb8c25be1c1f8ab7f141d7c274ccf0"
+    },
+    {
+      "name": "exp0_46_2.txt",
+      "upstream_path": "tests/data/exp0_46_2.txt",
+      "sha256": "123a3712bbf5fa3b61afa5908aa36cb05f6f226c8892f6443022f6adb042578f"
+    },
+    {
+      "name": "exp0_46_3.txt",
+      "upstream_path": "tests/data/exp0_46_3.txt",
+      "sha256": "4e12e565f18ffdbb9e778ce1d8e26a876e15feab12516cd5dee5cf7c00443367"
+    },
+    {
+      "name": "exp0_46_4.txt",
+      "upstream_path": "tests/data/exp0_46_4.txt",
+      "sha256": "7bc3c7721a3a2b52e8bf41169e99a44ff991fe0b5b43c6c2d64ca2726ab8a36b"
+    },
+    {
+      "name": "exp0_46_5.txt",
+      "upstream_path": "tests/data/exp0_46_5.txt",
+      "sha256": "013dd2f0efe83a6b05fbf947bce008f1bca3360fff7494adf30613a51366fe2d"
+    },
+    {
+      "name": "exp0_47_1.txt",
+      "upstream_path": "tests/data/exp0_47_1.txt",
+      "sha256": "ec7449fd40f10e58d68369ab8432d3723695531f2bce7ad2bd1b9ccc2548ec21"
+    },
+    {
+      "name": "exp0_47_2.txt",
+      "upstream_path": "tests/data/exp0_47_2.txt",
+      "sha256": "c5a3943befa35d2dbe9e4db9150656fb6b6292d0ab2e21fe1b44762b3b96e0a9"
+    },
+    {
+      "name": "exp0_47_3.txt",
+      "upstream_path": "tests/data/exp0_47_3.txt",
+      "sha256": "daf464acc4bd30d1615fa15786aac33a32452c260be2458024efddf8de4b964e"
+    },
+    {
+      "name": "exp0_47_4.txt",
+      "upstream_path": "tests/data/exp0_47_4.txt",
+      "sha256": "f8e3b228af2f120d8f84d1b2e78321e6206e6b648d6489e118e04d234e54c7f7"
+    },
+    {
+      "name": "exp0_47_5.txt",
+      "upstream_path": "tests/data/exp0_47_5.txt",
+      "sha256": "eab2c620813154e15301c522b854c785199b5467a4ce4cf7853856557d766741"
+    },
+    {
+      "name": "exp0_48_1.txt",
+      "upstream_path": "tests/data/exp0_48_1.txt",
+      "sha256": "23798969f531a15d6066ab7215688070d4bd711cc35c3f9e7ff7a42b24b8b44a"
+    },
+    {
+      "name": "exp0_48_2.txt",
+      "upstream_path": "tests/data/exp0_48_2.txt",
+      "sha256": "ba3392d5967f64870a4c0d162e892a93f41387925418a089b621c0dce76602ab"
+    },
+    {
+      "name": "exp0_48_3.txt",
+      "upstream_path": "tests/data/exp0_48_3.txt",
+      "sha256": "9a65ce04014bd9cb1802088997cfec65702741e0ad97bbd41b58bd4abbae7121"
+    },
+    {
+      "name": "exp0_48_4.txt",
+      "upstream_path": "tests/data/exp0_48_4.txt",
+      "sha256": "a2aeabb4a47ee7c057c4391302efa3b3542bc348f5412b689518da68a3f2f503"
+    },
+    {
+      "name": "exp0_48_5.txt",
+      "upstream_path": "tests/data/exp0_48_5.txt",
+      "sha256": "0dd81994c7011a61cbddbb9baa61f2c6edc2e81f66b18e462b2c9e683b735708"
+    },
+    {
+      "name": "exp0_49_1.txt",
+      "upstream_path": "tests/data/exp0_49_1.txt",
+      "sha256": "a45619d6a25086680541708a946f52d515f5d457db2926fcad2bbc8b6de6b992"
+    },
+    {
+      "name": "exp0_49_2.txt",
+      "upstream_path": "tests/data/exp0_49_2.txt",
+      "sha256": "ce3fcd96ccb9aa567e0ac1124ca203d0682dbd7b36929aeee7a6cc36164771ba"
+    },
+    {
+      "name": "exp0_49_3.txt",
+      "upstream_path": "tests/data/exp0_49_3.txt",
+      "sha256": "5bf89752b2b7e6607dab3320f7e97b4f95d34377afa76a7a3cbf40d53b0d6264"
+    },
+    {
+      "name": "exp0_49_4.txt",
+      "upstream_path": "tests/data/exp0_49_4.txt",
+      "sha256": "1805476ffdcd1af2ce6f2f787de81680863a1345f9ba023e5687817802939b7d"
+    },
+    {
+      "name": "exp0_49_5.txt",
+      "upstream_path": "tests/data/exp0_49_5.txt",
+      "sha256": "a4903de768e42ba38f8b7c7b8d687b6a1c0e22251a490519a1fb24019c4f2524"
+    },
+    {
+      "name": "exp0_4_1.txt",
+      "upstream_path": "tests/data/exp0_4_1.txt",
+      "sha256": "bba54d8eecb5235c3458c7152a1c1db9b48c0d24674847eab56b4c457d4c54fe"
+    },
+    {
+      "name": "exp0_4_2.txt",
+      "upstream_path": "tests/data/exp0_4_2.txt",
+      "sha256": "f977f5caba0b3402fcecc29ce0e2b1e0e97f56237423dce0714e9278497afaf0"
+    },
+    {
+      "name": "exp0_4_3.txt",
+      "upstream_path": "tests/data/exp0_4_3.txt",
+      "sha256": "56f7b7ba9bdc9f27c3bd78c56644bf1f3a0748b2aaff84c7a67810a0f7ab9076"
+    },
+    {
+      "name": "exp0_4_4.txt",
+      "upstream_path": "tests/data/exp0_4_4.txt",
+      "sha256": "3a845eae26847dc63d833f9eaaa5a4b14ea424f8604e02a7f2e8249702f73d50"
+    },
+    {
+      "name": "exp0_4_5.txt",
+      "upstream_path": "tests/data/exp0_4_5.txt",
+      "sha256": "4b665d560ac7ab1c48458c224d10b73e21eb8f8fc5c94933c1868cee2f7b75ea"
+    },
+    {
+      "name": "exp0_51_1.txt",
+      "upstream_path": "tests/data/exp0_51_1.txt",
+      "sha256": "09e5509a30a9cf9a6378673702508199f7a11b063956f0667e7c705ce77c99ee"
+    },
+    {
+      "name": "exp0_51_2.txt",
+      "upstream_path": "tests/data/exp0_51_2.txt",
+      "sha256": "2ba99e029f28162b8e262515ca2e778cd25faad3af3f3fe063e8d6abd92424fc"
+    },
+    {
+      "name": "exp0_51_3.txt",
+      "upstream_path": "tests/data/exp0_51_3.txt",
+      "sha256": "c4843e14ed8af188d591815e3c43238b5b1e17ac9b2571438f9e60b220887e99"
+    },
+    {
+      "name": "exp0_51_4.txt",
+      "upstream_path": "tests/data/exp0_51_4.txt",
+      "sha256": "4ad28631b99282a81ceec03a65a410c09df0df4fc0e67257e8f07376f98c9f18"
+    },
+    {
+      "name": "exp0_51_5.txt",
+      "upstream_path": "tests/data/exp0_51_5.txt",
+      "sha256": "a0909e8ec68affd43694a5e39d332a625bf907309d00dfaca53fd0828eb65b55"
+    },
+    {
+      "name": "exp0_5_1.txt",
+      "upstream_path": "tests/data/exp0_5_1.txt",
+      "sha256": "36799f64813696147e33bca23add2e164b9e4a726e0aa91d0c4c666c9115951c"
+    },
+    {
+      "name": "exp0_5_2.txt",
+      "upstream_path": "tests/data/exp0_5_2.txt",
+      "sha256": "c40ab57ae9644da2db1b04261b932d81732c7f684533638473d87b6e7280b4de"
+    },
+    {
+      "name": "exp0_5_3.txt",
+      "upstream_path": "tests/data/exp0_5_3.txt",
+      "sha256": "4b3d3ef931b771940595bb54021a6ba20fd47fa0dc044afdab67f8ebef599fed"
+    },
+    {
+      "name": "exp0_5_4.txt",
+      "upstream_path": "tests/data/exp0_5_4.txt",
+      "sha256": "ea391e39269e29071a13bb3e86c6dddc225090bc2d515c8cc85f20372e7d7ea9"
+    },
+    {
+      "name": "exp0_5_5.txt",
+      "upstream_path": "tests/data/exp0_5_5.txt",
+      "sha256": "02bf7ff00842d4936ba24fcea7e5e4422abbb702b2a50791f687f8d9325a3e00"
+    },
+    {
+      "name": "exp0_6_1.txt",
+      "upstream_path": "tests/data/exp0_6_1.txt",
+      "sha256": "c193e695f7f4952592537a9ef3ee357a02a4caadda786b8114d3d24a09387b60"
+    },
+    {
+      "name": "exp0_6_2.txt",
+      "upstream_path": "tests/data/exp0_6_2.txt",
+      "sha256": "c18ebd034f69d222ea77286c0ea623158617882c0832fafbf710209499cf092a"
+    },
+    {
+      "name": "exp0_6_3.txt",
+      "upstream_path": "tests/data/exp0_6_3.txt",
+      "sha256": "219c60c44c7ce74a78d3a6c90f37435c87570532571259f252753f36a9520390"
+    },
+    {
+      "name": "exp0_6_4.txt",
+      "upstream_path": "tests/data/exp0_6_4.txt",
+      "sha256": "07dd61debf1d994b09c9b84034571555b8bef29ed1ba25c55fa8c9495aac1a16"
+    },
+    {
+      "name": "exp0_6_5.txt",
+      "upstream_path": "tests/data/exp0_6_5.txt",
+      "sha256": "a4c0cee61d4d149bfc86c7623264bdef6a294830381986e8eb852efaead9f02f"
+    },
+    {
+      "name": "exp0_7_1.txt",
+      "upstream_path": "tests/data/exp0_7_1.txt",
+      "sha256": "331a3dd07215900923ec16a37f2d48c4c417e880ee098d85e7cd5865fecc1ba9"
+    },
+    {
+      "name": "exp0_7_2.txt",
+      "upstream_path": "tests/data/exp0_7_2.txt",
+      "sha256": "0b7edba2c8f38339f975b546e39f717ec81926023eff0187011b27e4a5b32962"
+    },
+    {
+      "name": "exp0_7_3.txt",
+      "upstream_path": "tests/data/exp0_7_3.txt",
+      "sha256": "f65244a4f9ee758ceeb0951737932554d677dad15b4541f16e31782ab38908b1"
+    },
+    {
+      "name": "exp0_7_4.txt",
+      "upstream_path": "tests/data/exp0_7_4.txt",
+      "sha256": "4727cfe42df11d8fe3fa2d98dabdbbb87c0017a55e7a3bc3558e2cf65288d34e"
+    },
+    {
+      "name": "exp0_7_5.txt",
+      "upstream_path": "tests/data/exp0_7_5.txt",
+      "sha256": "1c81fc59a598e2b9deb0dcef55ca0117cd4cae55d4dec5c7081553725afaf8f3"
+    },
+    {
+      "name": "exp0_8_1.txt",
+      "upstream_path": "tests/data/exp0_8_1.txt",
+      "sha256": "0e8072d6ab473f5cb2f1bceae92c63c72c1cdc44b048006e3d1581792b89af03"
+    },
+    {
+      "name": "exp0_8_2.txt",
+      "upstream_path": "tests/data/exp0_8_2.txt",
+      "sha256": "5b610442a9df797eabdc17b87377c2f41e8c40fa8cdbe5dc05f051ecc13f2ba4"
+    },
+    {
+      "name": "exp0_8_3.txt",
+      "upstream_path": "tests/data/exp0_8_3.txt",
+      "sha256": "af6c83f3935d9b9d5e9b179b2fea74493430cb49126b928db43ecc8b9dc72734"
+    },
+    {
+      "name": "exp0_8_4.txt",
+      "upstream_path": "tests/data/exp0_8_4.txt",
+      "sha256": "be8cb9262f2ada6dc9cee979c6a6162e93a484279821094ae9907dc372d88bc8"
+    },
+    {
+      "name": "exp0_8_5.txt",
+      "upstream_path": "tests/data/exp0_8_5.txt",
+      "sha256": "8d749d62a7172cb9a7c25053e920c8b38c85f4ae9fefcba51ca8849c071277e9"
+    },
+    {
+      "name": "exp0_agriculture_1.txt",
+      "upstream_path": "tests/data/exp0_agriculture_1.txt",
+      "sha256": "12fce3357944f8c404603145d99bba4d1946ff251698e669ca1c0e0542292190"
+    },
+    {
+      "name": "exp0_agriculture_2.txt",
+      "upstream_path": "tests/data/exp0_agriculture_2.txt",
+      "sha256": "8d2c2ff99b8caf3fdf29b61070e971f4881261ca9a48cfc6a6252a04fa9504e5"
+    },
+    {
+      "name": "exp0_agriculture_3.txt",
+      "upstream_path": "tests/data/exp0_agriculture_3.txt",
+      "sha256": "9b75e032ac3913dd9e985d393a2234d6fc566a6b9630ec6fe4f33ad54c7ac406"
+    },
+    {
+      "name": "exp0_agriculture_4.txt",
+      "upstream_path": "tests/data/exp0_agriculture_4.txt",
+      "sha256": "fe0d44be9ffe0a2cbf03e396671ebd02b9c07788359420fc69f0bbf762284106"
+    },
+    {
+      "name": "exp0_agriculture_5.txt",
+      "upstream_path": "tests/data/exp0_agriculture_5.txt",
+      "sha256": "53f9ce16b12604fc869a070f9e1daef1135240ba4ffefcb36d8c29cd60c55e01"
+    },
+    {
+      "name": "exp0_craigslist_data_wrangler_1.txt",
+      "upstream_path": "tests/data/exp0_craigslist_data_wrangler_1.txt",
+      "sha256": "a8c150ca66fef508463dc21bb5b976a99990aa9083046e27fe8ba8e665fdf960"
+    },
+    {
+      "name": "exp0_craigslist_data_wrangler_2.txt",
+      "upstream_path": "tests/data/exp0_craigslist_data_wrangler_2.txt",
+      "sha256": "ea687ee30c582371e47f9fdfcf4b0f35e5cc040e57c14736398950d056596ee0"
+    },
+    {
+      "name": "exp0_craigslist_data_wrangler_3.txt",
+      "upstream_path": "tests/data/exp0_craigslist_data_wrangler_3.txt",
+      "sha256": "6307023b53f33d5054e4cdc6ff1edbbec28f280e9ff98072e69ade2e62b28782"
+    },
+    {
+      "name": "exp0_craigslist_data_wrangler_4.txt",
+      "upstream_path": "tests/data/exp0_craigslist_data_wrangler_4.txt",
+      "sha256": "2e8263f0df685b6631eed0971074107fe950a5f07352c604507b54cc6c45442e"
+    },
+    {
+      "name": "exp0_craigslist_data_wrangler_5.txt",
+      "upstream_path": "tests/data/exp0_craigslist_data_wrangler_5.txt",
+      "sha256": "fa9311f3a0b12e7e34bd54bc2d2d9904bf322e478ab4539777e881669add3c6e"
+    },
+    {
+      "name": "exp0_crime_data_wrangler_1.txt",
+      "upstream_path": "tests/data/exp0_crime_data_wrangler_1.txt",
+      "sha256": "18a9a3810a0075b370fd0c9f539a12832c0b81bfcd28b46118a5df3c5b46d151"
+    },
+    {
+      "name": "exp0_crime_data_wrangler_2.txt",
+      "upstream_path": "tests/data/exp0_crime_data_wrangler_2.txt",
+      "sha256": "681f70be5b8506691687284a585d1551da89536fc4c29cf5e167064bf22dbf93"
+    },
+    {
+      "name": "exp0_crime_data_wrangler_3.txt",
+      "upstream_path": "tests/data/exp0_crime_data_wrangler_3.txt",
+      "sha256": "898c8b010b5d0d395f9953d7d37ab99086485959eb68c609b808b2a1d0e52f15"
+    },
+    {
+      "name": "exp0_crime_data_wrangler_4.txt",
+      "upstream_path": "tests/data/exp0_crime_data_wrangler_4.txt",
+      "sha256": "252015136dc733b1f4b01836c0b7712d94f6f9d3bc3042b5cd6c66906b01dbb1"
+    },
+    {
+      "name": "exp0_crime_data_wrangler_5.txt",
+      "upstream_path": "tests/data/exp0_crime_data_wrangler_5.txt",
+      "sha256": "f826934091e365770ec4cca9b77465db2afb3ca467b5116d63b1e68779239330"
+    },
+    {
+      "name": "exp0_potters_wheel_divide_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_divide_1.txt",
+      "sha256": "7d57581b4c25f410897ecedea1ec51fd61c68e3c0a844ad6f9752174c97b7a7d"
+    },
+    {
+      "name": "exp0_potters_wheel_divide_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_divide_2.txt",
+      "sha256": "e893c9b1496c3befd87fe22afd9c35d49cd1c5432b029acbb67e4db89231b7f5"
+    },
+    {
+      "name": "exp0_potters_wheel_divide_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_divide_3.txt",
+      "sha256": "005ae2faf2d63afb675aaeab224efc169c3cd6688ef35cb484847b3b67642232"
+    },
+    {
+      "name": "exp0_potters_wheel_divide_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_divide_4.txt",
+      "sha256": "35265e7c805c9ded190238068140b428d0cf81f2912c1bed95b6a412a10217b7"
+    },
+    {
+      "name": "exp0_potters_wheel_divide_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_divide_5.txt",
+      "sha256": "8b60ad6061595fd3977ce2b389864edac14e01c7b790338cd596d184e1c2df9d"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_1.txt",
+      "sha256": "d5f913c9d1a4e01550f5a4aa1f797f3d60d84d5544747411b51a613761c9532f"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2.txt",
+      "sha256": "f7d607f9e71d4d48f8f25eebfb39d7272ca5c84515ef3d2d325cade5ec67a6d2"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2_1.txt",
+      "sha256": "7dbe4fc779b58f5444cb5d3de07ff024153884cd737a91cc0fdfcd0f358ce9af"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2_2.txt",
+      "sha256": "5b6a1443638ec96c36e21f5a076acd7d4f03e0184bd1bed5c8a67a395e6539fd"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2_3.txt",
+      "sha256": "8f431de22d4a7a6ae385752954b742fb440d92cfc9f8a1ab0b9ff3235c4cb80b"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2_4.txt",
+      "sha256": "d87256628bfb70c6261f36c4e67e8e775cff10745c8d468009279be827cdecb9"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_2_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_2_5.txt",
+      "sha256": "2caae9f0a47d6566853b143c95597954a91690e5d862c58c421f4a7529cb8b69"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_3.txt",
+      "sha256": "840e18a2f8fba54c10638d621f0f078af53b1d86a091a1ebe3bfc3ed71b1a013"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_4.txt",
+      "sha256": "3a1672c959ead5be34104ead8ba8854b17cd1c2624c278d1287be62ce4fb8875"
+    },
+    {
+      "name": "exp0_potters_wheel_fold_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_fold_5.txt",
+      "sha256": "efdb77bd5969b7448db315f51c6e24736bd2f7188085ec9693e87b4663ba94fe"
+    },
+    {
+      "name": "exp0_potters_wheel_merge_split_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_merge_split_1.txt",
+      "sha256": "e6d4a4d1e5319f8d210fd67542ffa62b2afab68230ef7c6e51766de55c4c400d"
+    },
+    {
+      "name": "exp0_potters_wheel_merge_split_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_merge_split_2.txt",
+      "sha256": "7e6a8bf8353752cf55bb6783739c6b5bdf7526661d59e5700ec8966db260c7e1"
+    },
+    {
+      "name": "exp0_potters_wheel_merge_split_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_merge_split_3.txt",
+      "sha256": "b0ba4b8af568d9e42df8185ed43b1223271aa7dec9d115b9e28dec63d8039ab8"
+    },
+    {
+      "name": "exp0_potters_wheel_merge_split_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_merge_split_4.txt",
+      "sha256": "734271bae56432c878a6c52f89a04c153cb6079aa130134ad402a5762eb2114c"
+    },
+    {
+      "name": "exp0_potters_wheel_merge_split_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_merge_split_5.txt",
+      "sha256": "c7d21a8e0f83eed63e16a059e76faea027484884e920508cf36446ecf3870b13"
+    },
+    {
+      "name": "exp0_potters_wheel_split_fold_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_split_fold_1.txt",
+      "sha256": "17f6fa696c20e2198799605065d550c0917684629b3f0d649c1f1dd28bc4a967"
+    },
+    {
+      "name": "exp0_potters_wheel_split_fold_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_split_fold_2.txt",
+      "sha256": "190f297fa4fdbdd4fc56b68f8a40ba05ae82dda154cfb92dfedff5e18d9f5931"
+    },
+    {
+      "name": "exp0_potters_wheel_split_fold_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_split_fold_3.txt",
+      "sha256": "6894e3a681224724e1a3e67c8db4422473dcf30dea6b2cdf6ddd65b459bc30f3"
+    },
+    {
+      "name": "exp0_potters_wheel_split_fold_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_split_fold_4.txt",
+      "sha256": "f8d6509aa5b81b4400e71722ed3fc9a09eb023aa417c48da388115aa19080e91"
+    },
+    {
+      "name": "exp0_potters_wheel_split_fold_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_split_fold_5.txt",
+      "sha256": "b8e789382023793a9977264be434fedcaf4d4fe4bf549a8a5d79dfac6e5aff05"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold2_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold2_1.txt",
+      "sha256": "cdecb5780d922c4f3e3bc1570fe03029fa318cdb23d65621af625e883fab9723"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold2_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold2_2.txt",
+      "sha256": "953c4ef63e35b7d1ef4b5c6003edb5f07adae55083a1b0f221594787a3ab8b28"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold2_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold2_3.txt",
+      "sha256": "22592a1989826818adbe4e2c87794ee819aaa49d62e8cd5d6adbc31b1349b962"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold2_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold2_4.txt",
+      "sha256": "225f22a6502893ed38565a51f4d6e047b468700275407140a9fd048ac47877e2"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold2_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold2_5.txt",
+      "sha256": "f8873aa44dc7cfa092cd5f6a16b5438ea8c91a168a183d63eb46a409fcdb08c9"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold_1.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold_1.txt",
+      "sha256": "393e959de802a3929a663042e744b5b268724ac3b54efdf5a49cb3d505e9efb8"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold_2.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold_2.txt",
+      "sha256": "087707ab252d5a082b98cc4cf9e75d7e504234d010b0e004bb774cdab5d45db1"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold_3.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold_3.txt",
+      "sha256": "360348c0503d1982bc5b9f6435c938e73690485286f5e5d20454b942f2d4bd57"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold_4.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold_4.txt",
+      "sha256": "37f5b733155319d01f31f99725c0acdbd44c174d8cf05b0eefc1d0fb803b80a3"
+    },
+    {
+      "name": "exp0_potters_wheel_unfold_5.txt",
+      "upstream_path": "tests/data/exp0_potters_wheel_unfold_5.txt",
+      "sha256": "360ddc6771dd661ffabd8dcf75f399a648d2a737182f3b0fd11bc5a57533867b"
+    },
+    {
+      "name": "exp0_proactive_wrangling_complex_1.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_complex_1.txt",
+      "sha256": "11854b4728773aabb8effcced597e2110fee232136f04f6d25e044e5e0889b15"
+    },
+    {
+      "name": "exp0_proactive_wrangling_complex_2.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_complex_2.txt",
+      "sha256": "ae3144d0a0431a6b5c1725ad5fb688db153b223a381a369246ab3ac0e8806310"
+    },
+    {
+      "name": "exp0_proactive_wrangling_complex_3.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_complex_3.txt",
+      "sha256": "0e7cddd724bf58c9dd5cde7195ad00bce770bd68d6f62b2a11625c1606f6c3b3"
+    },
+    {
+      "name": "exp0_proactive_wrangling_complex_4.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_complex_4.txt",
+      "sha256": "1b4b857c4d3659d7102ed99635a3d8287dd8a0f16c8c69f75a4a98b911ae4e44"
+    },
+    {
+      "name": "exp0_proactive_wrangling_complex_5.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_complex_5.txt",
+      "sha256": "235ec523c142654c126164be01f53bd1bcec076affd44587e87c5149b46f6080"
+    },
+    {
+      "name": "exp0_proactive_wrangling_fold_1.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_fold_1.txt",
+      "sha256": "e2d172487d623d87e5b596b1f1a103e25e7da47de55732cd855c69929c39c184"
+    },
+    {
+      "name": "exp0_proactive_wrangling_fold_2.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_fold_2.txt",
+      "sha256": "ba9342e989b7fbbd18472124687c50df79160cf35e105ee1dff7fa0f72a91e3b"
+    },
+    {
+      "name": "exp0_proactive_wrangling_fold_3.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_fold_3.txt",
+      "sha256": "47725a70dfb7c71f077fba03103035e9e189a09c5841d2c816b924fb8b7b2363"
+    },
+    {
+      "name": "exp0_proactive_wrangling_fold_4.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_fold_4.txt",
+      "sha256": "c76648d37f9e1c662fc66fb254c1f1e808b9ff7d5361704d1c4288cf2ca698e6"
+    },
+    {
+      "name": "exp0_proactive_wrangling_fold_5.txt",
+      "upstream_path": "tests/data/exp0_proactive_wrangling_fold_5.txt",
+      "sha256": "129ef094dcf26c2b67d755c5008af1e6936eb0830d7e88fe5259683a144b2928"
+    },
+    {
+      "name": "exp0_reshape_table_structure_data_wrangler_1.txt",
+      "upstream_path": "tests/data/exp0_reshape_table_structure_data_wrangler_1.txt",
+      "sha256": "14004b561852083efe467f5249edf29ff079dfc5367357332e0fe973a766fefd"
+    },
+    {
+      "name": "exp0_reshape_table_structure_data_wrangler_2.txt",
+      "upstream_path": "tests/data/exp0_reshape_table_structure_data_wrangler_2.txt",
+      "sha256": "958b8cf4ca3a319c19a897c7f4ab97638f4beefddcb6493471ae24698a013904"
+    },
+    {
+      "name": "exp0_reshape_table_structure_data_wrangler_3.txt",
+      "upstream_path": "tests/data/exp0_reshape_table_structure_data_wrangler_3.txt",
+      "sha256": "28db0ed5dfc5a96c2ee7258990821a3ca584e7933bdbee9ab97e0c8a6ed782da"
+    },
+    {
+      "name": "exp0_reshape_table_structure_data_wrangler_4.txt",
+      "upstream_path": "tests/data/exp0_reshape_table_structure_data_wrangler_4.txt",
+      "sha256": "ecfc65425ef49acfddb2b0465b8de82f83b9085401d4b897c10d039c7d4ed426"
+    },
+    {
+      "name": "exp0_reshape_table_structure_data_wrangler_5.txt",
+      "upstream_path": "tests/data/exp0_reshape_table_structure_data_wrangler_5.txt",
+      "sha256": "c55aa24e6669b29a8aca007ec189f8c1327803f51ccaf6827d9fcd6b95c1cada"
+    }
+  ]
+}

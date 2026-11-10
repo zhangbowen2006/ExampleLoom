@@ -67,6 +67,88 @@ fn dispatch(request : Json) -> Json raise LoomError {
       }
       Json::object({ "ok": Json(true), "table": table_json(table) })
     }
+    "synthesize_table" => {
+      let examples = j_array(required(obj, "examples")).map(v => {
+        let e = j_object(v)
+        TableExample::{
+          before: table_from_json(required(e, "input")),
+          after: table_from_json(required(e, "output")),
+        }
+      })
+      let defaults = default_table_options()
+      let options = match obj.get("options") {
+        None => defaults
+        Some(v) => {
+          let o = j_object(v)
+          fields_only(o, [
+            "max_depth", "max_states", "max_evaluations", "max_candidates",
+          ])
+          TableSearchOptions::{
+            max_depth: option_int(o, "max_depth", defaults.max_depth),
+            max_states: option_int(o, "max_states", defaults.max_states),
+            max_evaluations: option_int(
+              o,
+              "max_evaluations",
+              defaults.max_evaluations,
+            ),
+            max_candidates: option_int(
+              o,
+              "max_candidates",
+              defaults.max_candidates,
+            ),
+          }
+        }
+      }
+      let patterns = match obj.get("patterns") {
+        Some(v) => json_strings(v)
+        None => []
+      }
+      let separators = match obj.get("separators") {
+        Some(v) => json_strings(v)
+        None => [",", ";", ":", "|", "/", "_", "-", " ", "\t"]
+      }
+      let r = synthesize_table(examples, options~, separators~, patterns~)
+      Json::object({
+        "ok": Json(true),
+        "status": Json(r.status),
+        "truncated": Json(r.truncated),
+        "stats": Json::object({
+          "states": Json(r.states),
+          "evaluations": Json(r.evaluations),
+          "rejected": Json(r.rejected),
+          "row_searches": Json(r.row_searches),
+        }),
+        "candidates": Json::array(
+          r.candidates.map(p => {
+            Json::object({
+              "pipeline": pipeline_to_json(p),
+              "description": Json::array(p.steps.map(table_step_to_json)),
+            })
+          }),
+        ),
+      })
+    }
+    "validate_pipeline" =>
+      Json::object({
+        "ok": Json(true),
+        "pipeline": pipeline_to_json(
+          pipeline_from_json(required(obj, "pipeline")),
+        ),
+      })
+    "transform" => {
+      let p = pipeline_from_json(required(obj, "pipeline"))
+      let output = apply_pipeline(p, table_from_json(required(obj, "table")))
+      let safe = match obj.get("spreadsheet_safe") {
+        Some(False) => false
+        Some(True) | None => true
+        _ => raise LoomError("spreadsheet_safe must be boolean")
+      }
+      Json::object({
+        "ok": Json(true),
+        "table": table_json(output),
+        "csv": Json(render_csv(output, spreadsheet_safe=safe)),
+      })
+    }
     "synthesize" => {
       let examples = j_array(required(obj, "examples")).map(v => {
         let e = j_object(v)
@@ -87,7 +169,18 @@ fn dispatch(request : Json) -> Json raise LoomError {
         Some(v) => j_array(v).map(j_text)
         None => []
       }
-      let report = synthesize(examples, options~, separators~)
+      let patterns = match obj.get("patterns") {
+        Some(v) => j_array(v).map(j_text)
+        None => []
+      }
+      let branch_depth = option_int(obj, "branch_depth", 2)
+      let report = synthesize(
+        examples,
+        options~,
+        separators~,
+        patterns~,
+        branch_depth~,
+      )
       let suggestions = disagreements(report.candidates, rows)
       Json::object({
         "ok": Json(true),

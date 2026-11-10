@@ -1,0 +1,1 @@
+{"title":"月度宽表变长表","description":"财务运营为分析系统整理月度表；用 A、B 两条记录示范，转换下一批 C、D，保留前导零和空单元格。","input":"id,Jan,Feb\nA,1,2\nB,3,4\n","target":"id,month,amount\nA,Jan,1\nA,Feb,2\nB,Jan,3\nB,Feb,4\n","next":"Feb,id,Jan\n9,C,07\n,D,5\n","expected":{"columns":["id","month","amount"],"rows":[["C","Jan","07"],["C","Feb","9"],["D","Jan","5"],["D","Feb",""]]}}

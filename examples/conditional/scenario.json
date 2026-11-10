@@ -1,0 +1,1 @@
+{"title":"条件编码","description":"两类供应商使用不同前缀和编号分隔符；前四行训练，最后两行为留出数据。","file":"input.csv","fields":[{"name":"normalized","labels":[{"row":0,"output":"CN/001"},{"row":1,"output":"CN/0482"},{"row":2,"output":"INT/98"},{"row":3,"output":"INT/601"}],"expected":["CN/001","CN/0482","INT/98","INT/601","CN/0777","INT/45001"]}]}

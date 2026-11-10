@@ -8,13 +8,13 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - name: Install pinned MoonBit toolchain
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh -o /tmp/install-moon.sh
@@ -35,11 +35,14 @@ jobs:
       - name: Build and test complete workflows
         run: |
           python3 scripts/import-public-data.py
+          python3 scripts/import-foofah.py
           git diff --exit-code -- fixtures/ examples/
           node scripts/build.mjs
           node scripts/integration.mjs
+          node scripts/advanced-test.mjs
           node scripts/public-data-test.mjs
           python3 scripts/verify-sqlite.py
+          node scripts/benchmark.mjs
       - name: Browser workflows
         run: |
           npm install --no-save --package-lock=false playwright@1.62.1
@@ -47,6 +50,7 @@ jobs:
           node scripts/serve.mjs > /tmp/exampleloom-server.log 2>&1 &
           curl --retry 20 --retry-connrefused --retry-delay 1 --max-time 30 http://127.0.0.1:4173/ > /dev/null
           node scripts/browser-test.mjs
+          node scripts/advanced-browser-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -59,7 +63,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       pages: write
       id-token: write

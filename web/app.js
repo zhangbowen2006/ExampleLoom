@@ -104,6 +104,8 @@ for (const button of document.querySelectorAll('[data-demo]')) button.onclick = 
   const name = button.dataset.demo;
   const response = await fetch(`./examples/${name}/scenario.json`); if (!response.ok) throw new Error('示例加载失败');
   const scenario = await response.json();
+  $('regex-hints').value = (scenario.patterns ?? []).join('\n');
+  $('branch-depth').value = String(scenario.branch_depth ?? 2);
   const source = await fetch(`./examples/${name}/${scenario.file}`); if (!source.ok) throw new Error('示例数据加载失败');
   $('source').value = await source.text(); $('format').value = 'csv'; recipe = null; staleFields.clear();
   await parseSource(); demo = scenario;
@@ -119,7 +121,7 @@ $('learn').onclick = () => task(async () => {
   if (!$('output-name').value.trim()) throw new Error('请填写输出字段名。');
   notice('正在搜索与所有样例一致的程序…');
   const start = performance.now();
-  report = await call({ op: 'synthesize', examples: [...labels].map(([i, output]) => ({ input: table.rows[i], output })), rows: table.rows.slice(0, 5000) });
+  report = await call({ op: 'synthesize', examples: [...labels].map(([i, output]) => ({ input: table.rows[i], output })), rows: table.rows.slice(0, 5000), patterns: $('regex-hints').value.split(/\r?\n/).filter(p => p.length), branch_depth:Number($('branch-depth').value) });
   $('candidate-count').textContent = `${report.candidates.length} 个候选`;
   $('search-stats').textContent = `${Math.round(performance.now() - start)} ms · ${report.stats.atom_evaluations} 次原子尝试 · ${report.stats.steps} 次搜索步骤`;
   $('search-boundary').hidden = false;
@@ -207,3 +209,5 @@ $('apply').onclick = () => task(async () => {
 });
 $('download-csv').onclick = () => batch?.csv != null && download(batch.csv, 'exampleloom.result.csv', 'text/csv;charset=utf-8');
 $('download-report').onclick = () => batch && download(JSON.stringify(batch, null, 2), 'exampleloom.results.json', 'application/json');
+$('regex-hints').oninput = labelsChanged;
+$('branch-depth').onchange = labelsChanged;

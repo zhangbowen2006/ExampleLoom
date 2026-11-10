@@ -1,0 +1,1 @@
+{"title":"带上下文的正则捕获","description":"运维人员从带噪声的记录提取 ref 编号；输入中别的数字不能当作 ref。","file":"input.csv","patterns":["ref=([[:digit:]]+)"],"fields":[{"name":"reference","labels":[{"row":0,"output":"009"},{"row":1,"output":"4812"}],"expected":["009","4812","70004","001234"]}]}
