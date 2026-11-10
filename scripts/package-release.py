@@ -34,6 +34,11 @@ if args.moon_zip:
     with zipfile.ZipFile(moon) as archive:
         manifest=tomllib.loads(archive.read('moon.mod').decode('utf-8'))
         assert manifest['name']=='zhangbowen2006/exampleloom' and manifest['version']==version
+        for info in archive.infolist():
+            if info.is_dir(): continue
+            original=(ROOT/info.filename).resolve()
+            assert original.is_relative_to(ROOT) and original.is_file(), 'Unexpected package path'
+            assert original.read_bytes()==archive.read(info), 'Stale packaged file: '+info.filename
     files.append(moon)
 hashes={}
 for path in files:
