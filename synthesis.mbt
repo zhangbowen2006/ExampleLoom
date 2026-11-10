@@ -200,6 +200,7 @@ fn build_atoms(
   // exhausting the atom budget before the more general selectors are tried.
   for col in 0..<examples[0].input.length() {
     let base = Field(col)
+    learn_replacements(pool, examples, col, patterns, options)
     let structural : Array[(Expr, Int32)] = [(base, 2)]
     for pattern in inferred_capture_patterns(examples, col) {
       structural.push((RegexCapture(base, pattern, 1, 0), 8))
@@ -247,19 +248,20 @@ fn build_atoms(
       }
     }
     for pair in structural {
+      if pool.attempts >= options.max_atom_evaluations {
+        pool.truncated = true
+        return pool
+      }
       let (expr, cost) = pair
       offer_variants(pool, expr, cost, examples, options)
       let date_inputs = [expr, Trim(expr)]
       for date_input in date_inputs {
+        let first_value = evaluate(date_input, examples[0].input) catch {
+          _ => continue
+        }
         for source in date_formats() {
           let valid = try {
-            ignore(
-              convert_date(
-                evaluate(date_input, examples[0].input),
-                source,
-                "YYYYMMDD",
-              ),
-            )
+            ignore(convert_date(first_value, source, "YYYYMMDD"))
             true
           } catch {
             _ => false

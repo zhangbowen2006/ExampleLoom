@@ -50,6 +50,7 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       Pivot(_, _, _, levels) => 12 + levels.length() / 8
       PivotGrid(_, _, _) => 9
       GroupRows(_, _) => 9
+      Aggregate(_, measures) => 11 + measures.length()
       SplitColumn(_, _, _) | Explode(_, _) => 7
       CombineColumns(names, sep, _) => 5 + names.length() + sep.char_length()
       SegmentRows(c, _) => 8 + condition_cost(c)
@@ -61,7 +62,15 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
 }
 
 ///|
-fn table_distance(table : Table, target : Table) -> Int32 {
+priv struct TargetProfile {
+  width : Int32
+  height : Int32
+  frequencies : Map[String, Int32]
+  total : Int32
+}
+
+///|
+fn target_profile(target : Table) -> TargetProfile {
   let wanted : Map[String, Int32] = Map([])
   let mut total = 0
   for row in target.rows {
@@ -73,6 +82,16 @@ fn table_distance(table : Table, target : Table) -> Int32 {
       total = total + 1
     }
   }
+  {
+    width: target.columns.length(),
+    height: target.rows.length(),
+    frequencies: wanted,
+    total,
+  }
+}
+
+///|
+fn table_distance(table : Table, target : TargetProfile) -> Int32 {
   let counts : Map[String, Int32] = Map([])
   let mut present = 0
   let mut cells = 0
@@ -83,17 +102,17 @@ fn table_distance(table : Table, target : Table) -> Int32 {
       }
       cells = cells + 1
       let n = counts.get(value).unwrap_or(0)
-      if n < wanted.get(value).unwrap_or(0) {
+      if n < target.frequencies.get(value).unwrap_or(0) {
         present = present + 1
+        counts[value] = n + 1
       }
-      counts[value] = n + 1
     }
   }
-  let shape = (table.columns.length() - target.columns.length()).abs() * 4 +
-    (table.rows.length() - target.rows.length()).abs() *
+  let shape = (table.columns.length() - target.width).abs() * 4 +
+    (table.rows.length() - target.height).abs() *
     20 /
-    Int32::max(1, Int32::max(table.rows.length(), target.rows.length()))
-  let missing = (total - present) * 100 / Int32::max(1, total)
+    Int32::max(1, Int32::max(table.rows.length(), target.height))
+  let missing = (target.total - present) * 100 / Int32::max(1, target.total)
   let extra = (cells - present) * 20 / Int32::max(1, cells)
   shape + missing + extra
 }
@@ -101,7 +120,7 @@ fn table_distance(table : Table, target : Table) -> Int32 {
 ///|
 fn state_priority(
   tables : Array[Table],
-  targets : Array[Table],
+  targets : Array[TargetProfile],
   steps : Array[TableStep],
 ) -> Int32 {
   let mut distance = 0

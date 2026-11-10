@@ -33,6 +33,20 @@ fn predicate_pool(
         result.push(Equals(Field(col), Literal(value)))
       }
     }
+    let shapes : Map[String, Int32] = Map([])
+    for e in examples {
+      if capture_shape(e.input[col]) is Some(p) {
+        shapes[p] = shapes.get(p).unwrap_or(0) + 1
+      }
+    }
+    let observed = shapes.keys().to_array()
+    observed.sort()
+    for p in observed {
+      let count = shapes.get(p).unwrap_or(0)
+      if count >= 2 && examples.length() - count >= 2 {
+        result.push(Matches(Field(col), p, true))
+      }
+    }
   }
   result
 }
@@ -45,6 +59,7 @@ fn learn_branches(
   patterns : Array[String],
   depth : Int32,
   budget : LearningBudget,
+  try_flat~ : Bool = true,
 ) -> Array[Candidate] raise LoomError {
   if budget.calls >= 64 ||
     budget.atoms >= options.max_atom_evaluations ||
@@ -52,40 +67,52 @@ fn learn_branches(
     budget.truncated = true
     return []
   }
-  budget.calls = budget.calls + 1
-  let atom_left = options.max_atom_evaluations - budget.atoms
-  let step_left = options.max_steps - budget.steps
-  let child_options : SearchOptions = {
-    ..options,
-    max_candidates: Int32::min(8, options.max_candidates),
-    max_atom_evaluations: Int32::min(
-      atom_left,
-      if depth > 0 {
-        3000
-      } else {
-        6000
-      },
-    ),
-    max_steps: Int32::min(step_left, if depth > 0 { 15000 } else { 30000 }),
-  }
-  let report = synthesize_flat(
-    examples,
-    options=child_options,
-    separators~,
-    patterns~,
-  )
-  budget.atoms = budget.atoms + report.atom_evaluations
-  budget.steps = budget.steps + report.steps
-  budget.cached = budget.cached + report.cached_states
-  budget.hits = budget.hits + report.cache_hits
-  budget.retained_atoms = budget.retained_atoms + report.atoms
-  budget.truncated = budget.truncated || report.truncated
-  if !report.candidates.is_empty() || depth == 0 {
-    return report.candidates
+  if try_flat {
+    budget.calls = budget.calls + 1
+    let reserve = if depth > 0 && examples.length() >= 4 { 2 } else { 1 }
+    let atom_left = Int32::max(
+      1,
+      (options.max_atom_evaluations - budget.atoms) / reserve,
+    )
+    let step_left = Int32::max(1, (options.max_steps - budget.steps) / reserve)
+    let child_options : SearchOptions = {
+      ..options,
+      max_candidates: Int32::min(8, options.max_candidates),
+      max_atom_evaluations: Int32::min(
+        atom_left,
+        if depth > 0 {
+          3000
+        } else {
+          6000
+        },
+      ),
+      max_steps: Int32::min(step_left, if depth > 0 { 15000 } else { 30000 }),
+    }
+    let report = synthesize_flat(
+      examples,
+      options=child_options,
+      separators~,
+      patterns~,
+    )
+    budget.atoms = budget.atoms + report.atom_evaluations
+    budget.steps = budget.steps + report.steps
+    budget.cached = budget.cached + report.cached_states
+    budget.hits = budget.hits + report.cache_hits
+    budget.retained_atoms = budget.retained_atoms + report.atoms
+    budget.truncated = budget.truncated || report.truncated
+    if !report.candidates.is_empty() || depth == 0 || examples.length() < 4 {
+      return report.candidates
+    }
   }
   let candidates : Array[Candidate] = []
   let partitions : Map[String, Bool] = Map([])
   for condition in predicate_pool(examples, patterns) {
+    if budget.calls >= 64 ||
+      budget.atoms >= options.max_atom_evaluations ||
+      budget.steps >= options.max_steps {
+      budget.truncated = true
+      break
+    }
     let yes : Array[Example] = []
     let no : Array[Example] = []
     let mask : Array[Bool] = []
@@ -111,7 +138,12 @@ fn learn_branches(
     partitions[key] = true
     let left = learn_branches(
       yes,
-      options,
+      {
+        ..options,
+        max_atom_evaluations: budget.atoms +
+        (options.max_atom_evaluations - budget.atoms + 1) / 2,
+        max_steps: budget.steps + (options.max_steps - budget.steps + 1) / 2,
+      },
       separators,
       patterns,
       depth - 1,
@@ -135,12 +167,8 @@ fn learn_branches(
       for b in right[:Int32::min(2, right.length())] {
         candidates.push({
           expression: If(condition, a.expression, b.expression),
-          cost: a.cost + b.cost + 8,
+          cost: a.cost + b.cost + 8 + condition_cost(condition),
         })
-        if candidates.length() >= options.max_candidates {
-          budget.truncated = true
-          return candidates
-        }
       }
     }
   }
@@ -151,7 +179,12 @@ fn learn_branches(
       explain(a.expression).compare(explain(b.expression))
     }
   })
-  candidates
+  if candidates.length() > options.max_candidates {
+    budget.truncated = true
+    candidates[:options.max_candidates].to_owned()
+  } else {
+    candidates
+  }
 }
 
 ///|
@@ -189,7 +222,7 @@ pub fn synthesize(
     ignore(compiled_regex(p))
   }
   // Validate the same input and option contract even with no search budget.
-  if branch_depth == 0 || examples.length() < 2 {
+  if branch_depth == 0 || examples.length() < 4 {
     return synthesize_flat(examples, options~, separators~, patterns~)
   }
   let first = synthesize_flat(
@@ -222,6 +255,7 @@ pub fn synthesize(
     patterns,
     branch_depth,
     budget,
+    try_flat=false,
   )
   {
     candidates,

@@ -132,6 +132,18 @@ pub fn Expr::equal(Self, Self) -> Bool
 pub fn Expr::not_equal(Self, Self) -> Bool
 pub fn Expr::to_repr(Self) -> @debug.Repr
 
+pub(all) enum GroupMetric {
+  RowCount
+  SumInt64(String)
+  MinInt64(String)
+  MaxInt64(String)
+}
+
+pub(all) struct Measure {
+  name : String
+  metric : GroupMetric
+}
+
 pub(all) struct OutputField {
   name : String
   expression : Expr
@@ -228,6 +240,7 @@ pub(all) enum TableStep {
   Melt(Array[String], Array[String], String, String, Bool)
   PackRows(Int32, Bool)
   GroupRows(Array[String], Array[String])
+  Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
   CombineColumns(Array[String], String, String)

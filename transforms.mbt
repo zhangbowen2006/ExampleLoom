@@ -12,6 +12,7 @@ pub(all) enum TableStep {
   Melt(Array[String], Array[String], String, String, Bool)
   PackRows(Int32, Bool)
   GroupRows(Array[String], Array[String])
+  Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
   CombineColumns(Array[String], String, String)
@@ -70,6 +71,7 @@ fn apply_step_unchecked(
   table : Table,
 ) -> Table raise LoomError {
   match step {
+    Aggregate(keys, measures) => aggregate_rows(table, keys, measures)
     PivotGrid(keys, variable, value_name) =>
       pivot_grid(table, keys, variable, value_name)
     CombineColumns(names, separator, output_name) =>

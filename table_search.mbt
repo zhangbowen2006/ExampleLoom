@@ -297,6 +297,20 @@ fn learned_map(
       }) {
       return None
     }
+    let mut copied = None
+    for i, column in tables[0].columns {
+      if (copied is None || column == name) &&
+        examples.all(e => e.input[i] == e.output) {
+        copied = Some(i)
+        if column == name {
+          break
+        }
+      }
+    }
+    if copied is Some(i) {
+      outputs.push({ name, expression: Field(i), })
+      continue
+    }
     let key = Json::array(
       examples.map(e => Json::array([Json(e.input), Json(e.output)])),
     ).stringify()
@@ -304,25 +318,36 @@ fn learned_map(
       Some(None) => return None
       Some(Some(e)) => e
       None => {
-        if examples.any(e => {
-            e.output.char_length() > 128 ||
-            e.input.any(s => s.char_length() > 128)
-          }) {
-          return None
-        }
         let canonical = canonical_examples(examples)
         let samples = if canonical.length() <= 32 {
           canonical
         } else {
           Array::makei(32, i => canonical[i * (canonical.length() - 1) / 31])
         }
-        let r = synthesize(samples, branch_depth=0, separators~, patterns~, options={
-          max_candidates: 4,
-          max_parts: 4,
-          max_atom_evaluations: 800,
-          max_steps: 6000,
-          max_frontier: 256,
-        }) catch {
+        let observed = separators.filter(s => {
+          samples.any(e => e.input.any(cell => cell.contains(s)))
+        })
+        let r = synthesize(
+          samples,
+          branch_depth=1,
+          separators=observed,
+          patterns~,
+          options={
+            max_candidates: 4,
+            max_parts: 4,
+            max_atom_evaluations: if samples.length() < 4 {
+              800
+            } else {
+              1600
+            },
+            max_steps: if samples.length() < 4 {
+              6000
+            } else {
+              12000
+            },
+            max_frontier: 256,
+          },
+        ) catch {
           _ => return None
         }
         let mut selected : Expr? = None
@@ -393,16 +418,18 @@ pub fn synthesize_table(
   }
   let inputs = examples.map(e => e.before)
   let targets = examples.map(e => e.after)
+  let profiles = targets.map(target_profile)
+  let input_key = tables_key(inputs)
   let queue : Array[TableState] = [
     {
       tables: inputs,
       steps: [],
-      priority: state_priority(inputs, targets, []),
+      priority: state_priority(inputs, profiles, []),
       serial: 0,
-      key: tables_key(inputs),
+      key: input_key,
     },
   ]
-  let seen : Map[String, Bool] = Map([(tables_key(inputs), true)])
+  let seen : Map[String, Bool] = Map([(input_key, true)])
   let goals : Array[RankedPipeline] = []
   let goal_keys : Map[String, Bool] = Map([])
   let row_memo : Map[String, Expr?] = Map([])
@@ -413,7 +440,7 @@ pub fn synthesize_table(
   let mut retained_cells = inputs.fold(init=0, (n, t) => {
     n + t.rows.length() * t.columns.length()
   })
-  let mut retained_units = tables_key(inputs).length()
+  let mut retained_units = input_key.length()
   let mut truncated = false
   while !queue.is_empty() {
     let state = pop_table_state(queue)
@@ -430,6 +457,7 @@ pub fn synthesize_table(
       continue
     }
     let neighbors : Array[TableStep] = []
+    neighbors.push_iter(aggregate_witnesses(state.tables[0], targets[0]).iter())
     if projection_step(state.tables, targets) is Some(step) {
       neighbors.push(step)
     }
@@ -489,7 +517,7 @@ pub fn synthesize_table(
           {
             tables,
             steps,
-            priority: state_priority(tables, targets, steps),
+            priority: state_priority(tables, profiles, steps),
             serial,
             key,
           },
@@ -512,7 +540,7 @@ pub fn synthesize_table(
       truncated = true
     }
     for next in next_states[:Int32::min(beam, next_states.length())] {
-      let key = tables_key(next.tables)
+      let key = next.key
       if seen.contains(key) {
         continue
       }

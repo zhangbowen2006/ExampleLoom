@@ -7,6 +7,21 @@ pub(all) struct Pipeline {
 ///|
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
+    Aggregate(keys, measures) =>
+      Json::array([
+        Json("aggregate"),
+        Json(keys),
+        Json::array(
+          measures.map(m => {
+            match m.metric {
+              RowCount => Json([m.name, "count"])
+              SumInt64(s) => Json([m.name, "sum", s])
+              MinInt64(s) => Json([m.name, "min", s])
+              MaxInt64(s) => Json([m.name, "max", s])
+            }
+          }),
+        ),
+      ])
     PivotGrid(keys, variable, value_name) =>
       Json::array([
         Json("pivot_grid"),
@@ -89,6 +104,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     | "explode"
     | "pack_rows"
     | "group_rows"
+    | "aggregate"
     | "segment_rows"
     | "carry_context" => 3
     "melt" => 6
@@ -151,6 +167,19 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
       PackRows(j_int(a[1]), columnwise)
     }
     "group_rows" => GroupRows(json_strings(a[1]), json_strings(a[2]))
+    "aggregate" => {
+      let measures = j_array(a[2]).map(item => {
+        let parts = json_strings(item)
+        match parts {
+          [name, "count"] => Measure::{ name, metric: RowCount, }
+          [name, "sum", col] => { name, metric: SumInt64(col), }
+          [name, "min", col] => { name, metric: MinInt64(col), }
+          [name, "max", col] => { name, metric: MaxInt64(col), }
+          _ => raise LoomError("invalid aggregate measure")
+        }
+      })
+      Aggregate(json_strings(a[1]), measures)
+    }
     "pivot" =>
       Pivot(json_strings(a[1]), j_text(a[2]), j_text(a[3]), json_strings(a[4]))
     "transpose" => Transpose
@@ -178,6 +207,18 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     }
   }
   match step {
+    Aggregate(keys, measures) => {
+      if measures.is_empty() {
+        raise LoomError("aggregate requires at least one measure")
+      }
+      names(keys + measures.map(m => m.name), false)
+      for m in measures {
+        match m.metric {
+          RowCount => ()
+          SumInt64(col) | MinInt64(col) | MaxInt64(col) => names([col], false)
+        }
+      }
+    }
     PivotGrid(keys, variable, value_name) => {
       names(keys, true)
       names(keys + [variable, value_name], false)

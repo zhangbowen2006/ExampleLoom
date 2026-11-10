@@ -15,10 +15,20 @@ fn regex_complexity(pattern : String) -> Unit raise LoomError {
       i = i + 2
       continue
     }
+    if in_class && c == '[' && i + 1 < chars.length() && chars[i + 1] == ':' {
+      let mut j = i + 2
+      while j < chars.length() && chars[j].is_ascii_alphabetic() {
+        j = j + 1
+      }
+      if j + 1 < chars.length() && chars[j] == ':' && chars[j + 1] == ']' {
+        i = j + 2
+        continue
+      }
+    }
     if c == '[' {
       in_class = true
     }
-    if c == ']' && !(i > 0 && chars[i - 1] == ':') {
+    if c == ']' {
       in_class = false
     }
     if !in_class && c == '{' {
@@ -129,12 +139,18 @@ fn regex_capture(
 fn replacement_text(
   template : String,
   m : @string.MatchResult,
+  remaining : Int32,
 ) -> String raise LoomError {
   let chars = template.to_array()
   let out = StringBuilder()
   let mut i = 0
+  let mut length = 0
   while i < chars.length() {
     if chars[i] != '$' {
+      length = length + (if chars[i].to_int() > 0xffff { 2 } else { 1 })
+      if length > remaining {
+        raise LoomError("regex replacement exceeds cell limit")
+      }
       out.write_char(chars[i])
       i = i + 1
       continue
@@ -144,9 +160,17 @@ fn replacement_text(
     }
     let next = chars[i + 1]
     if next == '$' {
+      length = length + 1
+      if length > remaining {
+        raise LoomError("regex replacement exceeds cell limit")
+      }
       out.write_char('$')
     } else if next.is_ascii_digit() {
       if m.group(next.to_int() - '0'.to_int()) is Some(value) {
+        length = length + value.length()
+        if length > remaining {
+          raise LoomError("regex replacement exceeds cell limit")
+        }
         out.write_string(value.to_owned())
       }
     } else {
@@ -182,25 +206,28 @@ fn regex_replace(
   let out = StringBuilder()
   let mut end = 0
   let mut count = 0
+  let mut written = 0
   for m in compiled_regex(pattern).find(text[:]) {
     count = count + 1
     if count > 4096 {
       raise LoomError("regex exceeds 4096 matches")
     }
     let start = m.before().length()
-    out.write_string(text[end:start].to_owned())
-    out.write_string(replacement_text(template, m))
-    end = start + m.content().length()
-    if out.to_string().length() > 65536 {
+    written = written + (start - end)
+    if written > 65536 {
       raise LoomError("regex replacement exceeds cell limit")
     }
+    out.write_string(text[end:start].to_owned())
+    let chunk = replacement_text(template, m, 65536 - written)
+    out.write_string(chunk)
+    written = written + chunk.length()
+    end = start + m.content().length()
   }
-  out.write_string(text[end:].to_owned())
-  let result = out.to_string()
-  if result.length() > 65536 {
+  if written + (text.length() - end) > 65536 {
     raise LoomError("regex replacement exceeds cell limit")
   }
-  result
+  out.write_string(text[end:].to_owned())
+  out.to_string()
 }
 
 ///|
