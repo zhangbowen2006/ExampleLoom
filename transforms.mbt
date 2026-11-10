@@ -13,6 +13,10 @@ pub(all) enum TableStep {
   PackRows(Int32, Bool)
   GroupRows(Array[String], Array[String])
   Pivot(Array[String], String, String, Array[String])
+  PivotGrid(Array[String], String, String)
+  CombineColumns(Array[String], String, String)
+  SegmentRows(Condition, Bool)
+  CarryContext(Condition, Array[String])
   Transpose
   PromoteHeaders
   DemoteHeaders
@@ -66,8 +70,15 @@ fn apply_step_unchecked(
   table : Table,
 ) -> Table raise LoomError {
   match step {
+    PivotGrid(keys, variable, value_name) =>
+      pivot_grid(table, keys, variable, value_name)
+    CombineColumns(names, separator, output_name) =>
+      combine_columns(table, names, separator, output_name)
+    SegmentRows(condition, starts_record) =>
+      segment_rows(table, condition, starts_record)
+    CarryContext(condition, names) => carry_context(table, condition, names)
     Select(names, output_names) => {
-      let indices = column_indices(table, names)
+      let indices = names.map(name => column_index(table, name))
       validate_columns(output_names)
       if indices.length() != output_names.length() {
         raise LoomError("select names have different lengths")

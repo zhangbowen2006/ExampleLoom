@@ -26,7 +26,7 @@ $('learn').onclick=()=>task(async()=>{
   chosen=false;$('pipeline').value='';resetOutput();$('candidates').replaceChildren();
   $('stats').textContent=`${Math.round(performance.now()-start)} ms · ${report.stats.states} 状态 · ${report.stats.evaluations} 次结构尝试 · ${report.stats.row_searches} 次行学习 · ${report.status}`;
   for(const [i,candidate]of report.candidates.entries()){
-    const box=el('div');box.className='candidate';const code=el('code',JSON.stringify(candidate.description));const choose=el('button',`选用管道 ${i+1}`);choose.dataset.tableChoose=String(i);
+    const box=el('div');box.className='candidate';const code=el('code',JSON.stringify(candidate.description));const choose=el('button',`选用管道 ${i+1} · 成本 ${candidate.cost}`);choose.dataset.tableChoose=String(i);
     choose.onclick=()=>{revision++;$('pipeline').value=JSON.stringify(candidate.pipeline,null,2);chosen=true;resetOutput();controls();notice('已选用管道。请在下一批数据上预览并核对。');};box.append(code,choose);$('candidates').append(box);
   }
   notice(report.candidates.length?`${report.candidates.length} 个训练一致候选。${report.truncated?'已触及限额，候选不完整。':''}请明确选择并检查下一批数据。`:'预算内没有找到程序；可补充或简化样例，也可明确编写管道。');

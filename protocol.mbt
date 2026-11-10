@@ -122,6 +122,7 @@ fn dispatch(request : Json) -> Json raise LoomError {
           r.candidates.map(p => {
             Json::object({
               "pipeline": pipeline_to_json(p),
+              "cost": Json(pipeline_cost(p)),
               "description": Json::array(p.steps.map(table_step_to_json)),
             })
           }),

@@ -42,6 +42,8 @@ pub fn parse_csv(String) -> Table raise LoomError
 
 pub fn parse_jsonl(String) -> Table raise LoomError
 
+pub fn pipeline_cost(Pipeline) -> Int32
+
 pub fn pipeline_from_json(Json) -> Pipeline raise LoomError
 
 pub fn pipeline_to_json(Pipeline) -> Json raise LoomError
@@ -227,6 +229,10 @@ pub(all) enum TableStep {
   PackRows(Int32, Bool)
   GroupRows(Array[String], Array[String])
   Pivot(Array[String], String, String, Array[String])
+  PivotGrid(Array[String], String, String)
+  CombineColumns(Array[String], String, String)
+  SegmentRows(Condition, Bool)
+  CarryContext(Condition, Array[String])
   Transpose
   PromoteHeaders
   DemoteHeaders

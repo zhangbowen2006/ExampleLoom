@@ -43,6 +43,12 @@ jobs:
           node scripts/public-data-test.mjs
           python3 scripts/verify-sqlite.py
           node scripts/benchmark.mjs
+      - name: Independent pandas reference validation
+        run: |
+          python3 -m venv /tmp/exampleloom-oracle-env
+          /tmp/exampleloom-oracle-env/bin/pip install pandas==3.1.0
+          /tmp/exampleloom-oracle-env/bin/python scripts/generate-oracle-cases.py
+          node scripts/oracle-test.mjs
       - name: Browser workflows
         run: |
           npm install --no-save --package-lock=false playwright@1.62.1

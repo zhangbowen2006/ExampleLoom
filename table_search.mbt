@@ -32,6 +32,9 @@ pub(all) struct TableSearchReport {
 priv struct TableState {
   tables : Array[Table]
   steps : Array[TableStep]
+  priority : Int32
+  serial : Int32
+  key : String
 }
 
 ///|
@@ -61,7 +64,7 @@ fn projection_step(tables : Array[Table], targets : Array[Table]) -> TableStep? 
           }
         }
       }
-      if same && !names.contains(tables[0].columns[i]) {
+      if same {
         found = i
         break
       }
@@ -81,6 +84,30 @@ fn structural_neighbors(
   separators : Array[String],
 ) -> Array[TableStep] {
   let result : Array[TableStep] = [Transpose, PromoteHeaders, DemoteHeaders]
+  let wanted : Map[String, Bool] = Map([])
+  for row in target.rows {
+    for value in row {
+      wanted[value] = true
+    }
+  }
+  let useful : Array[String] = []
+  let nonempty : Array[String] = []
+  for i, col in table.columns {
+    if table.rows.any(row => !row[i].is_empty()) {
+      nonempty.push(col)
+    }
+    if table.rows.any(row => !row[i].is_empty() && wanted.contains(row[i])) {
+      useful.push(col)
+    }
+  }
+  for names in [useful, nonempty] {
+    if !names.is_empty() && names.length() < table.columns.length() {
+      result.push(Select(names, names))
+    }
+  }
+  result.push(
+    Filter(Not(All(Array::makei(table.columns.length(), i => Empty(Field(i)))))),
+  )
   if !table.rows.is_empty() {
     result.push(DropRows(1))
   }
@@ -108,6 +135,27 @@ fn structural_neighbors(
     }
     let i = column_index(table, col) catch { _ => continue }
     result.push(Filter(Not(Empty(Field(i)))))
+    result.push(SegmentRows(Empty(Field(i)), false))
+    let context_width = target.columns.length() - table.columns.length()
+    if context_width > 0 && context_width <= table.columns.length() {
+      result.push(
+        CarryContext(Empty(Field(i)), table.columns[:context_width].to_owned()),
+      )
+    }
+    if !table.rows.is_empty() {
+      let chars = table.rows[0][i].to_array()
+      if !chars.is_empty() &&
+        chars[0].to_int() < 128 &&
+        !(chars[0].is_ascii_alphabetic() || chars[0].is_ascii_digit()) &&
+        !chars[0].is_whitespace() {
+        result.push(
+          SegmentRows(
+            Matches(Field(i), "^" + regex_literal(chars[0].to_string()), false),
+            true,
+          ),
+        )
+      }
+    }
     let values : Array[String] = []
     for row in table.rows {
       if !values.contains(row[i]) && values.length() < 9 {
@@ -126,6 +174,27 @@ fn structural_neighbors(
   for n in 2..<9 {
     result.push(PackRows(n, false))
     result.push(PackRows(n, true))
+  }
+  for n in [target.columns.length(), target.columns.length() / width] {
+    if n > 8 && n <= 64 {
+      result.push(PackRows(n, false))
+      result.push(PackRows(n, true))
+    }
+  }
+  for i in 0..<width {
+    for j in (i + 1)..<width {
+      for sep in ["", " ", "-"] {
+        if table.rows.any(row => wanted.contains(row[i] + sep + row[j])) {
+          result.push(
+            CombineColumns(
+              [table.columns[i], table.columns[j]],
+              sep,
+              "merged_\{i}_\{j}",
+            ),
+          )
+        }
+      }
+    }
   }
   for n in 0..<width {
     let keys = table.columns[:n].to_owned()
@@ -164,6 +233,9 @@ fn structural_neighbors(
         let keys = table.columns.filter(n => {
           n != table.columns[variable] && n != table.columns[value]
         })
+        result.push(
+          PivotGrid(keys, table.columns[variable], table.columns[value]),
+        )
         let expected_levels = target.columns.filter(n => !keys.contains(n))
         let observed_levels : Array[String] = []
         for row in table.rows {
@@ -190,12 +262,13 @@ fn learned_map(
   targets : Array[Table],
   separators : Array[String],
   patterns : Array[String],
+  memo : Map[String, Expr?],
 ) -> TableStep? {
   if tables[0].columns.length() > 16 {
     return None
   }
   let count = tables.fold(init=0, (n, t) => n + t.rows.length())
-  if count < 2 || count > 32 || targets[0].columns.length() > 16 {
+  if count < 2 || targets[0].columns.length() > 16 {
     return None
   }
   for k, t in tables {
@@ -211,19 +284,56 @@ fn learned_map(
         examples.push({ input: row, output: targets[k].rows[r][j], })
       }
     }
-    let r = synthesize(examples, branch_depth=0, separators~, patterns~, options={
-      max_candidates: 1,
-      max_parts: 4,
-      max_atom_evaluations: 800,
-      max_steps: 6000,
-      max_frontier: 256,
-    }) catch {
-      _ => return None
-    }
-    if r.candidates.is_empty() {
+    if examples.any(e => {
+        e.output.char_length() > 128 || e.input.any(s => s.char_length() > 128)
+      }) {
       return None
     }
-    outputs.push({ name, expression: r.candidates[0].expression, })
+    let key = Json::array(
+      examples.map(e => Json::array([Json(e.input), Json(e.output)])),
+    ).stringify()
+    let expression = match memo.get(key) {
+      Some(None) => return None
+      Some(Some(e)) => e
+      None => {
+        if examples.any(e => {
+            e.output.char_length() > 128 ||
+            e.input.any(s => s.char_length() > 128)
+          }) {
+          return None
+        }
+        let canonical = canonical_examples(examples)
+        let samples = if canonical.length() <= 32 {
+          canonical
+        } else {
+          Array::makei(32, i => canonical[i * (canonical.length() - 1) / 31])
+        }
+        let r = synthesize(samples, branch_depth=0, separators~, patterns~, options={
+          max_candidates: 4,
+          max_parts: 4,
+          max_atom_evaluations: 800,
+          max_steps: 6000,
+          max_frontier: 256,
+        }) catch {
+          _ => return None
+        }
+        let mut selected : Expr? = None
+        for c in r.candidates {
+          if examples.all(e => attempt(c.expression, e.input) == Ok(e.output)) {
+            selected = Some(c.expression)
+            break
+          }
+        }
+        if memo.length() < 64 && key.length() <= 16384 {
+          memo[key] = selected
+        }
+        match selected {
+          Some(e) => e
+          None => return None
+        }
+      }
+    }
+    outputs.push({ name, expression, })
   }
   Some(MapRows({ columns: tables[0].columns, outputs, }))
 }
@@ -278,28 +388,38 @@ pub fn synthesize_table(
   }
   let inputs = examples.map(e => e.before)
   let targets = examples.map(e => e.after)
-  let queue : Array[TableState] = [{ tables: inputs, steps: [], }]
+  let queue : Array[TableState] = [
+    {
+      tables: inputs,
+      steps: [],
+      priority: state_priority(inputs, targets, []),
+      serial: 0,
+      key: tables_key(inputs),
+    },
+  ]
   let seen : Map[String, Bool] = Map([(tables_key(inputs), true)])
-  let candidates : Array[Pipeline] = []
-  let mut cursor = 0
+  let goals : Array[RankedPipeline] = []
+  let goal_keys : Map[String, Bool] = Map([])
+  let row_memo : Map[String, Expr?] = Map([])
   let mut evaluations = 0
   let mut rejected = 0
   let mut row_searches = 0
+  let mut serial = 1
   let mut retained_cells = inputs.fold(init=0, (n, t) => {
     n + t.rows.length() * t.columns.length()
   })
   let mut retained_units = tables_key(inputs).length()
   let mut truncated = false
-  while cursor < queue.length() {
-    let state = queue[cursor]
-    cursor = cursor + 1
+  while !queue.is_empty() {
+    let state = pop_table_state(queue)
     if state.tables == targets {
-      candidates.push({ columns: inputs[0].columns, steps: state.steps, })
-      if candidates.length() >= options.max_candidates {
-        truncated = truncated || cursor < queue.length()
-        break
-      }
-      continue
+      truncated = retain_pipeline(
+          goals,
+          goal_keys,
+          { columns: inputs[0].columns, steps: state.steps, },
+          options.max_candidates,
+        ) ||
+        truncated
     }
     if state.steps.length() >= options.max_depth {
       continue
@@ -308,46 +428,90 @@ pub fn synthesize_table(
     if projection_step(state.tables, targets) is Some(step) {
       neighbors.push(step)
     }
-    // Try a row learner at most 16 times in the entire table search. Its
-    // separate fixed budget is reported through row_searches, not hidden in
-    // the structural operator-evaluation counter.
     if neighbors.is_empty() &&
       row_searches < 16 &&
       state.tables[0].rows.length() == targets[0].rows.length() {
       row_searches = row_searches + 1
-      if learned_map(state.tables, targets, separators, patterns) is Some(step) {
+      if learned_map(state.tables, targets, separators, patterns, row_memo)
+        is Some(step) {
         neighbors.push(step)
       }
     }
     neighbors.push_iter(
       structural_neighbors(state.tables[0], targets[0], separators).iter(),
     )
-    for step in neighbors {
+    let plans : Array[Array[TableStep]] = neighbors.map(step => [step])
+    plans.push_iter(
+      structural_completions(state.tables[0], targets[0], separators).iter(),
+    )
+    let next_states : Array[TableState] = []
+    for plan in plans {
+      if state.steps.length() + plan.length() > options.max_depth {
+        continue
+      }
       if evaluations >= options.max_evaluations {
         truncated = true
         break
       }
-      evaluations = evaluations + 1
-      let tables = state.tables.map(t => transform_table(t, [step])) catch {
+      if evaluations + plan.length() > options.max_evaluations {
+        truncated = true
+        continue
+      }
+      evaluations = evaluations + plan.length()
+      let tables = state.tables.map(t => transform_table(t, plan)) catch {
         LoomError(_) => {
           rejected = rejected + 1
           continue
         }
       }
-      let steps = state.steps + [step]
+      let steps = state.steps + plan
       if tables == targets {
-        candidates.push({ columns: inputs[0].columns, steps, })
-        if candidates.length() >= options.max_candidates {
-          truncated = true
-          break
-        }
+        truncated = retain_pipeline(
+            goals,
+            goal_keys,
+            { columns: inputs[0].columns, steps, },
+            options.max_candidates,
+          ) ||
+          truncated
         continue
       }
       let key = tables_key(tables)
       if seen.contains(key) {
         continue
       }
-      let cells = tables.fold(init=0, (n, t) => {
+      truncated = retain_table_state(
+          next_states,
+          {
+            tables,
+            steps,
+            priority: state_priority(tables, targets, steps),
+            serial,
+            key,
+          },
+          Int32::min(8, options.max_states),
+        ) ||
+        truncated
+      serial = serial + 1
+    }
+    next_states.sort_by((a, b) => {
+      if a.priority != b.priority {
+        a.priority - b.priority
+      } else {
+        a.serial - b.serial
+      }
+    })
+    // Keep the original lifetime state budget. A bounded beam per expansion
+    // avoids spending it on every unpromising root mutation.
+    let beam = Int32::min(8, options.max_states)
+    if next_states.length() > beam {
+      truncated = true
+    }
+    for next in next_states[:Int32::min(beam, next_states.length())] {
+      let key = tables_key(next.tables)
+      if seen.contains(key) {
+        continue
+      }
+      let cells = next.tables.fold(init=0, (n, t) => {
         n + t.rows.length() * t.columns.length()
       })
       if seen.length() >= options.max_states ||
@@ -359,13 +523,13 @@ pub fn synthesize_table(
       seen[key] = true
       retained_cells = retained_cells + cells
       retained_units = retained_units + key.length()
-      queue.push({ tables, steps, })
+      queue.push(next)
     }
-    if evaluations >= options.max_evaluations ||
-      candidates.length() >= options.max_candidates {
+    if evaluations >= options.max_evaluations {
       break
     }
   }
+  let candidates = goals.map(g => g.pipeline)
   {
     candidates,
     truncated,

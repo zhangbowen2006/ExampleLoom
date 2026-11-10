@@ -1,0 +1,1 @@
+{"title":"带标签单元格还原","description":"分析人员将 low:007 一类单元格还原为测量网格；自动组合 Fold、拆列和动态透视，下一批允许标签变化。","input":"id,m1,m2\nA,low:007,high:9\nB,low:0,high:8\n","target":"c0,c1,c2\n,low,high\nA,007,9\nB,0,8\n","next":"id,m1,m2\nC,minimum:001,maximum:2\nD,minimum:0,maximum:7\n","expected":{"columns":["c0","c1","c2"],"rows":[["","minimum","maximum"],["C","001","2"],["D","0","7"]]}}

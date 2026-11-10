@@ -7,6 +7,24 @@ pub(all) struct Pipeline {
 ///|
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
+    PivotGrid(keys, variable, value_name) =>
+      Json::array([
+        Json("pivot_grid"),
+        Json(keys),
+        Json(variable),
+        Json(value_name),
+      ])
+    CombineColumns(names, separator, output_name) =>
+      Json::array([
+        Json("combine_columns"),
+        Json(names),
+        Json(separator),
+        Json(output_name),
+      ])
+    SegmentRows(c, starts) =>
+      Json::array([Json("segment_rows"), condition_to_json(c), Json(starts)])
+    CarryContext(c, columns) =>
+      Json::array([Json("carry_context"), condition_to_json(c), Json(columns)])
     Select(names, output_names) =>
       Json::array([Json("select"), Json(names), Json(output_names)])
     Filter(c) => Json::array([Json("filter"), condition_to_json(c)])
@@ -67,9 +85,14 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
   }
   let op = j_text(a[0])
   let arity = match op {
-    "select" | "explode" | "pack_rows" | "group_rows" => 3
+    "select"
+    | "explode"
+    | "pack_rows"
+    | "group_rows"
+    | "segment_rows"
+    | "carry_context" => 3
     "melt" => 6
-    "split_column" | "fold" => 4
+    "split_column" | "fold" | "pivot_grid" | "combine_columns" => 4
     "unpivot" | "pivot" => 5
     "transpose" | "promote_headers" | "demote_headers" => 1
     _ => 2
@@ -78,6 +101,19 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     raise LoomError("wrong table operator arity")
   }
   let step = match op {
+    "pivot_grid" => PivotGrid(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
+    "combine_columns" =>
+      CombineColumns(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
+    "segment_rows" => {
+      let starts = match a[2] {
+        True => true
+        False => false
+        _ => raise LoomError("segment_rows starts_record must be boolean")
+      }
+      SegmentRows(condition_from_json(a[1]), starts)
+    }
+    "carry_context" =>
+      CarryContext(condition_from_json(a[1]), json_strings(a[2]))
     "select" => Select(json_strings(a[1]), json_strings(a[2]))
     "filter" => Filter(condition_from_json(a[1]))
     "map_rows" => MapRows(recipe_from_json(a[1]))
@@ -142,8 +178,31 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     }
   }
   match step {
+    PivotGrid(keys, variable, value_name) => {
+      names(keys, true)
+      names(keys + [variable, value_name], false)
+    }
+    CombineColumns(values, sep, output) => {
+      names(values, false)
+      names([output], false)
+      if values.length() < 2 || sep.char_length() > 16 {
+        raise LoomError(
+          "combine_columns requires at least two columns and a separator <=16 chars",
+        )
+      }
+    }
+    SegmentRows(c, _) => ignore(condition_to_json(c))
+    CarryContext(c, values) => {
+      ignore(condition_to_json(c))
+      names(values, false)
+    }
     Select(input, output) => {
-      names(input, false)
+      if input.is_empty() || input.length() > 64 {
+        raise LoomError("select expects 1..64 input columns")
+      }
+      for name in input {
+        names([name], false)
+      }
       names(output, false)
       if input.length() != output.length() {
         raise LoomError("select names have different lengths")

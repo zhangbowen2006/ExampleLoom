@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const help = `ExampleLoom 0.3.0 — examples to portable string and table programs
+const help = `ExampleLoom 0.4.0 — examples to portable string and table programs
 
 Build once: node scripts/build.mjs
 node bin/exampleloom.mjs learn --data input.csv --examples examples.json --out candidates.json

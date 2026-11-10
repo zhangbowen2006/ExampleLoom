@@ -19,7 +19,7 @@ for(const name of ['conditional','regex']){
   assert.deepEqual(applied.rows.map(r=>r.values[0]),field.expected,name);
   evidence.scenarios.push({name,selected:report.candidates[0].description,training:field.labels.length,heldout:table.rows.length-field.labels.length,all_values_match:true});
 }
-for(const name of ['unpivot','records','melt']){
+for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid']){
   const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
   const input=parse(demo.input), output=parse(demo.target);
   const report=run({op:'synthesize_table',examples:[{input,output}]});

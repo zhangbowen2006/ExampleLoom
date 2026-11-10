@@ -201,6 +201,20 @@ fn build_atoms(
   for col in 0..<examples[0].input.length() {
     let base = Field(col)
     let structural : Array[(Expr, Int32)] = [(base, 2)]
+    for pattern in inferred_capture_patterns(examples, col) {
+      structural.push((RegexCapture(base, pattern, 1, 0), 8))
+    }
+    for separator in [" ", "_", "-", "/", "."] {
+      if examples.any(e => e.input[col].contains(separator)) {
+        for replacement in ["", " ", "-", "_"] {
+          if separator != replacement {
+            structural.push(
+              (RegexReplace(base, regex_literal(separator), replacement), 8),
+            )
+          }
+        }
+      }
+    }
     for pattern in patterns {
       for group in 0..<5 {
         for occurrence in [0, 1, -1] {
