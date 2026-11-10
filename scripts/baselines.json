@@ -4,6 +4,11 @@
     "engine": "8085e8ebfd6692d6bb2dc193eebb584c9302c90e3246ca54e9316e40005703c1",
     "archive": "78dc86407991e4ce7b7f0712eeee98237823c1d3faa8592009d6893672fec0e5"
   },
+  "0.5.0": {
+    "commit": "5601abcdf37b8f12d13ff501711adf0694d1d3e3",
+    "engine": "cc4f09ad13cc9494cc3c92a6623796b637e7a97dc6900ea3789d3e04e0698ac9",
+    "archive": "373c475372d369f6e0d8cdd344d42c599e70af1d42ba858b499d0f9505662707"
+  },
   "0.4.0": {
     "commit": "c4ea3e7e2d47b3369d45765ae82f6c67c446317b",
     "engine": "eaedcdcea1f2bc3b3ab7ecda3c62745ff21df80059887c1f21996fbbe06724cd",

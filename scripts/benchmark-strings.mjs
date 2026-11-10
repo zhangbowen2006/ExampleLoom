@@ -66,7 +66,7 @@ async function benchmark() {
   const {version} = JSON.parse(await readFile('package.json'));
   const variants = [{version, path: resolve('dist/engine.js')}];
   if (process.argv.includes('--paired')) {
-    const old = process.env.BASELINE_VERSION ?? '0.4.0';
+    const old = process.env.BASELINE_VERSION ?? '0.5.0';
     const path = resolve('artifacts/baselines/v' + old + '-engine.mjs');
     const known = JSON.parse(await readFile('scripts/baselines.json'))[old];
     assert.equal(hash(await readFile(path)), known.engine);
