@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname, basename } from 'node:path';
 
@@ -16,4 +17,14 @@ await cp(resolve(root, 'web'), resolve(root, 'dist'), { recursive: true });
 await cp(resolve(root, 'examples'), resolve(root, 'dist/examples'), { recursive: true });
 await cp(resolve(root, 'LICENSE'), resolve(root, 'dist/LICENSE'));
 await cp(resolve(root, 'LICENSES'), resolve(root, 'dist/LICENSES'), { recursive: true });
+const git = args => {
+  const result = spawnSync('git', args, {cwd:root,encoding:'utf8'});
+  return result.status===0 ? result.stdout.trim() : null;
+};
+const top=git(['rev-parse','--show-toplevel']);
+const ownsRepository=top!==null && resolve(top)===root;
+const status=ownsRepository?git(['status','--porcelain']):null;
+const version=JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version;
+const metadata={version,built_at:new Date().toISOString(),git_head:ownsRepository?git(['rev-parse','HEAD']):null,dirty:status===null?null:status!=='',engine_sha256:createHash('sha256').update(await readFile(resolve(dist,'engine.js'))).digest('hex')};
+await writeFile(resolve(dist,'BUILD.json'),JSON.stringify(metadata,null,2)+'\n');
 console.log('Built dist/ — MoonBit engine and standalone workbench.');
