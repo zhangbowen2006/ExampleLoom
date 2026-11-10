@@ -44,6 +44,10 @@ fn tables_key(tables : Array[Table]) -> String {
 
 ///|
 fn projection_step(tables : Array[Table], targets : Array[Table]) -> TableStep? {
+  if targets.any(t => t.columns != targets[0].columns) ||
+    tables.any(t => t.columns != tables[0].columns) {
+    return None
+  }
   if tables[0].rows.length() != targets[0].rows.length() {
     return None
   }
@@ -264,6 +268,10 @@ fn learned_map(
   patterns : Array[String],
   memo : Map[String, Expr?],
 ) -> TableStep? {
+  if targets.any(t => t.columns != targets[0].columns) ||
+    tables.any(t => t.columns != tables[0].columns) {
+    return None
+  }
   if tables[0].columns.length() > 16 {
     return None
   }
@@ -379,11 +387,8 @@ pub fn synthesize_table(
         "table training limit: 128 input rows, 512 output rows, 16 input/32 output columns",
       )
     }
-    if e.before.columns != examples[0].before.columns ||
-      e.after.columns != examples[0].after.columns {
-      raise LoomError(
-        "training pairs require consistent input and output schemas",
-      )
+    if e.before.columns != examples[0].before.columns {
+      raise LoomError("training pairs require consistent input schemas")
     }
   }
   let inputs = examples.map(e => e.before)

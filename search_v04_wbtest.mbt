@@ -204,3 +204,57 @@ test "literal replacement witnesses learn normalization with variable text" {
   assert_true(!r.candidates.is_empty())
   assert_eq(evaluate(r.candidates[0].expression, ["Longer 007"]), "Longer007")
 }
+
+///|
+test "variable output schemas let additional examples distinguish transpose from packing" {
+  let first : Table = { columns: ["c0"], rows: [["A"], ["B"], ["C"]], }
+  let second : Table = { columns: ["c0"], rows: [["D"], ["E"], ["F"], ["G"]], }
+  let r = synthesize_table([
+    {
+      before: first,
+      after: { columns: ["c0", "c1", "c2"], rows: [["A", "B", "C"]], },
+    },
+    {
+      before: second,
+      after: {
+        columns: ["c0", "c1", "c2", "c3"],
+        rows: [["D", "E", "F", "G"]],
+      },
+    },
+  ])
+  assert_true(!r.candidates.is_empty())
+  let held : Table = {
+    columns: ["c0"],
+    rows: [["H"], ["I"], ["J"], ["K"], ["L"]],
+  }
+  assert_eq(apply_pipeline(r.candidates[0], held).rows, [
+    ["H", "I", "J", "K", "L"],
+  ])
+}
+
+///|
+test "multiple record examples require batch stable packing rather than transpose" {
+  let first : Table = { columns: ["c0"], rows: [["A"], ["team"], ["001"]], }
+  let second : Table = {
+    columns: ["c0"],
+    rows: [["B"], ["new"], ["002"], ["C"], ["other"], ["003"]],
+  }
+  let r = synthesize_table([
+    {
+      before: first,
+      after: { columns: ["c0", "c1", "c2"], rows: [["A", "team", "001"]], },
+    },
+    {
+      before: second,
+      after: {
+        columns: ["c0", "c1", "c2"],
+        rows: [["B", "new", "002"], ["C", "other", "003"]],
+      },
+    },
+  ])
+  assert_true(!r.candidates.is_empty())
+  assert_eq(apply_pipeline(r.candidates[0], second).rows, [
+    ["B", "new", "002"],
+    ["C", "other", "003"],
+  ])
+}
