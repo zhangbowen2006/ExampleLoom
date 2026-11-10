@@ -88,7 +88,18 @@ fn offer_atom(
     }
   }
   if progresses {
-    pool.atoms.push({ expression, values, cost, })
+    // A selector that happens to extract the same text from every varying
+    // input is weaker evidence than an explicit literal. Keep it available
+    // for ambiguity inspection, with a cost above that literal.
+    let incidental_constant = examples.length() > 1 &&
+      !(expression is Field(_)) &&
+      values.all(v => v == values[0])
+    let ranked_cost = if incidental_constant {
+      Int32::max(cost, 41 + values[0].length())
+    } else {
+      cost
+    }
+    pool.atoms.push({ expression, values, cost: ranked_cost, })
   }
 }
 
@@ -196,6 +207,11 @@ fn build_atoms(
   patterns : Array[String],
 ) -> Pool {
   let pool = { atoms: [], seen: Map([]), attempts: 0, truncated: false, }
+  // Every declared column gets basic selectors before a long early column
+  // spends the budget on composed selectors.
+  for col in 0..<examples[0].input.length() {
+    offer_variants(pool, Field(col), 2, examples, options)
+  }
   // Structural selectors before positional slices prevents the latter from
   // exhausting the atom budget before the more general selectors are tried.
   for col in 0..<examples[0].input.length() {
@@ -292,6 +308,22 @@ fn build_atoms(
             Err(_) => length = 0
           }
         }
+        for size in 1..<(length + 1) {
+          offer_variants(
+            pool,
+            Slice(expr, Start(0), Start(size)),
+            cost + 9,
+            examples,
+            options,
+          )
+          offer_variants(
+            pool,
+            Slice(expr, End(size), End(0)),
+            cost + 9,
+            examples,
+            options,
+          )
+        }
         for cut in 1..<length {
           offer_variants(
             pool,
@@ -344,6 +376,7 @@ priv struct SearchNode {
   positions : Array[Int32]
   parts : Array[Expr]
   cost : Int32
+  estimate : Int32
   serial : Int32
 }
 
@@ -356,7 +389,51 @@ priv struct Transition {
 
 ///|
 fn node_before(a : SearchNode, b : SearchNode) -> Bool {
-  a.cost < b.cost || (a.cost == b.cost && a.serial < b.serial)
+  if a.estimate != b.estimate {
+    a.estimate < b.estimate
+  } else if a.cost != b.cost {
+    a.cost < b.cost
+  } else {
+    a.serial < b.serial
+  }
+}
+
+///|
+/// A single-example relaxation admits every literal and ignores the other
+/// examples and the part limit. It is a lower bound on the remaining cost.
+/// Skip this optional pass when charging every indexed atom and substring
+/// would consume more than a quarter of the step budget.
+fn suffix_costs(
+  atoms : Array[Atom],
+  target : Array[Char],
+  limit : Int32,
+) -> (Array[Int32], Int32) {
+  let length = target.length()
+  let work = atoms.length() + length * (length + 1) / 2
+  let bounds = Array::make(length + 1, 0)
+  if work > limit {
+    return (bounds, 0)
+  }
+  let costs : Map[String, Int32] = Map([])
+  for atom in atoms {
+    let value = String::from_array(atom.values[0])
+    if !value.is_empty() {
+      costs[value] = Int32::min(
+        costs.get(value).unwrap_or(atom.cost),
+        atom.cost,
+      )
+    }
+  }
+  for i = length - 1; i >= 0; i = i - 1 {
+    let mut best = 40 + length - i
+    for j in (i + 1)..<(length + 1) {
+      let value = char_slice(target, i, j)
+      let cost = Int32::min(costs.get(value).unwrap_or(40 + j - i), 40 + j - i)
+      best = Int32::min(best, cost + bounds[j])
+    }
+    bounds[i] = best
+  }
+  (bounds, work)
 }
 
 // A small deterministic min heap; the frontier itself is strictly bounded.
@@ -510,17 +587,23 @@ fn synthesize_flat(
   let examples = canonical_examples(examples)
   let pool = build_atoms(examples, options, separators, patterns)
   let targets = examples.map(e => e.output.to_array())
+  let (remaining, initial_steps) = suffix_costs(
+    pool.atoms,
+    targets[0],
+    options.max_steps / 4,
+  )
   let frontier : Array[SearchNode] = [
     {
       positions: Array::make(examples.length(), 0),
       parts: [],
       cost: 0,
+      estimate: remaining[0],
       serial: 0,
     },
   ]
   let candidates : Array[Candidate] = []
   let seen : Map[String, Bool] = Map([])
-  let mut steps = 0
+  let mut steps = initial_steps
   let cache : Map[String, Array[Transition]] = Map([])
   let mut cache_hits = 0
   let mut serial = 1
@@ -618,6 +701,9 @@ fn synthesize_flat(
         positions: transition.positions,
         parts,
         cost: node.cost + transition.cost,
+        estimate: node.cost +
+        transition.cost +
+        remaining[transition.positions[0]],
         serial,
       })
       serial = serial + 1

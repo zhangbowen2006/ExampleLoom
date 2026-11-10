@@ -48,6 +48,89 @@ test "search composes fields and a learned literal" {
 }
 
 ///|
+test "bounded search preserves complete long fields around a literal separator" {
+  let examples : Array[Example] = [
+    {
+      input: ["Northern Research Institute", "East campus, Building Two"],
+      output: "Northern Research Institute, East campus, Building Two",
+    },
+    {
+      input: ["Lakeside College", "Main street, Centre"],
+      output: "Lakeside College, Main street, Centre",
+    },
+    {
+      input: ["West Academy", "South campus, Annex"],
+      output: "West Academy, South campus, Annex",
+    },
+  ]
+  let options = {
+    ..default_options(),
+    max_candidates: 8,
+    max_atom_evaluations: 4000,
+    max_steps: 30000,
+    max_frontier: 1024,
+  }
+  let r = synthesize(examples, options~)
+  assert_true(!r.candidates.is_empty())
+  let e = r.candidates[0].expression
+  assert_true(e is Concat([Field(0), Literal(", "), Field(1)]))
+  assert_eq(evaluate(e, ["New department", "Room 5"]), "New department, Room 5")
+  assert_true(
+    r.steps <= options.max_steps &&
+    r.atom_evaluations <= options.max_atom_evaluations,
+  )
+  let reversed = synthesize([examples[2], examples[1], examples[0]], options~)
+  assert_eq(explain(e), explain(reversed.candidates[0].expression))
+  for i in 1..<r.candidates.length() {
+    assert_true(r.candidates[i - 1].cost <= r.candidates[i].cost)
+  }
+}
+
+///|
+test "token prefixes and suffixes learn initials at Unicode scalar boundaries" {
+  let r = synthesize([
+    { input: ["Mia Wilson"], output: "M.W.", },
+    { input: ["Christopher Wu"], output: "C.W.", },
+    { input: ["Li Harrison"], output: "L.H.", },
+  ])
+  assert_true(!r.candidates.is_empty())
+  assert_eq(evaluate(r.candidates[0].expression, ["Amina Smith"]), "A.S.")
+  let unicode = synthesize([
+    { input: ["林 王月"], output: "林.王.", },
+    { input: ["陈星 赵"], output: "陈.赵.", },
+  ])
+  assert_true(!unicode.candidates.is_empty())
+  assert_eq(
+    evaluate(unicode.candidates[0].expression, ["😀明 𠮷田"]),
+    "😀.𠮷.",
+  )
+  let suffix = synthesize([
+    { input: ["长队甲/类别蓝"], output: "甲-蓝", },
+    { input: ["组乙/类绿"], output: "乙-绿", },
+  ])
+  assert_true(!suffix.candidates.is_empty())
+  assert_eq(
+    evaluate(suffix.candidates[0].expression, ["长队丁/新类别紫"]),
+    "丁-紫",
+  )
+}
+
+///|
+test "a long first field cannot starve a later column of its basic selector" {
+  let options = { ..default_options(), max_atom_evaluations: 32, }
+  let r = synthesize(
+    [
+      { input: ["tracking-".repeat(12), "A", "fresh"], output: "FRESH", },
+      { input: ["reference-".repeat(10), "B", "active"], output: "ACTIVE", },
+    ],
+    options~,
+  )
+  assert_true(!r.candidates.is_empty())
+  assert_eq(evaluate(r.candidates[0].expression, ["x", "C", "ready"]), "READY")
+  assert_true(r.atom_evaluations <= options.max_atom_evaluations && r.truncated)
+}
+
+///|
 test "date format inference validates a held-out leap day" {
   let report = synthesize([
     { input: ["20260112"], output: "2026-01-12", },
