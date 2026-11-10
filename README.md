@@ -36,7 +36,15 @@ node scripts/serve.mjs
 - v0.2：样例排序/去重，标点分隔符推断及可配置文字分隔符；Token 后截取、组合 trim/case；共享输出位置的搜索转移缓存。编辑样例会使旧规则失效并阻止旧结果导出。
 - v0.3：条件分支学习、MoonBit 正则捕获/替换与布尔谓词；17 类表格操作及结构程序搜索；新增[表格结构工作台](https://zhangbowen2006.github.io/ExampleLoom/structure.html)、CLI 管道和完整 Foofah 外部任务评估。支持范围与成熟系统差距见 [功能对比](docs/CAPABILITIES.md)。
 
-## 条件、正则与表格结构（v0.3）
+## v0.4：扩大搜索与验证
+
+- 条件/正则基础保持兼容；新增从共同字面上下文推断 ASCII 捕获模式、固定分隔符归一化，不要求所有提取任务都手填正则。
+- 结构搜索改为带预算的最佳优先搜索和成本排名；补充多步组合见证、行学习缓存、32 条样本之外的全量训练验证。排名不是准确率。
+- 新增动态网格透视、命名列合并、变长记录分段、表头上下文传播，共 21 类算子；多对训练表可有不同输出维度，以更多样例区分转置和定长记录打包。
+- 在结构工作台新增“动态测量透视”“表头上下文展开”“标签单元格还原”三个完整新批次流程。
+- 完整保留 250 个外部任务，发现并单列 25 个缺测试答案的任务；同一口径对照不可变 v0.3.0 引擎。结果与速度取舍见 [基准报告](docs/BENCHMARKS.md)。另以 pandas 参考实现验证 36 个构造任务；这不是外部盲测。
+
+## 条件、正则与表格结构
 
 逐行工作台展开“条件与正则搜索”，可运行条件供应商编码、带上下文的 ref 捕获示例。条件学习至少需要分支两侧各两个样例；正则提示采用 MoonBit core 的 lexmatch 语法，如 `ref=([[:digit:]]+)`。不是自动发明任意正则表达式。
 
@@ -50,7 +58,7 @@ node scripts/benchmark.mjs
 node scripts/serve.mjs
 ```
 
-本地打开 <http://127.0.0.1:4173/structure.html>。三个完整结构场景的数据、下一批输入与预期输出位于 `examples/structures/`。条件与正则场景分别在 `examples/conditional/`、`examples/regex/`。以上演示是构造数据；外部评估使用上游原有任务，完整成功、失败和限额记录见 [BENCHMARKS.md](docs/BENCHMARKS.md)。
+本地打开 <http://127.0.0.1:4173/structure.html>。六个完整结构场景的数据、下一批输入与预期输出位于 `examples/structures/`。动态透视允许下一批新增类别；带标签单元格会自动组合 Fold、拆列与透视。条件与正则场景分别在 `examples/conditional/`、`examples/regex/`。以上演示是构造数据；外部评估使用上游原有任务，完整成功、失败和限额记录见 [BENCHMARKS.md](docs/BENCHMARKS.md)。
 
 结构 CLI 在 `learn-table --data input.csv --target target.csv --out report.json` 后，使用 `pipeline --report report.json --choose 0 --out pipeline.json` 明确选择，再执行 `transform --data next.csv --pipeline pipeline.json --out result.csv`；命令均以 `node bin/exampleloom.mjs` 开头。逐行 `learn` 可选 `--patterns patterns.json` 和 `--depth 0..3`。
 
@@ -119,7 +127,7 @@ API 通过 `LoomError` 报告普通输入错误；调用者需要处理异常和
 
 ## 边界与可靠性
 
-**这是有界的字符串与表格程序合成器。**不支持任意自然语言任务、多表连接、数值聚合、循环或所有 Unicode 大小写规则。正则遵循 MoonBit 方言，不支持 PCRE 反向引用、前后查找或 `\d` 等简写；使用 POSIX 词类。捕获学习需要模式提示，替换和复合布尔条件可显式编写，尚不自动学习。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。解释器可执行的程序范围大于当前学习器可搜索的范围。
+**这是有界的字符串与表格程序合成器。**不支持任意自然语言任务、多表连接、数值聚合、循环或所有 Unicode 大小写规则。正则遵循 MoonBit 方言，不支持 PCRE 反向引用、前后查找或 `\d` 等简写；使用 POSIX 词类。捕获学习支持提示模式与共享上下文推断；部分固定分隔符替换可学习，任意替换模板及复合布尔条件仍需显式编写。训练样例一致不保证未见数据正确；`truncated=true` 表示候选不完整。解释器可执行的程序范围大于当前学习器可搜索的范围。
 
 默认最多 32 个样例、16 输入列、每个样例字段 128 字符、64 候选、6 个拼接片段。整表最多 20000 行、64 列；歧义检查最多前 5000 行。ASCII 词类与大小写有明确限制；日期必须指定格式，不能猜月日。全部预算、状态含义及算法见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
@@ -140,7 +148,7 @@ moon info
 
 ## 来源与维护
 
-MIT 开源。仅依赖工具链 `moonbitlang/core`（Apache-2.0）；浏览器回归使用 Playwright（Apache-2.0，开发期依赖）。交付的静态 JS 包含编译的 core 代码，分发其许可证与版权声明。
+MIT 开源。仅依赖工具链 `moonbitlang/core`（Apache-2.0）；浏览器回归使用 Playwright（Apache-2.0，开发期依赖）；可选差分验证使用 pandas 3.1.0（BSD-3-Clause，仅验证环境）。交付的静态 JS 包含编译的 core 代码，分发其许可证与版权声明。
 
 v0.3 另外再分发 Foofah 主仓库 MIT 许可下的全部 250 个 `tests/data/exp0_*.txt` 任务，仅作离线基准，不进入浏览器运行包；固定提交、文件哈希和完整许可见 [fixtures/foofah](fixtures/foofah/README.md)。这不是 Foofah 源码移植，不继承其功能覆盖或性能结论。
 

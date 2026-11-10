@@ -33,3 +33,10 @@ ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工�
 [当前报名表](https://bxup9uklfcb.feishu.cn/share/base/form/shrcnWUMlgpbwHaXgzV7HmNhNhg) 已显示 11 月：可提交三次、重复修改；新项目季度赛道要求一页以内 Markdown、本人撰写且不要使用 AI、至少三个完整预期场景、公开仓库至少十个有效提交。提交数与既有报名的剩余名额需要本人在表单查看记录确认。
 
 [官网](https://moonbitlang.github.io/Hackathon2026/)仍显示十月日期。用户提供的十一月公告说明十一月为新季度首月，十月截止后修改转入十一月，季度为十一月至次年一月。十一月确切报名/验收截止、当前账号剩余名额、Mooncakes 发布的最新强制口径仍待官方确认。正式提交由参赛者本人完成；申报正文的辅助方式以参赛者向组委会确认的口径处理，不由本仓库推断公开规则已改变。
+
+
+## v0.4 补充核对
+
+本次独立扩展 4 类算子、有限自动正则上下文与组合结构搜索，没有移植 Foofah/PROSE 源码。Foofah 测试数据中的 25 份 TestAnswer 为字面占位 `NOT AVAILABLE, SORRY`，需单列而不是视作模型预测错误；原始文件及 v0.3 历史记录保留。新的比较同时保留任务总数、有效答案分母和所有回退案例，不利用测试答案挑选首候选。
+
+差分验证调用 [pandas](https://github.com/pandas-dev/pandas) 的 pivot、melt、groupby、ffill、concat 等成熟实现，输入与输出为本项目构造的随机表。pandas 仅在验证环境运行，不构成业务引擎依赖；不能把该构造验证称为新的独立外部盲测。实测与复现见 BENCHMARKS、VALIDATION。

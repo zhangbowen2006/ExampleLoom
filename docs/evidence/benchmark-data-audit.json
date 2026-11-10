@@ -1,0 +1,33 @@
+{
+  "source_revision": "970864cd53b4c774a3dbdf4589d207f57ec63208",
+  "total": 250,
+  "holdout_gold": 225,
+  "missing_gold_sentinel": "NOT AVAILABLE, SORRY",
+  "missing_gold_tasks": [
+    "exp0_18_1.txt",
+    "exp0_18_2.txt",
+    "exp0_18_3.txt",
+    "exp0_18_4.txt",
+    "exp0_18_5.txt",
+    "exp0_24_1.txt",
+    "exp0_24_2.txt",
+    "exp0_24_3.txt",
+    "exp0_24_4.txt",
+    "exp0_24_5.txt",
+    "exp0_28_1.txt",
+    "exp0_28_2.txt",
+    "exp0_28_3.txt",
+    "exp0_28_4.txt",
+    "exp0_28_5.txt",
+    "exp0_3_1.txt",
+    "exp0_3_2.txt",
+    "exp0_3_3.txt",
+    "exp0_3_4.txt",
+    "exp0_3_5.txt",
+    "exp0_41_1.txt",
+    "exp0_41_2.txt",
+    "exp0_41_3.txt",
+    "exp0_41_4.txt",
+    "exp0_41_5.txt"
+  ]
+}

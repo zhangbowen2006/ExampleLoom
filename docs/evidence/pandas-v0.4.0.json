@@ -1,0 +1,1153 @@
+{
+  "date": "2026-11-10T09:37:23.673Z",
+  "engine_sha256": "eaedcdcea1f2bc3b3ab7ecda3c62745ff21df80059887c1f21996fbbe06724cd",
+  "reference": "pandas",
+  "reference_version": "3.1.0",
+  "scope": "constructed differential validation, not external independent tasks",
+  "seed": 20261110,
+  "explicit_programs_checked": 72,
+  "learned_top1": 36,
+  "tasks": 36,
+  "results": [
+    {
+      "name": "dynamic_pivot-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_pivot-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_pivot-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_pivot-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_pivot-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_pivot-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "kind",
+          "value"
+        ],
+        "steps": [
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "kind",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "carried_context-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "label",
+          "amount"
+        ],
+        "steps": [
+          [
+            "carry_context",
+            [
+              "empty",
+              [
+                "field",
+                2
+              ]
+            ],
+            [
+              "id",
+              "label"
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "marker_records-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "matches",
+              [
+                "field",
+                0
+              ],
+              "^\\*",
+              false
+            ],
+            true
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "blank_records-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "line"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "labelled_cells-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "m1",
+          "m2"
+        ],
+        "steps": [
+          [
+            "fold",
+            [
+              "id"
+            ],
+            [
+              "m1",
+              "m2"
+            ],
+            "__loom_value"
+          ],
+          [
+            "split_column",
+            "__loom_value",
+            ":",
+            [
+              "__loom_label",
+              "__loom_payload"
+            ]
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "__loom_label",
+            "__loom_payload"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-0",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-1",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-2",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-3",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-4",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "combined_labels-5",
+      "training_solved": true,
+      "top1": true,
+      "any": true,
+      "truncated": true,
+      "selected": {
+        "version": 2,
+        "columns": [
+          "id",
+          "left",
+          "right",
+          "value"
+        ],
+        "steps": [
+          [
+            "combine_columns",
+            [
+              "left",
+              "right"
+            ],
+            "",
+            "merged_1_2"
+          ],
+          [
+            "pivot_grid",
+            [
+              "id"
+            ],
+            "merged_1_2",
+            "value"
+          ]
+        ]
+      }
+    }
+  ]
+}

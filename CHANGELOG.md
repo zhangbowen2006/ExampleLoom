@@ -1,5 +1,14 @@
 # Changes
 
+## 0.4.0 — 2026-11-10
+
+- Add dynamic pivot grids, column combination, variable record segmentation and context propagation (21 structural operations).
+- Rank programs by declared cost; use bounded best-first exploration, finite composition witnesses and bounded row-learning caches.
+- Infer finite regex contexts/literal normalization, and accept training pairs with different output dimensions for disambiguation.
+- Correct the external benchmark audit: retain 250 tasks, distinguish 25 missing-test-answer sentinels, and compare both engines on 225 available gold outputs.
+- Preserve three paired old/new runs, gains and regressions; improve coverage without claiming overall speedup or mature-system parity.
+- Add pandas differential validation, 78 core tests and new real-browser workflows.
+
 ## 0.3.0 — 2026-11-10
 
 - Add short-circuit condition AST and bounded partition-based fallback induction, sharing search budgets and rejecting singleton memorization branches.
