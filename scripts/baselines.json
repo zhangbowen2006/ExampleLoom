@@ -1,0 +1,12 @@
+{
+  "0.3.0": {
+    "commit": "2b3374d38c3522fe72368a7e4679ae95665f4889",
+    "engine": "8085e8ebfd6692d6bb2dc193eebb584c9302c90e3246ca54e9316e40005703c1",
+    "archive": "78dc86407991e4ce7b7f0712eeee98237823c1d3faa8592009d6893672fec0e5"
+  },
+  "0.4.0": {
+    "commit": "c4ea3e7e2d47b3369d45765ae82f6c67c446317b",
+    "engine": "eaedcdcea1f2bc3b3ab7ecda3c62745ff21df80059887c1f21996fbbe06724cd",
+    "archive": "4ddb9d250a5c2e957e858a1cc84ea49020f3099714af99e83142e9fbc378e27a"
+  }
+}

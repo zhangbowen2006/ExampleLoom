@@ -42,7 +42,12 @@ jobs:
           node scripts/advanced-test.mjs
           node scripts/public-data-test.mjs
           python3 scripts/verify-sqlite.py
+          python3 scripts/verify-grouping.py
           node scripts/benchmark.mjs
+      - name: External string-task benchmark
+        run: |
+          python3 scripts/import-sygus.py
+          node scripts/benchmark-strings.mjs
       - name: Independent pandas reference validation
         run: |
           python3 -m venv /tmp/exampleloom-oracle-env
@@ -61,7 +66,9 @@ jobs:
         if: always()
         with:
           name: verification-evidence
-          path: artifacts/
+          path: |
+            artifacts/
+            !artifacts/sygus-2017/**
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:
