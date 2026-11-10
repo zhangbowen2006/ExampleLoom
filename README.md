@@ -14,6 +14,8 @@ v0.5 可以从混用两种格式的编号学出条件分支，从样例推导捕
 
 在公开 IANA 时区数据上，前两批共 30 行用于演示，另外 282 行作为新输入。学得的管道先拆分地区代码，再按地区计数。导出的 236 行与 SQLite 对照逐格、逐行序一致。[可复现验证](scripts/verify-grouping.py) · [外部任务的成功率与耗时](docs/BENCHMARKS.md) · [与 PROSE、Foofah 的功能对比](docs/CAPABILITIES.md)
 
+v0.5.1 修复姓名首字缩写和长字段拼接的学习失败，给所有输入列预留基本选择器，再用剩余输出的成本下界安排搜索。工作台新增「姓名首字缩写」示例。保存、载入期间修改数据会使旧操作失效，取消搜索和 Worker 故障后也可重新操作。当前测试和外部题库结果见[验证记录](docs/VALIDATION.md)及[基准报告](docs/BENCHMARKS.md)。
+
 ## 快速体验
 
 要求 MoonBit（验证版本 `moonc 0.10.17+093cb8f9c`、`moon 0.1.20261021`），工作台/CLI 另需 Node.js ≥20。没有 npm 运行时依赖。
@@ -150,7 +152,7 @@ moon test --deny-warn --target wasm
 moon info
 ```
 
-原生后端另需 C 编译器；Windows 需要 MSVC C++ 工具与 SDK。CI 在 Linux 同时测试 native。可选浏览器回归：安装 Playwright 1.62.1 和 Chromium，启动本地服务后运行 `node scripts/browser-test.mjs`、`node scripts/advanced-browser-test.mjs`；它们生成桌面/手机截图和 JSON 证据。也支持通过 `PLAYWRIGHT_MODULE` / `BROWSER_EXECUTABLE` 指定已安装环境。
+原生后端另需 C 编译器；Windows 需要 MSVC C++ 工具与 SDK。CI 在 Linux 同时测试 native。可选浏览器回归：安装 Playwright 1.62.1 和 Chromium，启动本地服务后运行 `node scripts/browser-test.mjs`、`node scripts/advanced-browser-test.mjs`、`node scripts/browser-recovery-test.mjs`；它们生成桌面/手机截图和 JSON 证据。也支持通过 `PLAYWRIGHT_MODULE` / `BROWSER_EXECUTABLE` 指定已安装环境。
 
 ## 来源与维护
 

@@ -63,10 +63,14 @@ try {
   await hold('validate_pipeline');
   await page.locator('#save').click();
   await waitForHeldRequest();
+  assert.equal(await page.locator('#load').isDisabled(), true);
+  assert.equal(await page.locator('#next-file').isDisabled(), true);
   await page.locator('#training').fill(training + 'C55,new\n');
   await resume();
   assert.deepEqual(downloads, []);
   assert.match(await page.locator('#notice').innerText(), /重新选用/);
+  assert.equal(await page.locator('#load').isEnabled(), true);
+  assert.equal(await page.locator('#next-file').isEnabled(), true);
   assert.equal(await page.locator('#pipeline').inputValue(), '');
   checks.push('Editing training data during save prevents downloading a stale pipeline');
 

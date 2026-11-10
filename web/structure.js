@@ -3,7 +3,14 @@ const el = (tag,text) => {const node=document.createElement(tag); if(text!=null)
 let worker, serial=0, pending=new Map(), busy=false, chosen=false, output=null, revision=0;
 const notice = (message,bad=false) => {$('notice').textContent=message;$('notice').classList.toggle('error',bad);};
 const resetOutput=()=>{output=null;$('export').disabled=true;$('results').replaceChildren();$('result-stats').textContent='';};
-const controls=()=>{$('learn').disabled=busy;$('apply').disabled=busy||!chosen;$('save').disabled=busy||!chosen;$('cancel').hidden=!busy;};
+const controls=()=>{
+  $('learn').disabled=busy;
+  $('apply').disabled=busy||!chosen;
+  $('save').disabled=busy||!chosen;
+  $('load').disabled=busy;
+  $('next-file').disabled=busy;
+  $('cancel').hidden=!busy;
+};
 function startWorker(){
   const active = new Worker('worker.js',{type:'module'});
   worker = active;

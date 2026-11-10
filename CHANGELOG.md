@@ -1,5 +1,13 @@
 # Changes
 
+## 0.5.1 — 2026-11-11
+
+- Learn fixed token prefixes and suffixes, including initials with variable-length names and Unicode scalar boundaries.
+- Offer basic selectors for every column before expensive derived selectors. Use a budgeted suffix-cost lower bound to guide the row search and rank incidental constant selectors above explicit literals.
+- Reject stale pipeline saves and loads, clear old candidates on a repeated search, recover a failed Worker on the next operation, and disable file selection while an operation is running.
+- Validate 90 core tests per backend, name-initial workflows, delayed-response browser regressions and pinned external comparisons. The string task score increases from 82/104 to 88/104; full results and search costs are in [the report](docs/BENCHMARKS.md).
+
+
 ## 0.5.0 — 2026-11-10
 
 - Learn whole-cell capture rewrites with reordered and repeated references. Infer regex shape predicates for mixed formats and conditional row maps inside table pipelines.
