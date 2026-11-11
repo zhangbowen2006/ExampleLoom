@@ -1,0 +1,50 @@
+{
+  "source_commit": "324994bcdd9af0959ffac68743cd92fc2b1c6ecd",
+  "engine_sha256": "df4e535be7064192960ac1ee70aac545c4db110bdb47ac0a6a0351c53bd3a7c1",
+  "old_version": "0.8.0",
+  "new_version": "0.9.0",
+  "top1": {
+    "gained": [
+      "exp0_48_1.txt",
+      "exp0_48_2.txt",
+      "exp0_48_3.txt",
+      "exp0_48_4.txt",
+      "exp0_48_5.txt",
+      "exp0_craigslist_data_wrangler_1.txt",
+      "exp0_crime_data_wrangler_1.txt",
+      "exp0_crime_data_wrangler_2.txt",
+      "exp0_crime_data_wrangler_3.txt",
+      "exp0_crime_data_wrangler_4.txt",
+      "exp0_crime_data_wrangler_5.txt",
+      "exp0_proactive_wrangling_complex_1.txt",
+      "exp0_proactive_wrangling_complex_2.txt",
+      "exp0_proactive_wrangling_complex_3.txt",
+      "exp0_proactive_wrangling_complex_4.txt",
+      "exp0_proactive_wrangling_complex_5.txt"
+    ],
+    "regressed": []
+  },
+  "oracle_any": {
+    "gained": [
+      "exp0_48_1.txt",
+      "exp0_48_2.txt",
+      "exp0_48_3.txt",
+      "exp0_48_4.txt",
+      "exp0_48_5.txt",
+      "exp0_craigslist_data_wrangler_1.txt",
+      "exp0_crime_data_wrangler_1.txt",
+      "exp0_crime_data_wrangler_2.txt",
+      "exp0_crime_data_wrangler_3.txt",
+      "exp0_crime_data_wrangler_4.txt",
+      "exp0_crime_data_wrangler_5.txt",
+      "exp0_proactive_wrangling_complex_1.txt",
+      "exp0_proactive_wrangling_complex_2.txt",
+      "exp0_proactive_wrangling_complex_3.txt",
+      "exp0_proactive_wrangling_complex_4.txt",
+      "exp0_proactive_wrangling_complex_5.txt"
+    ],
+    "regressed": []
+  },
+  "order_only_audit_count": 10,
+  "limits": "Exposed tasks, single repository, oracle-any uses gold after selection. Identical 225-task denominator and budgets; not blind and not a cross-tool comparison."
+}

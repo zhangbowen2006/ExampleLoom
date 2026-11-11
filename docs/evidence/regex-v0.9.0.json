@@ -1,0 +1,39 @@
+{
+  "created_at": "2026-11-11T14:19:28.769Z",
+  "engine_sha256": "df4e535be7064192960ac1ee70aac545c4db110bdb47ac0a6a0351c53bd3a7c1",
+  "methodology": "Constructed differential cases against Node RegExp with Unicode scalar iteration, strict full-string end; not external or blind tasks and not PCRE/ECMAScript full conformance.",
+  "comparisons": 24624,
+  "scenarios": [
+    {
+      "name": "conditional-regex",
+      "rows": 3,
+      "recipe_roundtrip": true
+    },
+    {
+      "name": "learned-assertions",
+      "training": 2,
+      "heldout": 2,
+      "expression": [
+        "capture",
+        [
+          "field",
+          0
+        ],
+        "(?rx)(?<=ref=)(\\d+)(?=;)",
+        0,
+        0
+      ]
+    },
+    {
+      "name": "wide-table-regex",
+      "steps": [
+        "filter",
+        "map_rows",
+        "unpivot",
+        "sort_rows"
+      ],
+      "rows": 4,
+      "reordered_columns": true
+    }
+  ]
+}

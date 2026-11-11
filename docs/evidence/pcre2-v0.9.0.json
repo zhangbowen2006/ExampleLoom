@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-11-11T14:19:28.687Z",
+  "wrapper": "0.6.0",
+  "pcre2": "10.47",
+  "options": "UTF, no UCP, no ALT_BSUX, interpreter without JIT",
+  "cases": 525,
+  "fold_pairs": 2938,
+  "comparisons": 7663,
+  "engine_sha256": "df4e535be7064192960ac1ee70aac545c4db110bdb47ac0a6a0351c53bd3a7c1",
+  "methodology": "Constructed shared supported syntax, compared against PCRE2 search/full match, capture and replacement. Additional pairs are drawn from the vendored simple-fold table and independently checked against PCRE2. No claim of full compatibility or external blind evaluation."
+}

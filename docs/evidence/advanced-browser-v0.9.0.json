@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-11T14:15:51.049Z",
+  "browser": "157.0.4341.42",
+  "checks": [
+    "conditional: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "regex: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "rewrite: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "initials: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "normalize: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "advanced-regex: real Worker learning, top1 program, all held-out rows and stale-hint invalidation",
+    "unpivot: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "records: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "melt: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "dynamic-pivot: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "header-details: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "labelled-grid: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "mixed-tags: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "regional-totals: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "record-grid: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "variable-records: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "context-metrics: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "labelled-contacts: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export",
+    "Extended regex predicates, named rewrite, conditional, unpivot and decimal sort: uploaded JSON executes in real Worker and matches every expected cell",
+    "390px table page has no overflow; no browser errors or remote data requests"
+  ]
+}

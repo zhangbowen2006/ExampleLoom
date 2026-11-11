@@ -1,0 +1,68 @@
+{
+  "engine_sha256": "df4e535be7064192960ac1ee70aac545c4db110bdb47ac0a6a0351c53bd3a7c1",
+  "methodology": "Post-hoc order-only diagnosis using held-out reference; no ground truth enters training or ranking. Equality of row multisets does not prove reference error or establish an intended order.",
+  "failures": 30,
+  "order_only_count": 10,
+  "tasks": [
+    {
+      "task": "exp0_29_1.txt",
+      "family": "29",
+      "rows": 5,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_29_2.txt",
+      "family": "29",
+      "rows": 4,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_29_3.txt",
+      "family": "29",
+      "rows": 3,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_29_4.txt",
+      "family": "29",
+      "rows": 3,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_29_5.txt",
+      "family": "29",
+      "rows": 3,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_6_1.txt",
+      "family": "6",
+      "rows": 15,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_6_2.txt",
+      "family": "6",
+      "rows": 12,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_6_3.txt",
+      "family": "6",
+      "rows": 9,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_6_4.txt",
+      "family": "6",
+      "rows": 6,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    },
+    {
+      "task": "exp0_6_5.txt",
+      "family": "6",
+      "rows": 3,
+      "description": "Every predicted row has the same cell multiset as its corresponding reference row, but at least one cell position differs."
+    }
+  ]
+}

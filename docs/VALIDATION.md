@@ -1,6 +1,6 @@
 # v0.9.0 验证记录
 
-v0.9 在三种本地后端分别运行 MoonBit 检查和测试，并以同口径重放完整 Foofah 与 SyGuS。PCRE2 10.47 的构造对照包含 525 个模式/文本组合及 2,938 对上游 Unicode 简单折叠映射，共 7,663 项匹配、捕获、替换和反向引用对照；原有 JS 共同语法构造对照为 24,624 项。新增三组可学习的变长记录、分组报表和分行明细流程；[结果与限制](BENCHMARKS.md) · [PCRE2 记录](evidence/pcre2-v0.9.0.json)。本机没有 MSVC，Linux 原生后端以本次 GitHub CI 实际结果为准。
+v0.9 的 JS、Wasm GC、Wasm 本地后端各通过 140 项 MoonBit 测试，含 5 项来自上游的 Unicode 测试；以相同口径重放完整 Foofah 与 SyGuS。PCRE2 10.47 的构造对照包含 525 个模式/文本组合及 2,938 对上游 Unicode 简单折叠映射，共 7,663 项匹配、捕获、替换和反向引用对照；原有 JS 共同语法构造对照为 24,624 项。新增三组可学习的变长记录、分组报表和分行明细流程，在真实浏览器和 CLI 中运行；高级浏览器检查共 20 项。[结果与限制](BENCHMARKS.md) · [PCRE2 记录](evidence/pcre2-v0.9.0.json) · [浏览器记录](evidence/advanced-browser-v0.9.0.json)。本机没有 MSVC，Linux 原生后端以本次 GitHub CI 实际结果为准。
 
 以下 v0.8 验证记录和数字保留作为历史资料。
 
