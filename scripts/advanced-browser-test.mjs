@@ -58,6 +58,13 @@ try{
     }
     checks.push(`${name}: real table search, explicit choice, unseen table, downloaded CSV; invalid/stale results cannot export`);
   }
+  const combined=JSON.parse(await readFile('examples/regex-extended/wide-table-regex.json','utf8'));
+  await page.locator('#load').setInputFiles({name:'extended.pipeline.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(combined.pipeline))});
+  await page.waitForFunction(()=>!document.querySelector('#apply').disabled);
+  await page.locator('#next').fill([combined.table.columns.join(','),...combined.table.rows.map(r=>r.join(','))].join('\n'));
+  await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);
+  assert.deepEqual(await page.locator('#results tbody tr').evaluateAll(rows=>rows.map(tr=>[...tr.children].map(td=>td.textContent))),combined.expected.rows);
+  checks.push('Extended regex predicates, named rewrite, conditional, unpivot and decimal sort: uploaded JSON executes in real Worker and matches every expected cell');
   await page.setViewportSize({width:390,height:844});await page.screenshot({path:'artifacts/advanced/table-mobile.png',fullPage:true});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Table workbench mobile overflow');
   assert.deepEqual(errors,[]);assert.deepEqual(remote,[]);
