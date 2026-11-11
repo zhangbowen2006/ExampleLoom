@@ -1,4 +1,10 @@
-# v0.7.0 验证记录
+# v0.8.0 验证记录
+
+本轮三个本地后端各 131 项通过，含 5 项随 Apache-2.0 源码保留的上游 Unicode 测试；`moon check --deny-warn --target all` 通过。本机未安装 MSVC，原生测试不能在本机执行；Linux native 仍由公开 CI 实际执行，是否成功以对应运行状态为准。
+
+`node scripts/regex-extended-test.mjs` 通过 23,940 项共同语法构造差分与三个完整流程，`node scripts/regex-robustness-test.mjs` 对 500 个固定种子的构造模式验证边界（83 接受、417 拒绝、无宿主崩溃）。真实浏览器新增断言提示学习与扩展正则四步表格组合；高级浏览器检查总数 17。[正则证据](evidence/regex-v0.8.0.json) · [边界证据](evidence/regex-robustness-v0.8.0.json) · [浏览器记录](evidence/advanced-browser-v0.8.0.json) · [详细范围](REGEX_PROFILE.md)
+
+原有逐行/CLI、530 项正则共同语法对照、结构学习、补样比较、128 组独立排序参考、36 组 pandas 参考、公开数据/SQLite、浏览器恢复和排序检查均重跑通过。完整外部任务保持原评分、训练和预算，具体成绩及未解决任务见[本轮重放](evidence/maintenance-v0.8.0.json)。以下表格保留 v0.7 的验证项，122 是当时测试数，不是当前总数。
 
 本地使用 Windows、MoonBit 编译器 `0.10.17+093cb8f9c`、moon `0.1.20261021` 和 Node v24.22.1。两个工作台和 CLI 使用同一份编译后的 MoonBit 引擎。[当前版本 CI](https://github.com/zhangbowen2006/ExampleLoom/actions) · [功能对比与场景](CAPABILITIES.md)
 

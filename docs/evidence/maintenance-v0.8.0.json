@@ -1,0 +1,52 @@
+{
+  "version": "0.8.0",
+  "source_feature_commit": "d577e50dca2e07c6dd43302e028cc07b2216392b",
+  "engine_sha256": "fa4918e85aface4cb6a1352f90a7387410b03daec4e806dd3dfb27a73d90fc8d",
+  "table": {
+    "tasks": 250,
+    "families": 50,
+    "holdout_available": 225,
+    "missing_holdout_gold": 25,
+    "reference_conflicts": 0,
+    "training_solved": 231,
+    "top1_holdout": 179,
+    "any_holdout": 191,
+    "timeouts": 0,
+    "errors": 5,
+    "unexpected_errors": 0,
+    "truncated": 245,
+    "p50_ms": 82.57999999999993,
+    "p95_ms": 132.1891000000005,
+    "max_ms": 168.64649999999983
+  },
+  "gained_top1": [],
+  "regressed_top1": [],
+  "string_summary": {
+    "0.8.0": {
+      "sha256": "fa4918e85aface4cb6a1352f90a7387410b03daec4e806dd3dfb27a73d90fc8d",
+      "by_file": {
+        "files": 104,
+        "training": 104,
+        "top1": 104,
+        "any": 104,
+        "truncated": 100,
+        "timeouts": 0,
+        "errors": 0,
+        "p50_ms": 30.998600000000806,
+        "p95_ms": 63.90300000000025
+      },
+      "unique_splits": {
+        "files": 51,
+        "training": 51,
+        "top1": 51,
+        "any": 51,
+        "truncated": 49,
+        "timeouts": 0,
+        "errors": 0,
+        "p50_ms": 30.998600000000806,
+        "p95_ms": 62.53269999999975
+      }
+    }
+  },
+  "limits": "Development-exposed tasks, unchanged splits and budgets; 46 table top1 failures remain. No same-machine Foofah/PROSE executable comparison or production deployment claim."
+}

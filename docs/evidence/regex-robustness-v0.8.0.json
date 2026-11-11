@@ -1,0 +1,7 @@
+{
+  "constructed_patterns": 500,
+  "accepted": 83,
+  "rejected": 417,
+  "host_panics": 0,
+  "seed": 72613
+}
