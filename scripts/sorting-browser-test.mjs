@@ -1,0 +1,52 @@
+import assert from 'node:assert/strict';
+import {mkdir, readFile, writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE?pathToFileURL(process.env.PLAYWRIGHT_MODULE).href:'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})});
+const base=process.env.BASE_URL??'http://127.0.0.1:4173';
+const checks=[],errors=[],remote=[];
+try{
+  const page=await browser.newPage({acceptDownloads:true});
+  page.on('pageerror',e=>errors.push(e.message));
+  page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
+  await page.goto(base+'/structure.html');
+  await mkdir('artifacts/sorting-browser',{recursive:true});
+  for(const name of ['sorted-catalog','sorted-measurements','sorted-invoices']){
+    const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
+    await page.locator(`[data-table-demo="${name}"]`).click();
+    await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
+    await page.locator('#learn').click();
+    await page.locator('[data-table-choose="0"]').waitFor();
+    await page.locator('[data-table-choose="0"]').click();
+    assert.ok(JSON.parse(await page.locator('#pipeline').inputValue()).steps.some(step=>step[0]==='sort_rows'));
+    await page.locator('#apply').click();
+    await page.waitForFunction(()=>!document.querySelector('#export').disabled);
+    const rows=await page.locator('#results tbody tr').evaluateAll(rows=>rows.map(tr=>[...tr.children].map(cell=>cell.textContent)));
+    assert.deepEqual(rows,demo.expected.rows,name);
+    const wait=page.waitForEvent('download');await page.locator('#export').click();const download=await wait;
+    await download.saveAs(`artifacts/sorting-browser/${name}.csv`);
+    assert.equal(await readFile(`artifacts/sorting-browser/${name}.csv`,'utf8'),demo.expected_csv);
+    checks.push(`${name}: real Worker learns sorting, explicitly selected program transforms all new rows and downloads expected spreadsheet-safe CSV.`);
+  }
+  const savedEvent=page.waitForEvent('download');await page.locator('#save').click();const saved=await savedEvent;
+  await saved.saveAs('artifacts/sorting-browser/saved.pipeline.json');
+  const expectedPipeline=JSON.parse(await readFile('artifacts/sorting-browser/saved.pipeline.json','utf8'));
+  await page.locator('#pipeline').fill('');
+  await page.locator('#load').setInputFiles('artifacts/sorting-browser/saved.pipeline.json');
+  await page.waitForFunction(()=>!document.querySelector('#apply').disabled);
+  assert.deepEqual(JSON.parse(await page.locator('#pipeline').inputValue()),expectedPipeline);
+  await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);
+  checks.push('A saved sort pipeline reloads through the public JSON validator and executes again.');
+  await page.locator('#next').fill('invoice,region,amount\nbad,A,NaN\n');
+  await page.locator('#apply').click();
+  await page.waitForFunction(()=>document.querySelector('#notice').textContent.includes('row 1, column amount'));
+  assert.equal(await page.locator('#export').isDisabled(),true);
+  assert.equal(await page.locator('#results tbody tr').count(),0);
+  checks.push('Malformed numeric keys report their row/column and cannot export a previous successful result.');
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  assert.deepEqual(errors,[]);assert.deepEqual(remote,[]);
+  checks.push('All sorting workflows have no browser errors, off-origin data requests or 390px layout overflow.');
+  await writeFile('artifacts/sorting-browser-results.json',JSON.stringify({date:new Date().toISOString(),browser:await browser.version(),checks},null,2)+'\n');
+  console.log(JSON.stringify({checks},null,2));
+}finally{await browser.close();}

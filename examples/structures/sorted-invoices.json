@@ -1,0 +1,9 @@
+{
+  "title": "按地区与金额排列发票",
+  "description": "财务运营示范先按地区升序、再按金额降序排列。新批次列顺序变化，保留前导零、相等金额的原始顺序和负数。",
+  "input": "invoice,region,amount\nu,B,2\nr,A,2\ns,A,10\na,B,10\nh,A,1\nx,B,0.50\n",
+  "target": "invoice,region,amount\ns,A,10\nr,A,2\nh,A,1\na,B,10\nu,B,2\nx,B,0.50\n",
+  "next": "amount,invoice,region\n3,one,C\n20,two,D\n11,three,C\n1,four,D\n00011.00,five,C\n-0.01,six,D\n",
+  "expected": {"columns":["invoice","region","amount"],"rows":[["three","C","11"],["five","C","00011.00"],["one","C","3"],["two","D","20"],["four","D","1"],["six","D","-0.01"]]},
+  "expected_csv": "invoice,region,amount\r\nthree,C,11\r\nfive,C,00011.00\r\none,C,3\r\ntwo,D,20\r\nfour,D,1\r\nsix,D,'-0.01\r\n"
+}

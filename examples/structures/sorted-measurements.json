@@ -1,0 +1,9 @@
+{
+  "title": "宽表读数展开并排序",
+  "description": "数据分析人员示范宽表转长表并按读数从小到大排列。新数据的位数与行数改变，排序依据读数而非传感器或月份。",
+  "input": "id,Jan,Feb\nB,8,2\nA,1,10\n",
+  "target": "id,month,value\nA,Jan,1\nB,Feb,2\nB,Jan,8\nA,Feb,10\n",
+  "next": "id,Jan,Feb\nC,30,4\nD,2,12\nE,9,6\n",
+  "expected": {"columns":["id","month","value"],"rows":[["D","Jan","2"],["C","Feb","4"],["E","Feb","6"],["E","Jan","9"],["D","Feb","12"],["C","Jan","30"]]},
+  "expected_csv": "id,month,value\r\nD,Jan,2\r\nC,Feb,4\r\nE,Feb,6\r\nE,Jan,9\r\nD,Feb,12\r\nC,Jan,30\r\n"
+}

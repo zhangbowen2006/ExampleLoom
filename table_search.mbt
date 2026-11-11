@@ -465,6 +465,9 @@ pub fn synthesize_table(
     let (aggregates, clipped) = aggregate_witnesses(state.tables, targets)
     truncated = truncated || clipped
     neighbors.push_iter(aggregates.iter())
+    let (sorts, sort_clipped) = sort_witnesses(state.tables, targets)
+    truncated = truncated || sort_clipped
+    neighbors.push_iter(sorts.iter())
     if projection_step(state.tables, targets) is Some(step) {
       neighbors.push(step)
     }

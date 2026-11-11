@@ -2,6 +2,7 @@
 /// Structural operations bind by column name. All operations return a new table;
 /// duplicates in pivot cells are errors, never silently aggregated or discarded.
 pub(all) enum TableStep {
+  SortRows(Array[SortKey])
   Select(Array[String], Array[String])
   Filter(Condition)
   MapRows(Recipe)
@@ -71,6 +72,7 @@ fn apply_step_unchecked(
   table : Table,
 ) -> Table raise LoomError {
   match step {
+    SortRows(keys) => sort_rows(table, keys)
     Aggregate(keys, measures) => aggregate_rows(table, keys, measures)
     PivotGrid(keys, variable, value_name) =>
       pivot_grid(table, keys, variable, value_name)

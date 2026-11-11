@@ -1,0 +1,10 @@
+{
+  "title": "按商品编码整理目录",
+  "description": "商品运营从混乱目录示范文本字典序；补充批次区分按编码排列与偶然的编号或标签排列。相同编码保留到货顺序。",
+  "input": "code,label\nz,A\naa,C\na,D\n",
+  "target": "code,label\na,D\naa,C\nz,A\n",
+  "additional": [{"input":"code,label\nz,Z\naa,B\na,A\n","target":"code,label\na,A\naa,B\nz,Z\n"}],
+  "next": "code,label\nz,new\nab,first\naa,other\nab,second\n",
+  "expected": {"columns":["code","label"],"rows":[["aa","other"],["ab","first"],["ab","second"],["z","new"]]},
+  "expected_csv": "code,label\r\naa,other\r\nab,first\r\nab,second\r\nz,new\r\n"
+}

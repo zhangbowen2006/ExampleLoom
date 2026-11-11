@@ -41,6 +41,8 @@ jobs:
           node scripts/integration.mjs
           node scripts/advanced-test.mjs
           node scripts/table-comparison-test.mjs
+          python3 scripts/generate-sort-oracle.py
+          node scripts/sorting-test.mjs
           node scripts/public-data-test.mjs
           python3 scripts/verify-sqlite.py
           python3 scripts/verify-grouping.py
@@ -66,6 +68,7 @@ jobs:
           node scripts/advanced-browser-test.mjs
           node scripts/browser-recovery-test.mjs
           node scripts/table-comparison-browser-test.mjs
+          node scripts/sorting-browser-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

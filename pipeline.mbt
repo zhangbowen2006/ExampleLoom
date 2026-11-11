@@ -7,6 +7,26 @@ pub(all) struct Pipeline {
 ///|
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
+    SortRows(keys) =>
+      Json::array([
+        Json("sort_rows"),
+        Json::array(
+          keys.map(key => {
+            Json([
+              key.column,
+              match key.kind {
+                Lexical => "text"
+                Decimal => "decimal"
+              },
+              if key.descending {
+                "desc"
+              } else {
+                "asc"
+              },
+            ])
+          }),
+        ),
+      ])
     Aggregate(keys, measures) =>
       Json::array([
         Json("aggregate"),
@@ -117,6 +137,28 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     raise LoomError("wrong table operator arity")
   }
   let step = match op {
+    "sort_rows" =>
+      SortRows(
+        j_array(a[1]).map(value => {
+          let fields = json_strings(value)
+          if fields.length() != 3 {
+            raise LoomError("sort key requires column, kind and direction")
+          }
+          SortKey::{
+            column: fields[0],
+            kind: match fields[1] {
+              "text" => Lexical
+              "decimal" => Decimal
+              _ => raise LoomError("sort kind must be text or decimal")
+            },
+            descending: match fields[2] {
+              "asc" => false
+              "desc" => true
+              _ => raise LoomError("sort direction must be asc or desc")
+            },
+          }
+        }),
+      )
     "pivot_grid" => PivotGrid(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
     "combine_columns" =>
       CombineColumns(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
@@ -207,6 +249,7 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     }
   }
   match step {
+    SortRows(keys) => validate_sort_keys(keys)
     Aggregate(keys, measures) => {
       if measures.is_empty() {
         raise LoomError("aggregate requires at least one measure")

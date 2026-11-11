@@ -1,5 +1,12 @@
 # Changes
 
+## 0.7.0 — 2026-11-11
+
+- Add stable multi-key row sorting, Unicode scalar lexical order and exact plain-decimal order without binary floats or machine-integer scaling. Preserve source spelling and input order for equal keys.
+- Learn up to three ordered text/decimal keys and mixed directions from all training permutations; runtime accepts eight keys. Search remains bounded and every returned step is replayed on all training pairs.
+- Compose ordering with existing structural operators. Add complete catalog, invoice and wide-to-long measurement workflows, JSON pipeline round trips and browser validation.
+- Add 14 core regressions (122 total) and 128 independently generated Python Decimal/stable-sort reference cases. Scope and actual benchmark results are documented separately.
+
 ## 0.6.1 — 2026-11-11
 
 - Compare retained table programs on an unlabelled complete batch through the MoonBit API and workbench. Group exact output tables and execution errors and locate the first schema, row-count or cell difference.

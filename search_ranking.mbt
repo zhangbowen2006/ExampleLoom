@@ -38,6 +38,7 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
   p.steps.fold(init=0, (cost, step) => {
     cost +
     (match step {
+      SortRows(keys) => 18 + keys.length() * 3
       Select(_, _) => 3
       FillDown(_) => 4
       Filter(c) => 4 + condition_cost(c)
