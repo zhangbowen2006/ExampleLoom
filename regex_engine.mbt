@@ -115,10 +115,7 @@ fn extended_pattern(pattern : String) -> CompiledPattern raise LoomError {
     }
   }
   let parsed = @rxparse.parse(body) catch {
-    _ =>
-      raise LoomError(
-        "invalid extended regex (variable-width lookbehind is unsupported)",
-      )
+    _ => raise LoomError("invalid extended regex or unsupported lookbehind")
   }
   if parsed.captures > 33 {
     raise LoomError("regex exceeds 32 capture groups")

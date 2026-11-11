@@ -1,0 +1,8 @@
+{
+  "title":"分行联系方式转矩阵",
+  "description":"表格中每个人的名称只出现在第一行，后续行以类型:值记录。学习填充名称、拆分类型并动态透视，缺失类型保留空格。",
+  "input":"name,detail\nDirectory,\nName,Contact\nAlice,phone:123\n,mail:alice\n",
+  "target":"c0,c1,c2\n,phone,mail\nAlice,123,alice\n",
+  "next":"detail,name\n,Directory\nContact,Name\nphone:456,Bob\nmail:bob,\n,\nphone:789,Carol\nchat:carol,\nmail:carol,\n",
+  "expected":{"columns":["c0","c1","c2","c3"],"rows":[["","phone","mail","chat"],["Bob","456","bob",""],["Carol","789","carol","carol"]]}
+}

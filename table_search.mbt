@@ -477,6 +477,17 @@ pub fn synthesize_table(
       row_searches = row_searches + 1
       if learned_map(state.tables, targets, separators, patterns, row_memo)
         is Some(step) {
+        if step is MapRows(recipe) &&
+          state.steps.any(s => {
+            match s {
+              SegmentRows(_, _) | PivotGrid(_, _, _) | Transpose => true
+              _ => false
+            }
+          }) {
+          if update_witness(recipe, state.tables[0].columns) is Some(update) {
+            neighbors.push(UpdateColumns(update))
+          }
+        }
         neighbors.push(step)
       }
     }

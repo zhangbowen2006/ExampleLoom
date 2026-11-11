@@ -49,11 +49,18 @@ jobs:
           python3 scripts/verify-sqlite.py
           python3 scripts/verify-grouping.py
           node scripts/benchmark.mjs
+          node scripts/audit-table-order.mjs
       - name: External string-task benchmark
         run: |
           python3 scripts/import-sygus.py
           python3 scripts/audit-string-benchmark.py
           node scripts/benchmark-strings.mjs
+      - name: PCRE2 reference checks
+        run: |
+          python3 -m venv /tmp/exampleloom-pcre2-env
+          /tmp/exampleloom-pcre2-env/bin/pip install pcre2==0.6.0
+          /tmp/exampleloom-pcre2-env/bin/python scripts/generate-pcre2-oracle.py
+          node scripts/pcre2-oracle-test.mjs
       - name: Independent pandas reference validation
         run: |
           python3 -m venv /tmp/exampleloom-oracle-env

@@ -26,12 +26,21 @@ pub(all) enum Instruction {
   Jump(Int32)
   Split(Int32, Int32)
   Assertion(Predicate)
-  Backreference(Int32)
+  Backreference(Int32, ignore_case~ : Bool)
   Look(Array[Instruction], positive~ : Bool, behind~ : Int32?)
+  LookBehind(Array[LookBranch], positive~ : Bool)
   Reset(Array[Int32])
 }
 pub fn Instruction::to_json(Self) -> Json
 pub impl ToJson for Instruction
+
+pub(all) struct LookBranch {
+  code : Array[Instruction]
+  minimum : Int32
+  maximum : Int32
+}
+pub fn LookBranch::to_json(Self) -> Json
+pub impl ToJson for LookBranch
 
 pub(all) enum Predicate {
   BeginText

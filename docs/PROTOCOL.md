@@ -2,6 +2,14 @@
 
 The exported `handle(request: String) -> String` always returns JSON. Ordinary input failures are `{ "ok": false, "error": "..." }`. There is no network, filesystem or host-code execution in this boundary.
 
+## Bounded lookbehind and field-preserving updates (v0.9.0)
+
+The extended `(?rx)` profile accepts fixed-width top-level lookbehind alternatives of different lengths, capture-free bounded variable-width branches up to 255 Unicode scalars, case-folded backreferences within a scoped `i` flag, and `\x{...}` scalar escapes. Repeated captures or captures within variable-width lookbehind branches are rejected; unbounded lookbehind is rejected. See [the exact profile](REGEX_PROFILE.md). This is not complete PCRE compatibility.
+
+The additive v2 step `["update_columns", recipe]` replaces existing named columns while preserving other columns produced by earlier pipeline steps. `recipe.columns` binds only fields used by expressions; every output name must already exist. All expressions observe the original row, and any evaluation failure rejects the entire step. The outer v2 pipeline still binds and selects its declared input columns, so columns absent from its input schema are not automatically retained. The learner may propose this operation after variable-width structural steps, and every proposed pipeline is replayed against all training pairs.
+
+The `context-metrics` and `labelled-contacts` examples learn four-step context/detail programs. Their filters intentionally discard rows outside the shown detail pattern; validate the source format and compare candidates before applying to other data. Inference from one example does not prove that a constant slice or separator generalizes.
+
 ## Extended regex (v0.8.0, additive profile)
 
 Existing recipe v1 and pipeline v2 encodings remain valid. A pattern starting with `(?rx)` explicitly selects the [extended native MoonBit profile](REGEX_PROFILE.md); other patterns retain the core/lexmatch dialect. Use it in `matches`, `capture`, `replace`, and synthesis `patterns` without a new recipe version. Example: `"(?rx)(?<=ref=)(\\d+)(?=;)"`. Replacement templates additionally accept `${name}` for named groups and `${12}` for multi-digit group indices through 32, preserving `$0..$9` and `$$`. This profile adds bounded lookaround and case-sensitive backreferences, not unrestricted PCRE. Unsupported syntax and resource exhaustion return errors. No external regex engine executes user data.
@@ -89,7 +97,7 @@ Synthesize accepts `patterns:["ref=([[:digit:]]+)"]` (up to 16 MoonBit regex pat
 | Regex predicate | `["matches",expr,pattern,fullMatchBoolean]` |
 | Boolean predicates | `["not",condition]`, `["all",[conditions]]`, `["any",[conditions]]` |
 
-If/All/Any short circuit. Capture occurrence may be negative (from the last non-overlapping match). Regex syntax is MoonBit core/lexmatch, not JS/PCRE. Regex replacement is executable but not automatically learned. Old recipes remain readable; older engine versions reject new operators.
+If/All/Any short circuit. Capture occurrence may be negative (from the last non-overlapping match). Unprefixed regex uses MoonBit core/lexmatch; `(?rx)` selects the documented extended profile. The learner can synthesize certain capture-based replacements from hints; it does not infer arbitrary regex programs. Old recipes remain readable; older engine versions reject new operators.
 
 ## Table synthesis
 

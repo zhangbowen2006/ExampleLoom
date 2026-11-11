@@ -64,6 +64,7 @@ pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
       Json::array([Json("select"), Json(names), Json(output_names)])
     Filter(c) => Json::array([Json("filter"), condition_to_json(c)])
     MapRows(r) => Json::array([Json("map_rows"), recipe_to_json(r)])
+    UpdateColumns(r) => Json::array([Json("update_columns"), recipe_to_json(r)])
     SplitColumn(name, sep, names) =>
       Json::array([Json("split_column"), Json(name), Json(sep), Json(names)])
     Explode(name, sep) => Json::array([Json("explode"), Json(name), Json(sep)])
@@ -175,6 +176,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     "select" => Select(json_strings(a[1]), json_strings(a[2]))
     "filter" => Filter(condition_from_json(a[1]))
     "map_rows" => MapRows(recipe_from_json(a[1]))
+    "update_columns" => UpdateColumns(recipe_from_json(a[1]))
     "split_column" =>
       SplitColumn(j_text(a[1]), j_text(a[2]), json_strings(a[3]))
     "explode" => Explode(j_text(a[1]), j_text(a[2]))
@@ -294,6 +296,7 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     }
     Filter(c) => ignore(condition_to_json(c))
     MapRows(r) => ignore(recipe_to_json(r))
+    UpdateColumns(r) => ignore(recipe_to_json(r))
     SplitColumn(col, sep, output) => {
       names([col], false)
       separator(sep)

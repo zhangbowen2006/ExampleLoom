@@ -261,6 +261,27 @@ test "compute complement of charclass" {
 }
 
 ///|
+pub fn simple_case_equal(a : Char, b : Char) -> Bool {
+  if a == b {
+    return true
+  }
+  let mut next = a
+  // Upstream's simple-fold table is made of cycles, including Kelvin K and
+  // Greek sigma. Bound the walk defensively for malformed future tables.
+  for _ in 0..<8 {
+    guard case_folding.get(next) is Some(value) else { return false }
+    if value == b {
+      return true
+    }
+    if value == a {
+      return false
+    }
+    next = value
+  }
+  false
+}
+
+///|
 pub fn case_insensitive_char_class(chars : ArrayView[Char]) -> ArrayView[Char] {
   // This function should compute the case-insensitive character class
   // based on the provided character ranges.

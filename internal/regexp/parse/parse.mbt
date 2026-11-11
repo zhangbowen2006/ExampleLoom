@@ -372,11 +372,10 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
             )
           }
           self.input = rest
-          guard expr.fixed_width() is Some(width) &&
-            expr.lookbehind_captures_safe() else {
+          guard expr.valid_lookbehind() else {
             raise RegexpError(err=InvalidRepeatSize, source_fragment=capture)
           }
-          Look(expr, positive=sign == '=', behind=Some(width))
+          Look(expr, positive=sign == '=', behind=Some(0))
         }
         ['<', .. rest] => {
           let captures = self.captures
@@ -520,7 +519,7 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
           }
         }
         'x' => {
-          let ch = self.parse_fixed_hex(2)
+          let ch = self.parse_hex_escape()
           if self.flags.ignore_case {
             CharClass(case_insensitive_char_class([ch, ch]), neg=false)
           } else {
@@ -535,9 +534,6 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
             CharClass(['\u{0}', '\u{0}'], neg=false) // Null character
           }
         '1'..<='9' as ch => {
-          if self.flags.ignore_case {
-            raise RegexpError(err=InvalidEscape, source_fragment=escape)
-          }
           let mut input = self.input
           let mut capture = ch.to_int() - '0'.to_int()
           while input is ['0'..<='9' as next_ch, .. next_rest] {
@@ -556,12 +552,9 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
           } else if capture >= self.captures {
             raise RegexpError(err=InvalidEscape, source_fragment=escape)
           }
-          Backreference(capture)
+          Backreference(capture, ignore_case=self.flags.ignore_case)
         }
         'k' => {
-          if self.flags.ignore_case {
-            raise RegexpError(err=InvalidEscape, source_fragment=escape)
-          }
           // Named backreference \k<name>
           guard self.input is ['<', .. rest] else {
             raise RegexpError(err=InvalidEscape, source_fragment=self.input)
@@ -587,7 +580,7 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
           } else if capture >= self.captures {
             raise RegexpError(err=InvalidEscape, source_fragment=escape)
           }
-          Backreference(capture)
+          Backreference(capture, ignore_case=self.flags.ignore_case)
         }
         // Unsupported alphabetic escapes must not silently change meaning.
         'a'..<='z' | 'A'..<='Z' =>
@@ -702,7 +695,7 @@ fn Parser::parse_char_class(self : Parser) -> Ast raise RegexpError {
           'r' => '\r'
           // backspace
           'b' => '\u{8}'
-          'x' => self.parse_fixed_hex(2)
+          'x' => self.parse_hex_escape()
           '0' => {
             if self.input is ['0'..<='9', ..] {
               raise RegexpError(err=InvalidEscape, source_fragment=escape)
@@ -755,7 +748,7 @@ fn Parser::parse_char_class(self : Parser) -> Ast raise RegexpError {
               'u' =>
                 // Unicode escape \u{aaaa} or \uaaaa
                 self.parse_unicode_escape()
-              'x' => self.parse_fixed_hex(2)
+              'x' => self.parse_hex_escape()
               '0' => {
                 if self.input is ['0'..<='9', ..] {
                   raise RegexpError(
@@ -1093,6 +1086,15 @@ fn Parser::parse_unicode_escape(self : Parser) -> Char raise RegexpError {
       }
       ch
     }
+  }
+}
+
+///|
+fn Parser::parse_hex_escape(self : Parser) -> Char raise RegexpError {
+  if self.input is ['{', ..] {
+    self.parse_unicode_escape()
+  } else {
+    self.parse_fixed_hex(2)
   }
 }
 

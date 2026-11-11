@@ -2,12 +2,14 @@
 
 本轮保持 ExampleLoom 的仓库、接口体系和示例驱动定位，按已核验来源比较功能范围。下表不表示这些系统彼此等价，也不以“MoonBit 重写”证明创新。
 
+v0.9 加入可保留结构步骤新增字段的列更新、两类分组报表学习见证，并让长输入的数字段选择器不被令牌切片消耗预算。完整任务首候选为 195/225，仍有 30 道失败；这些题已用于开发，下表的 v0.7/0.8 条目为历史描述。[结果与逐题差异](BENCHMARKS.md)
+
 v0.8 另补齐扩展正则：采用并修改 [moonbitlang/regexp.mbt](https://github.com/moonbitlang/regexp.mbt) 0.3.7 的 Apache-2.0 实现，补充断言、共享预算、捕获重置及防御修复；明确披露代码来源，未把正则算法当作原创。条件和表格程序原已具备，本轮验证其与新正则的实际组合。[覆盖矩阵与未支持语法](REGEX_PROFILE.md)
 
 | 来源 | 已核验的范围 | 本项目已有能力与差距 | 本轮处理 |
 | --- | --- | --- | --- |
 | [microsoft/prose](https://github.com/microsoft/prose)，仓库样例 MIT；[官方教程](https://www.microsoft.com/en-us/research/project/prose-framework/tutorial/) | DSL、见证函数、排名与交互合成；公开基准还包含字符串转换、文本拆表和结构化提取 | 已有有限 DSL、输出引导搜索、条件/正则、表格结构、交互补样。没有通用的第三方 DSL 扩展接口，也不覆盖完整文档/HTML 提取体系 | 保持固定算子边界，未引入 SDK；不宣称全面替代 PROSE |
-| [Foofah](https://github.com/umich-dbgroup/foofah)，MIT；[算子源码](https://github.com/umich-dbgroup/foofah/blob/970864cd53b4c774a3dbdf4589d207f57ec63208/foofah_libs/operators.py) | 从整表示例搜索拼接、拆分、填充、折叠、包装等程序 | 与本项目结构操作有实质交集。我们的严格拆列、已支持的谓词和组合见证仍未覆盖所有异构/不规则任务；46 道首候选失败未解决 | 原始 250 题完整保留，新功能前后同条件验证；没有移植其 Python 搜索实现 |
+| [Foofah](https://github.com/umich-dbgroup/foofah)，MIT；[算子源码](https://github.com/umich-dbgroup/foofah/blob/970864cd53b4c774a3dbdf4589d207f57ec63208/foofah_libs/operators.py) | 从整表示例搜索拼接、拆分、填充、折叠、包装等程序 | 与本项目结构操作有实质交集。我们的严格拆列、已支持的谓词和组合见证仍未覆盖所有异构/不规则任务；30 道首候选失败未解决 | 原始 250 题完整保留，新功能前后同条件验证；没有移植其 Python 搜索实现 |
 | [OpenRefine](https://github.com/OpenRefine/OpenRefine)，BSD-3-Clause；[排序文档](https://openrefine.org/docs/manual/sortview) | 多字段排序，文本、数值、日期、布尔及空值/错误位置；另有聚类、对账和多种导入导出 | 原有 22 类操作缺少真正的排序程序。其聚类、实体对账、跨表/外部数据能力也未覆盖 | 新增可学习且可保存的多字段稳定排序，支持文本及精确普通十进制。日期/布尔专用序、区域校对规则和空值位置策略未实现 |
 | [MoonFrame](https://github.com/ihb2032/MoonFrame)，Apache-2.0 | 面向 MoonBit 的显式 DataFrame、表达式和表格计算 | 我们关注“示例到可重放程序”，不提供完整 DataFrame API 或通用跨表连接 | 保持独立实现，不引入其运行时；重叠的排序、分组、CSV 不能单独作为创新声明 |
 

@@ -6,6 +6,7 @@ pub(all) enum TableStep {
   Select(Array[String], Array[String])
   Filter(Condition)
   MapRows(Recipe)
+  UpdateColumns(Recipe)
   SplitColumn(String, String, Array[String])
   Explode(String, String)
   Unpivot(Array[String], Array[String], String, String)
@@ -118,6 +119,30 @@ fn apply_step_unchecked(
         }
       }
       { columns: recipe.outputs.map(o => o.name), rows, }
+    }
+    UpdateColumns(recipe) => {
+      // Each expression observes the original row; apply only after every
+      // output succeeds, and retain all columns that the recipe does not edit.
+      let destinations = column_indices(table, recipe.outputs.map(o => o.name))
+      let result = apply_recipe(recipe, table)
+      if result.failures > 0 {
+        raise LoomError(
+          "update_columns has \{result.failures} failed rows; no partial table returned",
+        )
+      }
+      let rows : Array[Array[String]] = []
+      for i, row in table.rows {
+        let changed = row.copy()
+        match result.rows[i] {
+          Ok(values) =>
+            for j, index in destinations {
+              changed[index] = values[j]
+            }
+          Err(message) => raise LoomError(message)
+        }
+        rows.push(changed)
+      }
+      { columns: table.columns.copy(), rows, }
     }
     SplitColumn(name, separator, names) => {
       if separator.is_empty() || separator.char_length() > 16 {

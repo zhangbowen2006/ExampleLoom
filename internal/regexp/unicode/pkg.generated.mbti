@@ -30,6 +30,8 @@ pub let ranges_is_white_space_or_line_terminator : Array[Char]
 
 pub let ranges_is_word : Array[Char]
 
+pub fn simple_case_equal(Char, Char) -> Bool
+
 pub fn simplify_char_ranges(ArrayView[Char]) -> ArrayView[Char]
 
 // Errors

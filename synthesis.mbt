@@ -242,6 +242,18 @@ fn build_atoms(
         }
       }
     }
+    // Give character-run selectors an equal opportunity before long token
+    // slices consume the shared atom budget.
+    for kind in [Digits, Letters] {
+      let mut count = 129
+      for e in examples {
+        count = Int32::min(count, runs(e.input[col], kind).length())
+      }
+      for k in 0..<count {
+        structural.push((Run(base, kind, k), 6))
+        structural.push((Run(base, kind, k - count), 6))
+      }
+    }
     let separators = observed_separators(examples, col, extra_separators)
     if separators.length() > 64 {
       pool.truncated = true
@@ -254,16 +266,6 @@ fn build_atoms(
       for k in 0..<count {
         structural.push((Token(base, separator, k), 5))
         structural.push((Token(base, separator, k - count), 5))
-      }
-    }
-    for kind in [Digits, Letters] {
-      let mut count = 129
-      for e in examples {
-        count = Int32::min(count, runs(e.input[col], kind).length())
-      }
-      for k in 0..<count {
-        structural.push((Run(base, kind, k), 6))
-        structural.push((Run(base, kind, k - count), 6))
       }
     }
     for pair in structural {

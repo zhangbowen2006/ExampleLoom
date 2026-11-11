@@ -272,6 +272,7 @@ pub(all) enum TableStep {
   Select(Array[String], Array[String])
   Filter(Condition)
   MapRows(Recipe)
+  UpdateColumns(Recipe)
   SplitColumn(String, String, Array[String])
   Explode(String, String)
   Unpivot(Array[String], Array[String], String, String)

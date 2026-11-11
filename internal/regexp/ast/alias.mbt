@@ -13,7 +13,7 @@
 // limitations under the License.
 
 ///|
-using @vm {type Instruction, type Predicate}
+using @vm {type Instruction, type Predicate, type LookBranch}
 
 ///|
 using @unicode {simplify_char_ranges, compute_char_class_complement}

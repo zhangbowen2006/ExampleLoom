@@ -1,0 +1,8 @@
+{
+  "title":"分组报表转明细矩阵",
+  "description":"分析人员提供一个地区与年度明细，学习继承表头、跳过空行、动态展开年度并提取地区；新批次包含新增年度和多个地区。",
+  "input":"label,value\nRegion: North Coast,\n,\n2024,10\n2025,20\n",
+  "target":"c0,c1,c2\n,2024,2025\nNorth Coast,10,20\n",
+  "next":"value,label\n,Region: East Bay\n,\n3,2024\n4,2025\n5,2026\n,\n,Region: West Ridge\n,\n-2,2024\n6,2025\n8,2026\n",
+  "expected":{"columns":["c0","c1","c2","c3"],"rows":[["","2024","2025","2026"],["East Bay","3","4","5"],["West Ridge","-2","6","8"]]}
+}

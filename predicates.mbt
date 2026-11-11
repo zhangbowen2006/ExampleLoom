@@ -13,7 +13,12 @@ fn regex_complexity(pattern : String) -> Unit raise LoomError {
     let c = chars[i]
     if c == '\\' {
       if i + 2 < chars.length() &&
-        (chars[i + 1] == 'p' || chars[i + 1] == 'P' || chars[i + 1] == 'u') &&
+        (
+          chars[i + 1] == 'p' ||
+          chars[i + 1] == 'P' ||
+          chars[i + 1] == 'u' ||
+          chars[i + 1] == 'x'
+        ) &&
         chars[i + 2] == '{' {
         i += 3
         while i < chars.length() && chars[i] != '}' {

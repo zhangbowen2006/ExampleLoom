@@ -22,6 +22,33 @@ test "synthesis retains delimiter and suffix explanations of the same samples" {
 }
 
 ///|
+test "long input keeps simple digit-run selectors within the shared budget" {
+  let report = synthesize(
+    [
+      {
+        input: ["$4200 / 3br - Bright waterfront apartment near central park"],
+        output: "3",
+      },
+    ],
+    options={
+      max_candidates: 4,
+      max_parts: 4,
+      max_atom_evaluations: 800,
+      max_steps: 6000,
+      max_frontier: 256,
+    },
+  )
+  assert_true(!report.candidates.is_empty())
+  assert_eq(
+    evaluate(report.candidates[0].expression, [
+      "$1700 / 5br - Garden house by the harbor",
+    ]),
+    "5",
+  )
+  assert_true(report.atom_evaluations <= 800)
+}
+
+///|
 test "extra example eliminates the four character suffix" {
   let report = synthesize([
     { input: ["订单-0012"], output: "0012", },

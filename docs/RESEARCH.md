@@ -2,6 +2,8 @@
 
 这是技术调研记录，不是参赛申报书。实现代码由 AI 辅助编写，维护者需理解、验证并负责。
 
+v0.9 依据 [PCRE2 的官方语法说明](https://www.pcre.org/current/doc/html/pcre2pattern.html)核对有限后向断言和大小写反向引用，并以 [PCRE2 10.47](https://github.com/PCRE2Project/pcre2) 作为隔离环境的参考引擎测试；没有在产品运行时链接、携带或移植 PCRE2。扩展正则仍基于下述 Apache-2.0 源码，项目自身修改和限制见 NOTICE 与正则范围文档。
+
 v0.8 正则子系统直接采用并修改 [moonbitlang/regexp.mbt](https://github.com/moonbitlang/regexp.mbt) 的 Mooncakes 0.3.7（Apache-2.0），不再把所有正则实现描述为独立原创。包括解析器、AST、Unicode 表及 VM；新增断言、绝对位置匹配、共享执行预算、重复捕获重置与边界修复。[上游包哈希及修改清单](../LICENSES/moonbit-regexp.NOTICE) · [详细语义与范围](REGEX_PROFILE.md)。其余搜索、表格结构、配方、工作台和 CLI 沿用项目实现；PROSE 与 Foofah 没有作为引擎依赖。
 
 ## 独立价值与范围

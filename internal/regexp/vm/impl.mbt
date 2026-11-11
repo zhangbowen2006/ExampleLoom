@@ -21,10 +21,27 @@ pub(all) enum Instruction {
   Split(Int32, Int32)
   /// Zero-width assertions
   Assertion(Predicate)
-  Backreference(Int32)
+  Backreference(Int32, ignore_case~ : Bool)
   Look(Array[Instruction], positive~ : Bool, behind~ : Int32?)
+  LookBehind(Array[LookBranch], positive~ : Bool)
   Reset(Array[Int32])
 }
+
+///|
+/// Alternatives retain the pattern's original left-to-right priority.
+pub(all) struct LookBranch {
+  code : Array[Instruction]
+  minimum : Int32
+  maximum : Int32
+}
+
+///|
+pub impl ToJson for LookBranch with fn to_json(self) {
+  Json::array([Json(self.code), Json(self.minimum), Json(self.maximum)])
+}
+
+///|
+pub extend LookBranch with ToJson::{to_json}
 
 ///|
 pub impl ToJson for Instruction with fn to_json(self) {
@@ -36,7 +53,8 @@ pub impl ToJson for Instruction with fn to_json(self) {
     Split(i1, i2) => ["Split", i1, i2]
     Assertion(pred) => ["Assertion", pred]
     Look(code, positive~, behind~) => ["Look", code, positive, behind]
-    Backreference(i) => ["Backreference", i]
+    LookBehind(branches, positive~) => ["LookBehind", branches, positive]
+    Backreference(i, ignore_case~) => ["Backreference", i, ignore_case]
     Reset(slots) => ["Reset", slots]
   }
 }
@@ -110,9 +128,15 @@ priv struct Thread {
 }
 
 ///|
-fn previous(input : StringView, offset : Int32, scalars : Int32) -> Int32? {
+fn previous(
+  input : StringView,
+  offset : Int32,
+  scalars : Int32,
+  budget : Budget,
+) -> Int32? raise MatchLimit {
   let mut pos = offset
   for _ in 0..<scalars {
+    tick(budget)
     if pos == 0 {
       return None
     }
@@ -126,6 +150,31 @@ fn previous(input : StringView, offset : Int32, scalars : Int32) -> Int32? {
     }
   }
   Some(pos)
+}
+
+///| Compare simple Unicode folds without allocating the captured substring.
+
+///|
+/// Each examined scalar is charged to the same match budget as the VM.
+fn equal_casefold(
+  a : StringView,
+  b : StringView,
+  budget : Budget,
+) -> Bool raise MatchLimit {
+  let mut ai = 0
+  let mut bi = 0
+  while ai < a.length() && bi < b.length() {
+    tick(budget)
+    guard a.get_char(ai) is Some(ac) && b.get_char(bi) is Some(bc) else {
+      return false
+    }
+    if !simple_case_equal(ac, bc) {
+      return false
+    }
+    ai += if ac.to_int() > 0xffff { 2 } else { 1 }
+    bi += if bc.to_int() > 0xffff { 2 } else { 1 }
+  }
+  ai == a.length() && bi == b.length()
 }
 
 ///|
@@ -220,7 +269,7 @@ fn add_thread(
       }
       let start = match behind {
         None => Some(thread.sp)
-        Some(n) => previous(content, thread.sp, n)
+        Some(n) => previous(content, thread.sp, n, budget)
       }
       let found = match start {
         None => []
@@ -248,7 +297,46 @@ fn add_thread(
         next(thread.captures)
       }
     }
-    Backreference(i) if thread.captures[i * 2] < 0 ||
+    LookBehind(branches, positive~) => {
+      if depth >= 8 {
+        raise MatchLimit
+      }
+      let mut found : Array[Int32] = []
+      for branch in branches {
+        // Variable-length branches have no captures, so trial order cannot
+        // alter observable capture values. Shared budget bounds every trial.
+        for width = branch.maximum; width >= branch.minimum; width = width - 1 {
+          tick(budget)
+          if previous(content, thread.sp, width, budget) is Some(start) {
+            let trial = run(
+              branch.code,
+              content,
+              start,
+              thread.captures.copy(),
+              true,
+              Some(thread.sp),
+              budget,
+              depth + 1,
+            )
+            if !trial.is_empty() {
+              found = trial
+              break
+            }
+          }
+        }
+        if !found.is_empty() {
+          break
+        }
+      }
+      if positive && !found.is_empty() {
+        found[0] = thread.captures[0]
+        found[1] = thread.captures[1]
+        next(found)
+      } else if !positive && found.is_empty() {
+        next(thread.captures)
+      }
+    }
+    Backreference(i, ..) if thread.captures[i * 2] < 0 ||
       thread.captures[i * 2] == thread.captures[i * 2 + 1] =>
       next(thread.captures)
     _ => {
@@ -271,6 +359,8 @@ fn run(
   budget : Budget,
   depth : Int32,
 ) -> Array[Int32] raise MatchLimit {
+  budget.remaining -= instructions.length()
+  tick(budget)
   let inst_gen = Array::make(instructions.length(), -1)
   let mut clist : Array[Thread] = []
   let mut nlist : Array[Thread] = []
@@ -326,11 +416,16 @@ fn run(
               depth,
             )
           }
-        Backreference(i) => {
+        Backreference(i, ignore_case~) => {
           let a = captures[i * 2]
           let b = captures[i * 2 + 1]
           let end = sp + b - a
-          if end <= input.length() && input[a:b] == input[sp:end] {
+          if end <= input.length() &&
+            (if ignore_case {
+              equal_casefold(input[a:b], input[sp:end], budget)
+            } else {
+              input[a:b] == input[sp:end]
+            }) {
             add_thread(
               input,
               instructions,

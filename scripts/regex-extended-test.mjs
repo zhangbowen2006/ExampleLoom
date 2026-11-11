@@ -13,8 +13,6 @@ const patterns=['','a|bc','(a|aa)+','a+?','[A-Z]{2,4}','\\d+','\\w+','\\W+','\\s
 patterns.push('(a|(b))*','(a(b)?)+','\\x41+','[\\x41-\\x61]','(?<a>a)(?<b>b)','\\u0041+');
 const evidence={created_at:new Date().toISOString(),engine_sha256:createHash('sha256').update(await readFile('dist/engine.js')).digest('hex'),methodology:'Constructed differential cases against Node RegExp with Unicode scalar iteration, strict full-string end; not external or blind tasks and not PCRE/ECMAScript full conformance.',comparisons:0,scenarios:[]};
 for(const flags of ['', 'i','s','m'])for(const source of patterns){
-  // Case-insensitive backreferences are an explicit unsupported combination.
-  if(flags==='i' && /\\(?:[1-9]|k<)/.test(source))continue;
   const pattern='(?rx)'+(flags?`(?${flags}:${source})`:source);
   for(const text of textCases){
     const oracle=[...text.matchAll(new RegExp(source,flags+'gu'))];
@@ -56,7 +54,7 @@ for(const name of ['conditional-regex','learned-assertions','wide-table-regex'])
     evidence.scenarios.push({name,steps:scenario.pipeline.steps.map(s=>s[0]),rows:response.table.rows.length,reordered_columns:true});
   }
 }
-for(const pattern of ['(?rx)[','(?rx)(?<=a+)b','(?rx)\\4294967296','(?rx)(?i:(a)\\1)']){
+for(const pattern of ['(?rx)[','(?rx)(?<=a+)b','(?rx)\\4294967296']){
   const result=request({op:'apply',table:{columns:['x'],rows:[['a']]},recipe:{version:1,columns:['x'],outputs:[{name:'v',expression:['capture',field,pattern,0,0]}]}});
   assert.equal(result.ok,false,pattern);
 }

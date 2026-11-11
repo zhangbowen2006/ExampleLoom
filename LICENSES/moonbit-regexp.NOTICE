@@ -11,6 +11,10 @@ adjusted. ExampleLoom changes add lookahead and fixed scalar-width lookbehind,
 absolute-position matching, a shared runtime budget and live-thread bound,
 capture reset on repetition, hexadecimal escapes and defensive validation.
 Unicode word-boundary inspection handles surrogate offsets without panicking.
+Version 0.9 additionally supports bounded variable-length, capture-free
+lookbehind alternatives (and fixed-width capturing alternatives), case-folded
+backreferences and braced hexadecimal Unicode escapes. Scalar checks and
+assertion state allocation are charged to the shared VM budget.
 This is a modified regex subsystem, not an original regex algorithm, a full
 PCRE implementation, or a claim to implement every ECMAScript regex rule.
 The remaining ExampleLoom search, expressions, recipes, table operators,

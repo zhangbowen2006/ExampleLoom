@@ -26,7 +26,7 @@ pub(all) enum Ast {
   Repeat(Ast, greedy~ : Bool, min~ : UInt32, max~ : UInt32?)
   Concat(Array[Ast])
   Alternate(Ast, Ast)
-  Backreference(Int32)
+  Backreference(Int32, ignore_case~ : Bool)
   Look(Ast, positive~ : Bool, behind~ : Int32?)
 } derive(Debug)
 
@@ -161,8 +161,15 @@ fn Ast::compile_aux(regex : Ast, instructions : Array[Instruction]) -> Unit {
       instructions[jmp_pos] = Jump(instructions.length())
     }
     Look(inner, positive~, behind~) =>
-      instructions.push(Look(inner.compile_anchored(), positive~, behind~))
-    Backreference(i) => instructions.push(Backreference(i))
+      if behind is Some(_) {
+        let branches : Array[LookBranch] = []
+        inner.append_lookbehind_branches(branches)
+        instructions.push(LookBehind(branches, positive~))
+      } else {
+        instructions.push(Look(inner.compile_anchored(), positive~, behind~))
+      }
+    Backreference(i, ignore_case~) =>
+      instructions.push(Backreference(i, ignore_case~))
   }
 }
 
@@ -201,7 +208,7 @@ pub impl ToJson for Ast with fn to_json(self) {
     Concat(regexs) => [..regexs.map(r => r.to_json())]
     Alternate(left, right) => ["Alternate", left, right]
     Look(inner, positive~, behind~) => ["Look", inner, positive, behind]
-    Backreference(i) => ["Backreference", i]
+    Backreference(i, ignore_case~) => ["Backreference", i, ignore_case]
   }
 }
 
@@ -256,36 +263,87 @@ pub fn Ast::compile_anchored(self : Ast) -> Array[Instruction] {
   instructions
 }
 
-///| A fixed width in Unicode scalars, not UTF-16 units. Variable-width
+///| Scalar-width interval used only for bounded lookbehind. Reject unbounded
 
 ///|
-/// lookbehind is deliberately rejected before execution.
-pub fn Ast::fixed_width(self : Ast) -> Int32? {
+/// repetition and references whose length depends on a previous capture.
+pub fn Ast::width_bounds(self : Ast) -> (Int32, Int32)? {
   match self {
-    Empty | Assertion(_) | Look(_, ..) => Some(0)
-    CharClass(_, ..) => Some(1)
-    Capture(inner, ..) => inner.fixed_width()
+    Empty | Assertion(_) | Look(_, ..) => Some((0, 0))
+    CharClass(_, ..) => Some((1, 1))
+    Capture(inner, ..) => inner.width_bounds()
     Concat(parts) => {
-      let mut total = 0
+      let mut low = 0
+      let mut high = 0
       for part in parts {
-        guard part.fixed_width() is Some(n) else { return None }
-        total += n
+        guard part.width_bounds() is Some((a, b)) else { return None }
+        low += a
+        high += b
+        if high > 255 {
+          return None
+        }
       }
-      Some(total)
+      Some((low, high))
     }
     Alternate(a, b) => {
-      let x = a.fixed_width()
-      if x == b.fixed_width() {
-        x
-      } else {
-        None
+      guard a.width_bounds() is Some((alo, ahi)) &&
+        b.width_bounds() is Some((blo, bhi)) else {
+        return None
       }
+      Some((Int32::min(alo, blo), Int32::max(ahi, bhi)))
+    }
+    ZeroOrOne(inner, ..) => {
+      guard inner.width_bounds() is Some((_, high)) else { return None }
+      Some((0, high))
     }
     Repeat(inner, min~, max~, ..) => {
-      guard max is Some(max) && min == max else { return None }
-      inner.fixed_width().map(n => n * min.reinterpret_as_int())
+      guard max is Some(max) &&
+        max <= 255U &&
+        inner.width_bounds() is Some((low, high)) else {
+        return None
+      }
+      let a = low * min.reinterpret_as_int()
+      let b = high * max.reinterpret_as_int()
+      if b > 255 {
+        None
+      } else {
+        Some((a, b))
+      }
     }
     _ => None
+  }
+}
+
+///| Validate each top-level alternative separately, preserving PCRE branch
+
+///| order. Variable-width capturing branches are excluded because reversed
+
+///|
+/// backtracking can choose different captures from our forward VM.
+pub fn Ast::valid_lookbehind(self : Ast) -> Bool {
+  match self {
+    Alternate(a, b) => a.valid_lookbehind() && b.valid_lookbehind()
+    _ => {
+      guard self.width_bounds() is Some((low, high)) else { return false }
+      let slots = []
+      self.capture_slots(slots)
+      self.lookbehind_captures_safe() && (low == high || slots.is_empty())
+    }
+  }
+}
+
+///|
+fn Ast::append_lookbehind_branches(self : Ast, out : Array[LookBranch]) -> Unit {
+  match self {
+    Alternate(a, b) => {
+      a.append_lookbehind_branches(out)
+      b.append_lookbehind_branches(out)
+    }
+    _ => {
+      // The parser has already validated this assertion.
+      guard! self.width_bounds() is Some((minimum, maximum))
+      out.push({ code: self.compile_anchored(), minimum, maximum, })
+    }
   }
 }
 

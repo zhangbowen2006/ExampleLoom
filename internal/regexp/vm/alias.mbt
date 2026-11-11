@@ -13,4 +13,4 @@
 // limitations under the License.
 
 ///|
-using @unicode {char_in_ranges, is_word_char_at}
+using @unicode {char_in_ranges, is_word_char_at, simple_case_equal}

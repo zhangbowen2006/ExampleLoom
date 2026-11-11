@@ -1,4 +1,9 @@
 {
+  "0.8.0": {
+    "commit": "12e4d0fad1e608a210978b3eeee4b477557993fb",
+    "engine": "fa4918e85aface4cb6a1352f90a7387410b03daec4e806dd3dfb27a73d90fc8d",
+    "archive": "9d56b356ceb654258d151d33791f7909a0e888e2c4ba12300995f55e7286835d"
+  },
   "0.6.1": {
     "commit": "6926fa9643acda56843b64eae53b1ce11e808eda",
     "engine": "898a98b54879fd6fb2b9a96191f35c07a12c94bb63fb5d2754234953944290ac",

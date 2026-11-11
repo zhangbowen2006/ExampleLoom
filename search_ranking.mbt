@@ -55,9 +55,16 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       Aggregate(_, measures) => 11 + measures.length()
       SplitColumn(_, _, _) | Explode(_, _) => 7
       CombineColumns(names, sep, _) => 5 + names.length() + sep.char_length()
+      // A witnessed start marker states where records begin. Prefer that
+      // reusable boundary over guessing a fixed record size from one block.
+      SegmentRows(Matches(Field(_), pattern, false), true) if pattern.has_prefix(
+          "^",
+        ) => 5 + pattern.char_length() / 8
       SegmentRows(c, _) => 8 + condition_cost(c)
       CarryContext(c, _) => 9 + condition_cost(c)
       MapRows(r) =>
+        r.outputs.fold(init=8, (n, o) => n + expression_cost(o.expression))
+      UpdateColumns(r) =>
         r.outputs.fold(init=8, (n, o) => n + expression_cost(o.expression))
     })
   })

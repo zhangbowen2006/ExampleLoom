@@ -17,12 +17,18 @@ test "extended regex supports shorthand Unicode named groups flags and backrefer
   assert_true(regex_test("a", "(?rx)(a*)\\1", true) == false)
   assert_true(regex_test("", "(?rx)(a*)\\1", true))
   assert_true(regex_test("aF", "(?rx)[\\x41-\\x61]\\x46", true))
+  assert_true(regex_test("😀Z", "(?rx)\\x{1F600}[\\x{41}-\\x{5A}]", true))
+  assert_true(regex_test("က", "(?rx)\\x{1000}", true))
+  assert_true(regex_test("k", "(?rx)(?i:\\x{212A})", true))
   assert_true(regex_test("က", "(?rx)\\u{1000}", true))
   assert_true(regex_test("😀word😀", "(?rx)\\bword\\b", false))
   assert_true(regex_test("\u{0}", "(?rx)[\\0]", true))
-  assert_true(
-    attempt(RegexCapture(Field(0), "(?rx)(?mi:(a)\\1)", 0, 0), ["aa"]) is Err(_),
-  )
+  assert_true(regex_test("aA", "(?rx)(?i:(a)\\1)", true))
+  assert_true(regex_test("KK", "(?rx)(?i:(?<x>K)\\k<x>)", true))
+  assert_true(regex_test("Σς", "(?rx)(?i:(Σ)\\1)", true))
+  assert_true(!regex_test("aB", "(?rx)(?i:(a)\\1)", true))
+  assert_true(regex_test("aA", "(?rx)(a)(?i:\\1)", true))
+  assert_true(!regex_test("aA", "(?rx)(?i:(a))\\1", true))
 }
 
 ///|
@@ -42,6 +48,40 @@ test "lookaround keeps absolute context during global replacement and scalar loo
   assert_true(!regex_test("a\n", "(?rx)a", true))
   assert_true(regex_test("a\nb", "(?rx)(?m:^b$)", false))
   assert_true(regex_test("a\nb", "(?rx)(?s:a.b)", true))
+}
+
+///|
+test "bounded lookbehind honors alternatives, Unicode and shared budgets" {
+  assert_eq(
+    regex_replace(
+      "color=red colour=blue colr=no", "(?rx)(?<=colou?r=)\\w+", "#",
+    ),
+    "color=# colour=# colr=no",
+  )
+  assert_eq(
+    regex_replace("ID-42 REF-71 XYZ-9", "(?rx)(?<=ID-|REF-)\\d+", "#"),
+    "ID-# REF-# XYZ-9",
+  )
+  assert_eq(
+    regex_replace("a42 aaa42 aaaa42 42", "(?rx)(?<!a{1,3})42", "#"),
+    "a42 aaa42 aaaa42 #",
+  )
+  assert_eq(
+    regex_capture("甲😀-12", "(?rx)(?<=甲😀|😀)-\\d+", 0, 0),
+    "-12",
+  )
+  // First successful alternative wins even when it is shorter.
+  assert_eq(regex_capture("bax", "(?rx)(?<=(a)|(ba))x", 1, 0), "a")
+  assert_true(
+    attempt(RegexCapture(Field(0), "(?rx)(?<=a*)b", 0, 0), ["ab"]) is Err(_),
+  )
+  assert_true(
+    attempt(RegexCapture(Field(0), "(?rx)(?<=(a{1,2}))b", 0, 0), ["aab"])
+    is Err(_),
+  )
+  assert_true(
+    attempt(RegexCapture(Field(0), "(?rx)(?<=a{256})b", 0, 0), ["ab"]) is Err(_),
+  )
 }
 
 ///|

@@ -1,0 +1,8 @@
+{
+  "title":"变长记录整理",
+  "description":"运营人员用一条星号开头的记录示范字段整理；新批次每条记录长度不同，保留新增字段并填补短记录。",
+  "input":"line\n*Alpha\nMain Street\nNorth\n",
+  "target":"c0,c1,c2\nAlpha,Main Street,North\n",
+  "next":"line\n*Beta\nSecond Road\n*Gamma\nThird Road\nWest\nPhone\n",
+  "expected":{"columns":["c0","c1","c2","c3"],"rows":[["Beta","Second Road","",""],["Gamma","Third Road","West","Phone"]]}
+}
