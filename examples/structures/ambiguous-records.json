@@ -1,0 +1,13 @@
+{
+  "title": "候选歧义与补充样例",
+  "description": "一条两行记录同时符合转置与定长打包。比较下一批的不同结果，填写正确目标表后重新学习，再处理第三批。",
+  "input": "c0\nA\nred\n",
+  "target": "c0,c1\nA,red\n",
+  "next": "c0\nB\nblue\nC\ngreen\n",
+  "expected": {"columns": ["c0", "c1"], "rows": [["B", "blue"], ["C", "green"]]},
+  "refinement_target": "c0,c1\nB,blue\nC,green\n",
+  "after_refinement": {
+    "input": "c0\nD\norange\nE\npurple\nF\nwhite\n",
+    "expected": {"columns": ["c0", "c1"], "rows": [["D", "orange"], ["E", "purple"], ["F", "white"]]}
+  }
+}

@@ -1,12 +1,19 @@
 # Changes
 
+## 0.6.1 — 2026-11-11
+
+- Compare retained table programs on an unlabelled complete batch through the MoonBit API and workbench. Group exact output tables and execution errors and locate the first schema, row-count or cell difference.
+- Complete an explicit refinement workflow: copy the compared input, leave the target blank for the user, invalidate old candidates, relearn and replay on a third batch. Discard delayed results after edits.
+- Bound comparison to eight programs and 2000 rows / 20000 cells / 250000 UTF-16 units per input or successful output. Refuse oversized batches without sampling partial records or calling a resource-limit failure program evidence.
+- Add nine core regressions (108 total), API/browser refinement tests and two existing Foofah failure cases. Search operators, budgets, ranking and evaluation protocols are unchanged.
+
 ## 0.6.0 — 2026-11-11
 
 - Learn single-token literal rewrites and guarded suffix completion from observed inputs and outputs. Whole-field search shares the caller's budget with the complete grammar.
 - Compose packing with projection, splitting with folding, and key-value context propagation with pivoting. Allow row learning from one table row, with the existing ambiguity feedback.
 - Share default separators between the MoonBit API and JSON protocol, including equal-sign records. Prefer key-based grouping over fixed-size packing.
 - Audit identical training calls with incompatible test labels. Correct the string evaluation's training cap from 6 to the supported 32 and retain an explicitly labelled legacy evaluation. Preserve original contradictory source constraints as diagnostic evidence.
-- Add 99 core tests and complete browser demonstrations. Actual external scores, failures and measurement settings are in [the benchmark report](docs/BENCHMARKS.md).
+- Validate 99 core tests and complete browser demonstrations. Actual external scores, failures and measurement settings are in [the benchmark report](docs/BENCHMARKS.md).
 
 ## 0.5.1 — 2026-11-11
 

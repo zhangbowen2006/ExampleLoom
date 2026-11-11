@@ -12,6 +12,8 @@ pub fn apply_recipe(Recipe, Table) -> BatchResult raise LoomError
 
 pub fn attempt(Expr, Array[String]) -> Result[String, String]
 
+pub fn compare_table_candidates(Array[Pipeline], Table) -> TableComparison raise LoomError
+
 pub fn condition_from_json(Json) -> Condition raise LoomError
 
 pub fn condition_to_json(Condition) -> Json raise LoomError
@@ -207,9 +209,31 @@ pub fn Table::equal(Self, Self) -> Bool
 pub fn Table::not_equal(Self, Self) -> Bool
 pub fn Table::to_repr(Self) -> @debug.Repr
 
+pub(all) struct TableComparison {
+  groups : Array[TablePredictionGroup]
+  status : String
+  successful_candidates : Int32
+  first_difference : TableDifference?
+}
+
+pub(all) enum TableDifference {
+  ColumnNames
+  RowCount
+  Cell(Int32, Int32)
+  Execution
+} derive(Eq, @debug.Debug)
+pub fn TableDifference::equal(Self, Self) -> Bool
+pub fn TableDifference::not_equal(Self, Self) -> Bool
+pub fn TableDifference::to_repr(Self) -> @debug.Repr
+
 pub(all) struct TableExample {
   before : Table
   after : Table
+}
+
+pub(all) struct TablePredictionGroup {
+  prediction : Result[Table, String]
+  candidates : Array[Int32]
 }
 
 pub(all) struct TableSearchOptions {

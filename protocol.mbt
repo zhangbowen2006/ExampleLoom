@@ -129,6 +129,45 @@ fn dispatch(request : Json) -> Json raise LoomError {
         ),
       })
     }
+    "compare_table_candidates" => {
+      fields_only(obj, ["op", "pipelines", "table"])
+      let r = compare_table_candidates(
+        j_array(required(obj, "pipelines")).map(pipeline_from_json),
+        table_from_json(required(obj, "table")),
+      )
+      let first_difference = match r.first_difference {
+        None => Json::null()
+        Some(ColumnNames) => Json::object({ "kind": Json("columns") })
+        Some(RowCount) => Json::object({ "kind": Json("row_count") })
+        Some(Cell(row, column)) =>
+          Json::object({
+            "kind": Json("cell"),
+            "row_index": Json(row),
+            "column_index": Json(column),
+          })
+        Some(Execution) => Json::object({ "kind": Json("error") })
+      }
+      Json::object({
+        "ok": Json(true),
+        "status": Json(r.status),
+        "successful_candidates": Json(r.successful_candidates),
+        "first_difference": first_difference,
+        "groups": Json::array(
+          r.groups.map(g => {
+            let prediction = match g.prediction {
+              Ok(table) =>
+                Json::object({ "ok": Json(true), "table": table_json(table) })
+              Err(message) =>
+                Json::object({ "ok": Json(false), "error": Json(message) })
+            }
+            Json::object({
+              "candidates": Json(g.candidates),
+              "prediction": prediction,
+            })
+          }),
+        ),
+      })
+    }
     "validate_pipeline" =>
       Json::object({
         "ok": Json(true),
