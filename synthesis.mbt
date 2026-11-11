@@ -589,6 +589,65 @@ fn synthesize_flat(
   }
   let examples = canonical_examples(examples)
   let pool = build_atoms(examples, options, separators, patterns)
+  let whole_fields = pool.atoms.filter(atom => {
+    match atom.expression {
+      Field(_)
+      | Trim(Field(_))
+      | Lower(Field(_))
+      | Upper(Field(_))
+      | RegexReplace(Field(_), _, _)
+      | If(_, _, _) => true
+      _ => false
+    }
+  })
+  if whole_fields.is_empty() ||
+    whole_fields.length() == pool.atoms.length() ||
+    options.max_steps < 16 {
+    return search_pool(pool, examples, options)
+  }
+  // Find short combinations of complete fields before positional atoms fill
+  // the frontier. This pass shares the caller's step budget with the full
+  // grammar, which still runs to retain alternative explanations.
+  let quick = search_pool({ ..pool, atoms: whole_fields, }, examples, {
+    ..options,
+    max_steps: Int32::min(512, options.max_steps / 8),
+  })
+  let full = search_pool(pool, examples, {
+    ..options,
+    max_steps: options.max_steps - quick.steps,
+  })
+  let choices : Array[Candidate] = []
+  let seen : Map[String, Bool] = Map([])
+  for c in full.candidates + quick.candidates {
+    let key = explain(c.expression)
+    if !seen.contains(key) {
+      seen[key] = true
+      choices.push(c)
+    }
+  }
+  choices.sort_by((a, b) => {
+    if a.cost != b.cost {
+      a.cost - b.cost
+    } else {
+      explain(a.expression).compare(explain(b.expression))
+    }
+  })
+  {
+    ..full,
+    candidates: choices[:Int32::min(choices.length(), options.max_candidates)].to_owned(),
+    truncated: full.truncated || choices.length() > options.max_candidates,
+    steps: quick.steps + full.steps,
+    cached_states: quick.cached_states + full.cached_states,
+    cache_hits: quick.cache_hits + full.cache_hits,
+  }
+}
+
+///|
+fn search_pool(
+  pool : Pool,
+  examples : Array[Example],
+  options : SearchOptions,
+) -> SearchReport {
   let targets = examples.map(e => e.output.to_array())
   let (remaining, initial_steps) = suffix_costs(
     pool.atoms,

@@ -21,6 +21,40 @@ test "learn optional suffixes within a longer concatenated result" {
 }
 
 ///|
+test "complete-field witnesses prevent an unrelated category branch under a small budget" {
+  let rows = [
+    ["Greenwood Manufacturing Institute", "Hill Park; NW; ACTIVE"],
+    ["Lakeside Research and Development", "Riverside; SE"],
+    ["Westland Science and Research", "Old Harbor; NE; ACTIVE"],
+    ["Northern Technical University", "Main Site; SW; ACTIVE"],
+  ]
+  let samples = rows.map(row => Example::{
+    input: row,
+    output: row[0] +
+    ", " +
+    row[1] +
+    (if row[1].has_suffix("; ACTIVE") { "" } else { "; ACTIVE" }),
+  })
+  let options = {
+    ..default_options(),
+    max_candidates: 8,
+    max_atom_evaluations: 4000,
+    max_steps: 30000,
+    max_frontier: 1024,
+  }
+  let r = synthesize(samples, options~)
+  assert_true(!r.candidates.is_empty())
+  assert_eq(
+    evaluate(r.candidates[0].expression, ["Fresh Team Lab", "New Site; W"]),
+    "Fresh Team Lab, New Site; W; ACTIVE",
+  )
+  assert_true(
+    r.steps <= options.max_steps &&
+    r.atom_evaluations <= options.max_atom_evaluations,
+  )
+}
+
+///|
 test "token normalization keeps an equal city token and escapes literal dollars" {
   let r = synthesize([
     { input: ["North West, North West, LIVE"], output: "North West, NW, LIVE", },
