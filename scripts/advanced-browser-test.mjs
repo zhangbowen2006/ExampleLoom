@@ -10,12 +10,12 @@ try{
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
   await page.goto(base+'/');
   await page.locator('details').evaluate(e=>{e.open=true;});
-  for(const name of ['conditional','regex','rewrite','initials','normalize']){
+  for(const name of ['conditional','regex','rewrite','initials','normalize','advanced-regex']){
     const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
     await page.locator(`[data-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-choose="0"]').waitFor();
     if(name==='rewrite')assert.match(await page.locator('.candidate').first().innerText(),/replace/);
-    if(name==='regex')assert.match(await page.locator('.candidate').first().innerText(),/capture/);
+    if(name==='regex'||name==='advanced-regex')assert.match(await page.locator('.candidate').first().innerText(),/capture/);
     if(name==='conditional')assert.match(await page.locator('.candidate').first().innerText(),/if\(/);
     await page.locator('[data-choose="0"]').click();await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#download-csv').disabled);
     const rows=await page.locator('#results tbody tr').evaluateAll(rows=>rows.map(tr=>tr.children[1].textContent));assert.deepEqual(rows,scenario.fields[0].expected);

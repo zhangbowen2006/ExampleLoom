@@ -40,6 +40,7 @@ jobs:
           node scripts/build.mjs
           node scripts/integration.mjs
           node scripts/advanced-test.mjs
+          node scripts/regex-extended-test.mjs
           node scripts/table-comparison-test.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs

@@ -2,6 +2,8 @@
 
 这是技术调研记录，不是参赛申报书。实现代码由 AI 辅助编写，维护者需理解、验证并负责。
 
+v0.8 正则子系统直接采用并修改 [moonbitlang/regexp.mbt](https://github.com/moonbitlang/regexp.mbt) 的 Mooncakes 0.3.7（Apache-2.0），不再把所有正则实现描述为独立原创。包括解析器、AST、Unicode 表及 VM；新增断言、绝对位置匹配、共享执行预算、重复捕获重置与边界修复。[上游包哈希及修改清单](../LICENSES/moonbit-regexp.NOTICE) · [详细语义与范围](REGEX_PROFILE.md)。其余搜索、表格结构、配方、工作台和 CLI 沿用项目实现；PROSE 与 Foofah 没有作为引擎依赖。
+
 ## 独立价值与范围
 
 目标使用者是需要重复整理产品编号、活动名单和素材目录，但不想逐行处理或手写表达式的人。应用独立提供数据导入、样例编辑、程序搜索、分歧预览、配方保存和批量导出；不依赖旧项目、Excel、PROSE、云模型或专用服务端。可复用 MoonBit 库是同一核心的另一使用方式。

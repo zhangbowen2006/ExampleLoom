@@ -1,5 +1,5 @@
 ///|
-let regex_cache : Map[String, @string.Regex] = Map([])
+let regex_cache : Map[String, CompiledPattern] = Map([])
 
 ///|
 fn regex_complexity(pattern : String) -> Unit raise LoomError {
@@ -12,6 +12,16 @@ fn regex_complexity(pattern : String) -> Unit raise LoomError {
   while i < chars.length() {
     let c = chars[i]
     if c == '\\' {
+      if i + 2 < chars.length() &&
+        (chars[i + 1] == 'p' || chars[i + 1] == 'P' || chars[i + 1] == 'u') &&
+        chars[i + 2] == '{' {
+        i += 3
+        while i < chars.length() && chars[i] != '}' {
+          i += 1
+        }
+        i += 1
+        continue
+      }
       i = i + 2
       continue
     }
@@ -63,7 +73,7 @@ fn regex_complexity(pattern : String) -> Unit raise LoomError {
 }
 
 ///|
-fn compiled_regex(pattern : String) -> @string.Regex raise LoomError {
+fn compiled_regex(pattern : String) -> CompiledPattern raise LoomError {
   if pattern.length() > 256 {
     raise LoomError("regex pattern exceeds 256 UTF-16 units")
   }
@@ -71,8 +81,15 @@ fn compiled_regex(pattern : String) -> @string.Regex raise LoomError {
     Some(regex) => regex
     None => {
       regex_complexity(pattern)
-      let regex = @string.Regex(pattern[:]) catch {
-        _ => raise LoomError("invalid MoonBit regular expression: \{pattern}")
+      let regex = if pattern.has_prefix("(?rx)") {
+        extended_pattern(pattern)
+      } else {
+        Classic(
+          @string.Regex(pattern[:]) catch {
+            _ =>
+              raise LoomError("invalid MoonBit regular expression: \{pattern}")
+          },
+        )
       }
       if regex_cache.length() >= 64 {
         regex_cache.clear()
@@ -94,7 +111,7 @@ fn regex_test(
     if pattern.length() > 248 {
       raise LoomError("full regex pattern exceeds 248 units")
     }
-    compiled_regex("^(?:" + pattern + ")$").execute(text[:]) is Some(_)
+    compiled_regex(anchored_pattern(pattern)).execute(text[:]) is Some(_)
   } else {
     compiled_regex(pattern).execute(text[:]) is Some(_)
   }
@@ -110,7 +127,7 @@ fn regex_capture(
   if group < 0 || group > 32 || occurrence < -4096 || occurrence >= 4096 {
     raise LoomError("regex group/occurrence outside limits")
   }
-  let matches : Array[@string.MatchResult] = []
+  let matches : Array[RegexMatch] = []
   for m in compiled_regex(pattern).find(text[:]) {
     if matches.length() == 4096 {
       raise LoomError("regex exceeds 4096 matches")
@@ -136,22 +153,23 @@ fn regex_capture(
 }
 
 ///|
-fn replacement_text(
+priv enum ReplacementPart {
+  Text(String)
+  Number(Int32)
+  Named(String)
+}
+
+///|
+fn replacement_parts(
   template : String,
-  m : @string.MatchResult,
-  remaining : Int32,
-) -> String raise LoomError {
+) -> Array[ReplacementPart] raise LoomError {
   let chars = template.to_array()
-  let out = StringBuilder()
+  let parts : Array[ReplacementPart] = []
+  let mut literal = StringBuilder()
   let mut i = 0
-  let mut length = 0
   while i < chars.length() {
     if chars[i] != '$' {
-      length = length + (if chars[i].to_int() > 0xffff { 2 } else { 1 })
-      if length > remaining {
-        raise LoomError("regex replacement exceeds cell limit")
-      }
-      out.write_char(chars[i])
+      literal.write_char(chars[i])
       i = i + 1
       continue
     }
@@ -160,23 +178,70 @@ fn replacement_text(
     }
     let next = chars[i + 1]
     if next == '$' {
-      length = length + 1
-      if length > remaining {
-        raise LoomError("regex replacement exceeds cell limit")
-      }
-      out.write_char('$')
-    } else if next.is_ascii_digit() {
-      if m.group(next.to_int() - '0'.to_int()) is Some(value) {
-        length = length + value.length()
-        if length > remaining {
-          raise LoomError("regex replacement exceeds cell limit")
-        }
-        out.write_string(value.to_owned())
-      }
-    } else {
-      raise LoomError("replacement supports only $$ and $0..$9")
+      literal.write_char('$')
+      i += 2
+      continue
     }
-    i = i + 2
+    parts.push(Text(literal.to_string()))
+    literal = StringBuilder()
+    if next.is_ascii_digit() {
+      parts.push(Number(next.to_int() - '0'.to_int()))
+      i += 2
+    } else if next == '{' {
+      let start = i + 2
+      i = start
+      while i < chars.length() && chars[i] != '}' {
+        i += 1
+      }
+      if i == chars.length() || i == start || i - start > 64 {
+        raise LoomError("invalid braced regex replacement reference")
+      }
+      let name = String::from_array(chars[start:i])
+      if chars[start:i].all(c => c.is_ascii_digit()) {
+        let mut n = 0
+        for c in chars[start:i] {
+          n = n * 10 + c.to_int() - '0'.to_int()
+          if n > 32 {
+            raise LoomError("replacement group exceeds 32")
+          }
+        }
+        parts.push(Number(n))
+      } else {
+        parts.push(Named(name))
+      }
+      i += 1
+    } else {
+      raise LoomError("replacement supports $$, $0..$9 and ${group}")
+    }
+  }
+  parts.push(Text(literal.to_string()))
+  parts
+}
+
+///|
+fn replacement_text(
+  parts : Array[ReplacementPart],
+  m : RegexMatch,
+  remaining : Int32,
+) -> String raise LoomError {
+  let out = StringBuilder()
+  let mut length = 0
+  for part in parts {
+    let value = match part {
+      Text(s) => s
+      Number(i) => m.group(i).map(s => s.to_owned()).unwrap_or("")
+      Named(name) => {
+        guard m.names.get(name) is Some(i) else {
+          raise LoomError("unknown named capture: " + name)
+        }
+        m.group(i).map(s => s.to_owned()).unwrap_or("")
+      }
+    }
+    length += value.length()
+    if length > remaining {
+      raise LoomError("regex replacement exceeds cell limit")
+    }
+    out.write_string(value)
   }
   out.to_string()
 }
@@ -190,24 +255,21 @@ fn regex_replace(
   if text.length() > 65536 || template.length() > 65536 {
     raise LoomError("regex input/template exceeds cell limit")
   }
-  // Validate replacement even if no match would execute it.
-  let chars = template.to_array()
-  let mut i = 0
-  while i < chars.length() {
-    if chars[i] == '$' {
-      if i + 1 >= chars.length() ||
-        !(chars[i + 1] == '$' || chars[i + 1].is_ascii_digit()) {
-        raise LoomError("replacement supports only $$ and $0..$9")
+  let parts = replacement_parts(template)
+  let regex = compiled_regex(pattern)
+  // Invalid named references must also fail when there are zero matches.
+  for part in parts {
+    if part is Named(name) {
+      guard regex is Extended(rx) && rx.names.contains(name) else {
+        raise LoomError("unknown named capture: " + name)
       }
-      i = i + 1
     }
-    i = i + 1
   }
   let out = StringBuilder()
   let mut end = 0
   let mut count = 0
   let mut written = 0
-  for m in compiled_regex(pattern).find(text[:]) {
+  for m in regex.find(text[:]) {
     count = count + 1
     if count > 4096 {
       raise LoomError("regex exceeds 4096 matches")
@@ -218,7 +280,7 @@ fn regex_replace(
       raise LoomError("regex replacement exceeds cell limit")
     }
     out.write_string(text[end:start].to_owned())
-    let chunk = replacement_text(template, m, 65536 - written)
+    let chunk = replacement_text(parts, m, 65536 - written)
     out.write_string(chunk)
     written = written + chunk.length()
     end = start + m.content().length()

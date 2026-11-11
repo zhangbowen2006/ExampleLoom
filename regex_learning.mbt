@@ -198,11 +198,12 @@ fn learn_replacements(
     if pat.length() > 248 {
       continue
     }
-    let pattern = "^(?:" + pat + ")$"
+    let pattern = anchored_pattern(pat)
     let regex = compiled_regex(pattern) catch { _ => continue }
-    let matches : Array[@string.MatchResult] = []
+    let matches : Array[RegexMatch] = []
     for e in examples {
-      if regex.execute(e.input[col][:]) is Some(m) {
+      let matched = regex.execute(e.input[col][:]) catch { _ => break }
+      if matched is Some(m) {
         matches.push(m)
       } else {
         break

@@ -1,0 +1,7 @@
+{
+  "op":"apply",
+  "purpose":"Operations users classify vendor IDs with regex predicates and format named captures; unmatched values take an explicit fallback branch.",
+  "table":{"columns":["x"],"rows":[["AB-0042"],["XY-81"],["free text"]]},
+  "recipe":{"version":1,"columns":["x"],"outputs":[{"name":"normalized","expression":["if",["matches",["field",0],"(?rx)[A-Z]{2}-\\d+",true],["replace",["field",0],"(?rx)(?<vendor>[A-Z]{2})-(?<id>\\d+)","${id}/${vendor}"],["literal","unclassified"]]}]},
+  "expected":[["0042/AB"],["81/XY"],["unclassified"]]
+}

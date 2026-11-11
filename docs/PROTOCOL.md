@@ -2,6 +2,10 @@
 
 The exported `handle(request: String) -> String` always returns JSON. Ordinary input failures are `{ "ok": false, "error": "..." }`. There is no network, filesystem or host-code execution in this boundary.
 
+## Extended regex (v0.8.0, additive profile)
+
+Existing recipe v1 and pipeline v2 encodings remain valid. A pattern starting with `(?rx)` explicitly selects the [extended native MoonBit profile](REGEX_PROFILE.md); other patterns retain the core/lexmatch dialect. Use it in `matches`, `capture`, `replace`, and synthesis `patterns` without a new recipe version. Example: `"(?rx)(?<=ref=)(\\d+)(?=;)"`. Replacement templates additionally accept `${name}` for named groups and `${12}` for multi-digit group indices through 32, preserving `$0..$9` and `$$`. This profile adds bounded lookaround and case-sensitive backreferences, not unrestricted PCRE. Unsupported syntax and resource exhaustion return errors. No external regex engine executes user data.
+
 ## Stable row ordering (v0.7.0)
 
 The additive v2 step is `["sort_rows",[["region","text","asc"],["amount","decimal","desc"]]]`. Each key is exactly `[column,kind,direction]`, with kind `text` or `decimal` and direction `asc` or `desc`. Supply 1–8 distinct, existing column names. Keys are evaluated left-to-right; full ties retain their original input ordinal even in descending order. JSON pipeline v2 and every existing operator encoding remain valid.

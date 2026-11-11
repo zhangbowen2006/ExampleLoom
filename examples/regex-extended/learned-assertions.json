@@ -1,0 +1,7 @@
+{
+  "op":"synthesize",
+  "purpose":"Support staff label the ref value in noisy logs and learn an extraction that requires both left and right context; held-out noise numbers must be ignored.",
+  "patterns":["(?rx)(?<=ref=)(\\d+)(?=;)"],
+  "examples":[{"input":["noise 8 ref=003; note=98"],"output":"003"},{"input":["ref=1047; note=99"],"output":"1047"}],
+  "unseen":[{"input":["noise 812 ref=80001; note=77"],"output":"80001"},{"input":["noise 2 ref=00009; note=88"],"output":"00009"}]
+}

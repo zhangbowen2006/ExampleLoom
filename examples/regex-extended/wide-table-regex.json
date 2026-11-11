@@ -1,0 +1,15 @@
+{
+  "op":"transform",
+  "purpose":"An analyst filters valid vendor codes, normalizes them with a conditional and named captures, unpivots month columns and sorts exact decimal values; source column order may change.",
+  "table":{"columns":["code","Jan","Feb"],"rows":[["AB-0042","12.50","-3"],["XY-81","2","100"],["noise","9","9"]]},
+  "pipeline":{"version":2,"columns":["code","Jan","Feb"],"steps":[
+    ["filter",["matches",["field",0],"(?rx)[A-Z]{2}-\\d+",true]],
+    ["map_rows",{"version":1,"columns":["code","Jan","Feb"],"outputs":[
+      {"name":"vendor_id","expression":["if",["matches",["field",0],"(?rx)(?=AB-).*",true],["replace",["field",0],"(?rx)(?<v>[A-Z]{2})-(?<n>\\d+)","primary/${n}/${v}"],["replace",["field",0],"(?rx)(?<v>[A-Z]{2})-(?<n>\\d+)","other/${n}/${v}"]]},
+      {"name":"Jan","expression":["field",1]}, {"name":"Feb","expression":["field",2]}
+    ]}],
+    ["unpivot",["vendor_id"],["Jan","Feb"],"month","amount"],
+    ["sort_rows",[["amount","decimal","desc"]]]
+  ]},
+  "expected":{"columns":["vendor_id","month","amount"],"rows":[["other/81/XY","Feb","100"],["primary/0042/AB","Jan","12.50"],["other/81/XY","Jan","2"],["primary/0042/AB","Feb","-3"]]}
+}

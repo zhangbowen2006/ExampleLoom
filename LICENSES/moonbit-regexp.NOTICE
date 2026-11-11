@@ -1,0 +1,17 @@
+ExampleLoom includes modified source from moonbitlang/regexp 0.3.7.
+Upstream: https://github.com/moonbitlang/regexp.mbt
+Package: https://download.mooncakes.io/user/moonbitlang/regexp/0.3.7.zip
+Package SHA-256: 533f0af3129ccbdb43900cd1f59d9bbb54284e0f08c410c8cf864051161958cc
+Copyright 2025 International Digital Economy Academy.
+License: Apache License, Version 2.0 (moonbit-regexp.LICENSE).
+
+Included production parser, AST compiler, Unicode tables and VM files are under
+internal/regexp/. Original headers are retained. Local module import paths are
+adjusted. ExampleLoom changes add lookahead and fixed scalar-width lookbehind,
+absolute-position matching, a shared runtime budget and live-thread bound,
+capture reset on repetition, hexadecimal escapes and defensive validation.
+Unicode word-boundary inspection handles surrogate offsets without panicking.
+This is a modified regex subsystem, not an original regex algorithm, a full
+PCRE implementation, or a claim to implement every ECMAScript regex rule.
+The remaining ExampleLoom search, expressions, recipes, table operators,
+workbench and CLI continue under the project's MIT license.

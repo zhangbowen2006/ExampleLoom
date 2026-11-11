@@ -1,0 +1,1 @@
+{"title":"断言与扩展正则学习","description":"从带噪声日志提取 ref：模式要求左侧 ref=、右侧分号，其他数字不能替代。","file":"input.csv","patterns":["(?rx)(?<=ref=)(\\d+)(?=;)"],"fields":[{"name":"reference","labels":[{"row":0,"output":"003"},{"row":1,"output":"1047"}],"expected":["003","1047","80001","00009"]}]}

@@ -2,6 +2,8 @@
 
 本轮保持 ExampleLoom 的仓库、接口体系和示例驱动定位，按已核验来源比较功能范围。下表不表示这些系统彼此等价，也不以“MoonBit 重写”证明创新。
 
+v0.8 另补齐扩展正则：采用并修改 [moonbitlang/regexp.mbt](https://github.com/moonbitlang/regexp.mbt) 0.3.7 的 Apache-2.0 实现，补充断言、共享预算、捕获重置及防御修复；明确披露代码来源，未把正则算法当作原创。条件和表格程序原已具备，本轮验证其与新正则的实际组合。[覆盖矩阵与未支持语法](REGEX_PROFILE.md)
+
 | 来源 | 已核验的范围 | 本项目已有能力与差距 | 本轮处理 |
 | --- | --- | --- | --- |
 | [microsoft/prose](https://github.com/microsoft/prose)，仓库样例 MIT；[官方教程](https://www.microsoft.com/en-us/research/project/prose-framework/tutorial/) | DSL、见证函数、排名与交互合成；公开基准还包含字符串转换、文本拆表和结构化提取 | 已有有限 DSL、输出引导搜索、条件/正则、表格结构、交互补样。没有通用的第三方 DSL 扩展接口，也不覆盖完整文档/HTML 提取体系 | 保持固定算子边界，未引入 SDK；不宣称全面替代 PROSE |
