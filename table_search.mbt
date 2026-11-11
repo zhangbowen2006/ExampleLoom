@@ -18,6 +18,11 @@ pub fn default_table_options() -> TableSearchOptions {
 }
 
 ///|
+fn default_table_separators() -> Array[String] {
+  [",", ";", ":", "|", "/", "_", "-", " ", "\t", "="]
+}
+
+///|
 pub(all) struct TableSearchReport {
   candidates : Array[Pipeline]
   truncated : Bool
@@ -276,7 +281,7 @@ fn learned_map(
     return None
   }
   let count = tables.fold(init=0, (n, t) => n + t.rows.length())
-  if count < 2 || targets[0].columns.length() > 16 {
+  if count < 1 || targets[0].columns.length() > 16 {
     return None
   }
   for k, t in tables {
@@ -372,12 +377,12 @@ fn learned_map(
 }
 
 ///|
-/// Breadth-first search over structural programs with observational state
+/// Bounded best-first search over structural programs with observational state
 /// deduplication on every training table. No test/holdout rows are inspected.
 pub fn synthesize_table(
   examples : Array[TableExample],
   options~ : TableSearchOptions = default_table_options(),
-  separators~ : Array[String] = [",", ";", ":", "|", "/", "_", "-", " ", "\t"],
+  separators~ : Array[String] = default_table_separators(),
   patterns~ : Array[String] = [],
 ) -> TableSearchReport raise LoomError {
   if examples.is_empty() || examples.length() > 8 {
@@ -476,6 +481,10 @@ pub fn synthesize_table(
       structural_neighbors(state.tables[0], targets[0], separators).iter(),
     )
     let plans : Array[Array[TableStep]] = neighbors.map(step => [step])
+    let packed = packed_projection(state.tables, targets)
+    if !packed.is_empty() {
+      plans.push(packed)
+    }
     plans.push_iter(
       structural_completions(state.tables[0], targets[0], separators).iter(),
     )

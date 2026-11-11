@@ -105,7 +105,7 @@ fn dispatch(request : Json) -> Json raise LoomError {
       }
       let separators = match obj.get("separators") {
         Some(v) => json_strings(v)
-        None => [",", ";", ":", "|", "/", "_", "-", " ", "\t"]
+        None => default_table_separators()
       }
       let r = synthesize_table(examples, options~, separators~, patterns~)
       Json::object({

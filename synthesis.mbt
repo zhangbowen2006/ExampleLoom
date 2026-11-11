@@ -212,6 +212,9 @@ fn build_atoms(
   for col in 0..<examples[0].input.length() {
     offer_variants(pool, Field(col), 2, examples, options)
   }
+  for col in 0..<examples[0].input.length() {
+    learn_normalizations(pool, examples, col, options)
+  }
   // Structural selectors before positional slices prevents the latter from
   // exhausting the atom budget before the more general selectors are tried.
   for col in 0..<examples[0].input.length() {

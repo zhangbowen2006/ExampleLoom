@@ -43,10 +43,11 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       Filter(c) => 4 + condition_cost(c)
       Deduplicate(_) => 6
       DropRows(n) => 4 + n
-      PackRows(n, _) => 6 + n / 16
+      PackRows(n, _) => 10 + n / 16
       Transpose => 18
       PromoteHeaders | DemoteHeaders => 7
-      Unpivot(_, _, _, _) | Fold(_, _, _) | Melt(_, _, _, _, _) => 8
+      Unpivot(_, _, _, _) | Fold(_, _, _) => 8
+      Melt(_, _, _, _, _) => 12
       Pivot(_, _, _, levels) => 12 + levels.length() / 8
       PivotGrid(_, _, _) => 9
       GroupRows(_, _) => 9
