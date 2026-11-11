@@ -1,4 +1,8 @@
-# v0.9.1 验证记录
+# v0.10.0 验证记录
+
+Windows 本地 JS、Wasm GC、Wasm 各运行 147 项 MoonBit 测试全部通过；完整 PCRE2 10.47 构造对照共 88,852 项，另有 24,624 项 JavaScript 共同语法对照、500 个正则边界构造、250 组记录构造和 5 个非法数据拒绝用例。浏览器实际执行新增学习示例，以及额外输入列管道的保存、载入和重放。[正则记录](evidence/pcre2-v0.10.0.json) · [记录转换](evidence/record-pivot-v0.10.0.json) · [浏览器记录](evidence/advanced-browser-v0.10.0.json)。这些不是生产采用证明，也不构成完整 PCRE 一致性证明。Linux native 结果以[对应提交的 CI](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。
+
+## v0.9.1 历史验证
 
 v0.9.1 只更新版本号和 CI 浏览器依赖选择。v0.9.0 的一次运行中，Ubuntu 软件源 DNS 解析失败导致依赖安装长时间停滞；现在优先使用 GitHub Ubuntu 运行器预装 Chrome，缺少时才限时安装。该补丁的应用引擎与 v0.9.0 的可执行引擎哈希相同，以下功能基准沿用 v0.9.0 的逐题证据。实际 CI 状态以本次运行结果为准。
 

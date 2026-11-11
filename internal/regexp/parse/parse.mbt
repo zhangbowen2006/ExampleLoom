@@ -266,45 +266,58 @@ fn Parser::parse_sequence(self : Parser) -> Ast raise RegexpError {
 /// Returns: Parsed Regex AST
 fn Parser::parse_term(self : Parser) -> Ast raise RegexpError {
   let mut base = self.parse_factor()
+  let mut quantified = false
+  let mut is_lazy = false
 
   // Handle quantifiers
   match self.input {
     [.. "*?", .. rest] => {
+      quantified = true
+      is_lazy = true
       // Handle lazy quantifier '*?'
       self.input = rest // consume '*?'
       base = ZeroOrMore(base, greedy=false)
     }
     [.. "*", .. rest] => {
+      quantified = true
       // Handle greedy quantifier '*'
       self.input = rest // consume '*'
       base = ZeroOrMore(base, greedy=true)
     }
     [.. "+?", .. rest] => {
+      quantified = true
+      is_lazy = true
       // Handle lazy quantifier '+?'
       self.input = rest // consume '+?'
       base = OneOrMore(base, greedy=false)
     }
     [.. "+", .. rest] => {
+      quantified = true
       // Handle greedy quantifier '+'
       self.input = rest // consume '+'
       base = OneOrMore(base, greedy=true)
     }
     [.. "??", .. rest] => {
+      quantified = true
+      is_lazy = true
       // Handle lazy quantifier '??'
       self.input = rest // consume '??'
       base = ZeroOrOne(base, greedy=false)
     }
     [.. "?", .. rest] => {
+      quantified = true
       // Handle greedy quantifier '?'
       self.input = rest // consume '?'
       base = ZeroOrOne(base, greedy=true)
     }
     ['{', .. rest] => {
+      quantified = true
       self.input = rest
       // Handle repeat quantifiers {n}, {n,}, {n,m}
       let repeat_result = self.parse_repeat()
       let greedy = match self.input {
         ['?', .. rest] => {
+          is_lazy = true
           self.input = rest // consume '?'
           false
         }
@@ -313,6 +326,10 @@ fn Parser::parse_term(self : Parser) -> Ast raise RegexpError {
       base = Repeat(base, greedy~, min=repeat_result.0, max=repeat_result.1)
     }
     _ => ()
+  }
+  if quantified && !is_lazy && self.input is ['+', .. rest] {
+    self.input = rest
+    base = Atomic(base)
   }
   base
 }
@@ -350,6 +367,18 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
     [.. "(?", .. rest] as capture =>
       // Handle various special group syntax
       match rest {
+        ['>', .. rest] => {
+          self.input = rest
+          let expr = self.parse_expression()
+          guard self.input is [')', .. rest] else {
+            raise RegexpError(
+              err=MissingParenthesis,
+              source_fragment=self.input,
+            )
+          }
+          self.input = rest
+          Atomic(expr)
+        }
         ['=' | '!' as sign, .. rest] => {
           self.input = rest
           let expr = self.parse_expression()

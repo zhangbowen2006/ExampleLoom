@@ -1,0 +1,12 @@
+{
+  "title":"整理编码并保留新增列",
+  "description":"采购人员统一编码，下一批表新增仓库和负责人；管道保留这些额外信息。后续主动选列或重组步骤仍可改变输出列。",
+  "input":"code,qty\n ab-7 ,12\n",
+  "target":"code,qty\nAB-7,12\n",
+  "next":"warehouse,qty,code,owner\nA,12, ab-7 ,team1\nB,2, cd-8 ,team2\n",
+  "pipeline":{"version":2,"columns":["code","qty"],"steps":[
+    ["preserve_extra_columns"],
+    ["update_columns",{"version":1,"columns":["code"],"outputs":[{"name":"code","expression":["upper",["trim",["field",0]]]}]}]
+  ]},
+  "expected":{"columns":["code","qty","warehouse","owner"],"rows":[["AB-7","12","A","team1"],["CD-8","2","B","team2"]]}
+}

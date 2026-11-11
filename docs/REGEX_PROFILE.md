@@ -1,4 +1,4 @@
-# 扩展正则与初审意见对应（v0.9.0）
+# 扩展正则与初审意见对应（v0.10.0）
 
 本轮保留 ExampleLoom 的身份、历史及接口，在现有条件表达式和表格程序中扩展正则执行能力。旧配方继续使用 MoonBit core 方言；以 `(?rx)` 开头的模式明确选择扩展方言。两者都由 MoonBit 执行，浏览器和 CLI 没有调用宿主正则或远程模型。
 
@@ -7,9 +7,9 @@
 | 邮件中的缺口 | 当前可运行能力 | 复现 |
 | --- | --- | --- |
 | 尚不支持条件分支 | `If`、空值、相等、局部/整串正则及短路布尔条件；可以保存、重载、按列名重绑定。学习器支持至多三层，表格行学习一层，两侧各需至少两条观察 | [条件核心测试](../advanced_wbtest.mbt)、[条件与命名捕获流程](../examples/regex-extended/conditional-regex.json) |
-| 正则范围不足 | 扩展方言具有整串/局部匹配、贪婪/惰性量词、捕获/命名捕获、数字/命名反向引用、前向断言、有限宽度后向断言、作用域 `i/m/s` 标志、Unicode 通用类别、全局捕获与替换 | [实现与边界测试](../regex_extended_wbtest.mbt)、[PCRE2 差分验证](../scripts/pcre2-oracle-test.mjs) |
-| 尚不支持表格结构变换 | 24 类结构操作、1–8 对训练表、多步骤管道；条件与正则行映射可与筛选、宽长表、透视、分组及排序组合 | [完整组合](../examples/regex-extended/wide-table-regex.json)、[变长记录](../examples/structures/variable-records.json) |
-| 独立任务验证不足 | Foofah 与 SyGuS 逐题基准保留；新增构造正则差分及完整流程另计，不能将构造检查量当作外部任务成功数 | [外部基准定义与失败](BENCHMARKS.md)、[PCRE2 检查](evidence/pcre2-v0.9.0.json) |
+| 正则范围不足 | 扩展方言具有整串/局部匹配、贪婪/惰性量词、原子组和占有量词、捕获/命名捕获、数字/命名反向引用、前向断言、有限宽度后向断言、作用域 `i/m/s` 标志、Unicode 通用类别、全局捕获与替换 | [实现与边界测试](../regex_extended_wbtest.mbt)、[PCRE2 差分验证](../scripts/pcre2-oracle-test.mjs) |
+| 尚不支持表格结构变换 | 25 类结构操作及保留输入额外列选项、1–8 对训练表、多步骤管道；条件与正则行映射可与筛选、宽长表、透视、分组及排序组合 | [完整组合](../examples/regex-extended/wide-table-regex.json)、[变长记录](../examples/structures/variable-records.json) |
+| 独立任务验证不足 | Foofah 与 SyGuS 逐题基准保留；新增构造正则差分及完整流程另计，不能将构造检查量当作外部任务成功数 | [外部基准定义与失败](BENCHMARKS.md)、[PCRE2 检查](evidence/pcre2-v0.10.0.json) |
 
 ## 方言、兼容性与限额
 
@@ -23,9 +23,11 @@
 
 后向断言中的重复捕获组（如 `(?<=(a){2})b`）和可变宽度分支内的捕获组仍拒绝，避免从已知起点向前执行时返回与反向求值不同的捕获。固定宽度分支中的普通捕获和有限宽度的无捕获重复可用；按顶层分支顺序选择第一个成功的断言。
 
-不支持 PCRE 的递归、子程序、原子组、占有量词、条件子模式或任意长后向断言，不支持脚本/二进制 Unicode 属性、区域化字符排序；不宣称 ECMAScript 或 PCRE 全兼容。未知字母转义拒绝，避免把未实现的语法静默解释成字面量。
+原子组 `(?>...)` 选定组内匹配后不再回溯；支持 `*+`、`++`、`?+`、`{m,n}+` 等占有量词，不能把惰性与占有修饰同时用于同一量词。原子组与断言共用嵌套及执行预算。
 
-每个模式最多 256 UTF-16 单位，整串模式最多 248；数值量词最多 256，并保留保守展开检查。扩展捕获最多 32 组，嵌套组最多 24，断言递归最多 8。每次扩展匹配或全局迭代共享 300,000 个工作单位；指令、捕获复制和反向引用的状态数组分配都计入。每个待执行列表最多 4096 线程，最多返回 4096 次匹配，输入、替换模板和输出单元格最多 65536 UTF-16 单位。超限返回 `LoomError`，不会当作普通“不匹配”。
+不支持 PCRE 的递归、子程序、条件子模式或任意长后向断言，不支持脚本/二进制 Unicode 属性、区域化字符排序；不宣称 ECMAScript 或 PCRE 全兼容。未知字母转义拒绝，避免把未实现的语法静默解释成字面量。
+
+每个模式最多 256 UTF-16 单位，整串模式最多 248；数值量词最多 256，并保留保守展开检查。扩展捕获最多 32 组，嵌套组最多 24，断言和原子组的运行时嵌套合计最多 8。每次扩展匹配或全局迭代共享 300,000 个工作单位；指令、捕获复制和反向引用的状态数组分配都计入。每个待执行列表最多 4096 线程，最多返回 4096 次匹配，输入、替换模板和输出单元格最多 65536 UTF-16 单位。超限返回 `LoomError`，不会当作普通“不匹配”。
 
 学习器可以使用同一扩展方言的显式提示，并在全部训练样例上验证捕获、替换或分支；自动模式生成仍限于已文档化的形状和上下文。执行任意一个合法模式与从少数示例推断任意模式是不同能力。本轮没有扩大后者的承诺。
 
@@ -33,6 +35,6 @@
 
 正则子系统基于 [moonbitlang/regexp.mbt](https://github.com/moonbitlang/regexp.mbt) 的 Mooncakes 0.3.7 源码，Apache-2.0；包哈希、修改范围和许可见 [NOTICE](../LICENSES/moonbit-regexp.NOTICE)。断言、执行预算、绝对位置全局迭代及防御修复是本项目修改，不把所借鉴实现申报为原创。PBE 搜索、表格引擎和独立工作台保持原有实现。
 
-运行 `moon test --deny-warn --target js`、`node scripts/build.mjs`、`node scripts/regex-extended-test.mjs`。另在隔离环境安装 `pcre2==0.6.0`，执行 `python scripts/generate-pcre2-oracle.py` 和 `node scripts/pcre2-oracle-test.mjs`：对 PCRE2 10.47 使用 UTF、关闭 UCP 与 ALT_BSUX，比较 525 个构造输入的匹配/捕获/替换，以及上游简单折叠表的 2,938 对字符；合计 7,663 项对照。[PCRE2 官方断言规则](https://www.pcre.org/current/doc/html/pcre2pattern.html) · [本轮证据](evidence/pcre2-v0.9.0.json)。PCRE2 仅用于测试，不是运行时依赖。这些构造验证不构成完整语言一致性证明或生产采用证据。
+运行 `moon test --deny-warn --target js`、`node scripts/build.mjs`、`node scripts/regex-extended-test.mjs`。另在隔离环境安装 `pcre2==0.6.0`，执行 `python scripts/generate-pcre2-oracle.py` 和 `node scripts/pcre2-oracle-test.mjs`：对 PCRE2 10.47 使用 UTF、关闭 UCP 与 ALT_BSUX，比较 9,546 个构造模式/文本组合的匹配、捕获和替换，以及上游简单折叠表的 2,938 对字符；合计 88,852 项对照。[PCRE2 官方语法](https://www.pcre.org/current/doc/html/pcre2pattern.html) · [本轮证据](evidence/pcre2-v0.10.0.json)。PCRE2 仅用于测试，不是运行时依赖。这些构造验证不构成完整语言一致性证明或生产采用证据。
 
 工作台点击「扩展正则学习」，两条标注生成捕获程序，另两条未标注记录输出 `80001`、`00009`；保存 JSON 后可在同一核心上重放。三个新增流程包括条件分类、断言提示学习和四步表格管道，最后一项是显式编写的组合程序，不声称该整条四步程序由学习器自动推导。初审是否通过仍由组委会根据真实材料判断。

@@ -75,6 +75,14 @@ for(const button of document.querySelectorAll('[data-table-demo]'))button.onclic
   $('table-patterns').value=(demo.patterns ?? []).join('\n');
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;notice(`${demo.title}：${demo.description}`);
 });
+for(const button of document.querySelectorAll('[data-pipeline-demo]'))button.onclick=()=>task(async()=>{
+  const response=await fetch(`examples/structures/${button.dataset.pipelineDemo}.json`);if(!response.ok)throw new Error('示例加载失败');
+  const demo=await response.json();
+  extraPairs.replaceChildren();$('add-pair').disabled=false;$('table-patterns').value='';
+  invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;
+  $('pipeline').value=JSON.stringify(demo.pipeline,null,2);chosen=true;controls();
+  notice(`${demo.title}：${demo.description}示例管道已经填好，请预览并核对。`);
+});
 $('learn').onclick=()=>task(async()=>{
   invalidate();
   const generation = revision;

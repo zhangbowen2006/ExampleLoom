@@ -2,6 +2,7 @@
 /// Structural operations bind by column name. All operations return a new table;
 /// duplicates in pivot cells are errors, never silently aggregated or discarded.
 pub(all) enum TableStep {
+  PreserveExtraColumns
   SortRows(Array[SortKey])
   Select(Array[String], Array[String])
   Filter(Condition)
@@ -17,6 +18,7 @@ pub(all) enum TableStep {
   Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
+  PivotRecords(String, String, String)
   CombineColumns(Array[String], String, String)
   SegmentRows(Condition, Bool)
   CarryContext(Condition, Array[String])
@@ -73,10 +75,17 @@ fn apply_step_unchecked(
   table : Table,
 ) -> Table raise LoomError {
   match step {
+    PreserveExtraColumns =>
+      {
+        columns: table.columns.copy(),
+        rows: table.rows.map(row => row.copy()),
+      }
     SortRows(keys) => sort_rows(table, keys)
     Aggregate(keys, measures) => aggregate_rows(table, keys, measures)
     PivotGrid(keys, variable, value_name) =>
       pivot_grid(table, keys, variable, value_name)
+    PivotRecords(variable, value_name, marker) =>
+      pivot_records(table, variable, value_name, marker)
     CombineColumns(names, separator, output_name) =>
       combine_columns(table, names, separator, output_name)
     SegmentRows(condition, starts_record) =>

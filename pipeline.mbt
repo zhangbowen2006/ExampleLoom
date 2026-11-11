@@ -7,6 +7,7 @@ pub(all) struct Pipeline {
 ///|
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
+    PreserveExtraColumns => Json::array([Json("preserve_extra_columns")])
     SortRows(keys) =>
       Json::array([
         Json("sort_rows"),
@@ -48,6 +49,13 @@ pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
         Json(keys),
         Json(variable),
         Json(value_name),
+      ])
+    PivotRecords(variable, value_name, marker) =>
+      Json::array([
+        Json("pivot_records"),
+        Json(variable),
+        Json(value_name),
+        Json(marker),
       ])
     CombineColumns(names, separator, output_name) =>
       Json::array([
@@ -129,15 +137,23 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     | "segment_rows"
     | "carry_context" => 3
     "melt" => 6
-    "split_column" | "fold" | "pivot_grid" | "combine_columns" => 4
+    "split_column"
+    | "fold"
+    | "pivot_grid"
+    | "pivot_records"
+    | "combine_columns" => 4
     "unpivot" | "pivot" => 5
-    "transpose" | "promote_headers" | "demote_headers" => 1
+    "transpose"
+    | "promote_headers"
+    | "demote_headers"
+    | "preserve_extra_columns" => 1
     _ => 2
   }
   if a.length() != arity {
     raise LoomError("wrong table operator arity")
   }
   let step = match op {
+    "preserve_extra_columns" => PreserveExtraColumns
     "sort_rows" =>
       SortRows(
         j_array(a[1]).map(value => {
@@ -161,6 +177,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
         }),
       )
     "pivot_grid" => PivotGrid(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
+    "pivot_records" => PivotRecords(j_text(a[1]), j_text(a[2]), j_text(a[3]))
     "combine_columns" =>
       CombineColumns(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
     "segment_rows" => {
@@ -268,6 +285,12 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
       names(keys, true)
       names(keys + [variable, value_name], false)
     }
+    PivotRecords(variable, value_name, marker) => {
+      names([variable, value_name], false)
+      if marker.is_empty() || marker.length() > 256 {
+        raise LoomError("pivot_records marker must contain 1..256 UTF-16 units")
+      }
+    }
     CombineColumns(values, sep, output) => {
       names(values, false)
       names([output], false)
@@ -344,7 +367,7 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
       if n < 0 || n > 20000 {
         raise LoomError("drop_rows count outside 0..20000")
       }
-    Transpose | PromoteHeaders | DemoteHeaders => ()
+    Transpose | PromoteHeaders | DemoteHeaders | PreserveExtraColumns => ()
   }
 }
 
@@ -361,7 +384,15 @@ pub fn pipeline_from_json(v : Json) -> Pipeline raise LoomError {
   if values.length() > 16 {
     raise LoomError("pipeline exceeds 16 steps")
   }
-  { columns, steps: values.map(table_step_from_json), }
+  let steps = values.map(table_step_from_json)
+  for i, step in steps {
+    if step is PreserveExtraColumns && i != 0 {
+      raise LoomError(
+        "preserve_extra_columns must occur only as the first step",
+      )
+    }
+  }
+  { columns, steps, }
 }
 
 ///|
@@ -377,9 +408,19 @@ pub fn pipeline_to_json(p : Pipeline) -> Json raise LoomError {
 
 ///|
 /// Rebind the saved input schema by name before running a version-2 pipeline.
-/// Additional incoming columns are ignored; missing saved columns fail.
+/// Additional incoming columns are ignored by default; a first-step
+/// PreserveExtraColumns keeps them after the declared columns. Missing saved
+/// columns always fail. Later projection or reshaping may still remove extras.
 pub fn apply_pipeline(p : Pipeline, table : Table) -> Table raise LoomError {
   ignore(pipeline_to_json(p))
-  let bound = transform_table(table, [Select(p.columns, p.columns)])
+  let names = p.columns.copy()
+  if !p.steps.is_empty() && p.steps[0] is PreserveExtraColumns {
+    for name in table.columns {
+      if !names.contains(name) {
+        names.push(name)
+      }
+    }
+  }
+  let bound = transform_table(table, [Select(names, names)])
   transform_table(bound, p.steps)
 }

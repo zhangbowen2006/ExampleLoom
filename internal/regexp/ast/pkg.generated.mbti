@@ -24,6 +24,7 @@ pub(all) enum Ast {
   Alternate(Ast, Ast)
   Backreference(Int32, ignore_case~ : Bool)
   Look(Ast, positive~ : Bool, behind~ : Int32?)
+  Atomic(Ast)
 } derive(@debug.Debug)
 pub fn Ast::compile(Self) -> Array[@vm.Instruction]
 pub fn Ast::compile_anchored(Self) -> Array[@vm.Instruction]

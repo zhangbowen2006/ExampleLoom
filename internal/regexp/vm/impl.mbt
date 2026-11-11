@@ -24,6 +24,7 @@ pub(all) enum Instruction {
   Backreference(Int32, ignore_case~ : Bool)
   Look(Array[Instruction], positive~ : Bool, behind~ : Int32?)
   LookBehind(Array[LookBranch], positive~ : Bool)
+  Atomic(Array[Instruction])
   Reset(Array[Int32])
 }
 
@@ -54,6 +55,7 @@ pub impl ToJson for Instruction with fn to_json(self) {
     Assertion(pred) => ["Assertion", pred]
     Look(code, positive~, behind~) => ["Look", code, positive, behind]
     LookBehind(branches, positive~) => ["LookBehind", branches, positive]
+    Atomic(code) => ["Atomic", code]
     Backreference(i, ignore_case~) => ["Backreference", i, ignore_case]
     Reset(slots) => ["Reset", slots]
   }
@@ -263,6 +265,35 @@ fn add_thread(
         next(thread.captures)
       }
     }
+    Atomic(code) => {
+      if depth >= 8 {
+        raise MatchLimit
+      }
+      let found = run(
+        code,
+        content,
+        thread.sp,
+        thread.captures.copy(),
+        true,
+        None,
+        budget,
+        depth + 1,
+      )
+      if !found.is_empty() {
+        let end = found[1]
+        found[0] = thread.captures[0]
+        found[1] = thread.captures[1]
+        add_thread(
+          content,
+          instructions,
+          inst_gen,
+          { pc: thread.pc + 1, sp: end, captures: found, },
+          clist,
+          budget,
+          depth,
+        )
+      }
+    }
     Look(code, positive~, behind~) => {
       if depth >= 8 {
         raise MatchLimit
@@ -462,12 +493,16 @@ pub fn search(
   full : Bool,
   budget : Budget,
 ) -> Array[Int32] raise MatchLimit {
+  // Atomic instructions can advance more than one scalar in a single VM
+  // transition, so different start positions must not share a generation map.
+  let separate_generations = backreferences ||
+    instructions.any(instruction => instruction is Atomic(_))
   run(
     instructions,
     input,
     from,
     Array::make(captures * 2, -1),
-    backreferences,
+    separate_generations,
     if full {
       Some(input.length())
     } else {

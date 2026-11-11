@@ -85,6 +85,46 @@ test "bounded lookbehind honors alternatives, Unicode and shared budgets" {
 }
 
 ///|
+test "atomic groups and possessive quantifiers commit without backtracking" {
+  assert_true(regex_test("abc", "(?rx)(?:a|ab)c", true))
+  assert_true(!regex_test("abc", "(?rx)(?>a|ab)c", true))
+  assert_true(regex_test("abc", "(?rx)(?>ab|a)c", true))
+  assert_true(regex_test("aaa", "(?rx)a*a", true))
+  assert_true(!regex_test("aaa", "(?rx)a*+a", true))
+  assert_true(!regex_test("aaa", "(?rx)a++a", true))
+  assert_true(!regex_test("aa", "(?rx)a?+a?+a", true))
+  assert_true(!regex_test("aaa", "(?rx)a{1,3}+a", true))
+  assert_eq(regex_capture("xababc", "(?rx)(?>(ab|a)+)c", 1, 0), "ab")
+  assert_eq(regex_replace("bbb", "(?rx)(?>a*)b", "X"), "XXX")
+  assert_true(regex_test("ab", "(?rx)(?>(?=a)a)b", true))
+  // A later start may not suppress the higher-priority greedy continuation
+  // after an atomic instruction has advanced to a future input position.
+  assert_eq(regex_replace("aab aaab", "(?rx)(?>a)a?b", "<$0>"), "<aab> a<aab>")
+  assert_true(
+    attempt(RegexCapture(Field(0), "(?rx)a*?+", 0, 0), ["a"]) is Err(_),
+  )
+  assert_true(regex_test("abc", "(?rx)(?<=(?>ab))c", false))
+}
+
+///|
+test "possessive regex hints participate in example driven learning" {
+  let report = synthesize(
+    [
+      { input: ["noise 5 ref=003; note=98"], output: "003", },
+      { input: ["ref=1047; note=99 extra=2"], output: "1047", },
+    ],
+    patterns=["(?rx)(?<=ref=)(\\d++)(?=;)"],
+  )
+  assert_true(
+    report.candidates.any(c => {
+      c.expression is RegexCapture(_, _, _, _) &&
+      evaluate(c.expression, ["noise 812 ref=80001; note=77 extra=6 more=7"]) ==
+      "80001"
+    }),
+  )
+}
+
+///|
 test "extended regex rejects invalid syntax and bounds work as errors" {
   assert_true(
     attempt(RegexCapture(Field(0), "(?rx)(a|(b))*", 2, 0), ["aba"]) is Err(_),

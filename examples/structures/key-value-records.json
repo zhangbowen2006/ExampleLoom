@@ -1,0 +1,11 @@
+{
+  "title": "重复键值记录转表",
+  "description": "将以 name 开始的多组键值记录展开为表格；新增字段按首次出现顺序排列，缺失字段留空。",
+  "input": "key,value\nname,Alpha\ncity,North\nscore,7\n",
+  "target": "c0,c1,c2\nname,city,score\nAlpha,North,7\n",
+  "next": "value,key\nBeta,name\nEast,city\n8,score\nGamma,name\n9,score\nCN,country\n",
+  "expected": {
+    "columns": ["c0", "c1", "c2", "c3"],
+    "rows": [["name", "city", "score", "country"], ["Beta", "East", "8", ""], ["Gamma", "", "9", "CN"]]
+  }
+}

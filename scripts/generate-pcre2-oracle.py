@@ -6,6 +6,7 @@ Inputs are constructed, not independent benchmark tasks or PCRE conformance.
 from pathlib import Path
 import json
 import re
+import itertools
 import pcre2
 from pcre2 import _cy
 
@@ -20,13 +21,38 @@ patterns = [
     r"(?<=(?:AA|B){1,2})z", r"(?<=.{0,2}#)\d+",
     r"\x{1F600}", r"[\x{41}-\x{5A}]+", r"(?i:\x{212A})",
     r"(?i:(a|aa)\1)", r"(?i:(ab|a)b?\1)", r"(?i:((a)|(aa))\1)",
+    r"(?>a|ab)c", r"(?>ab|a)c", r"(?:a|ab)c", r"a*+a", r"a++a", r"a?+a?+a",
+    r"a{1,3}+a", r"(?>a*)b", r"(?>(ab|a)+)c", r"(?>(?=a)a)b", r"((?>a|ab)c|abc)",
+    r"(?>(a|ab))\1", r"(?:ab|a)++c", r"(?>\d+)foo", r"\d++foo",
+    r"(?>a|aa)a", r"(?>aa|a)a", r"(?:a|aa)++a", r"(?>(a?))a",
+    r"(?>(a|b)+)a", r"(?>a?)a", r"(?>(?>a|aa)+)a", r"(?:(?>a?))*+b",
+    r"(?>(?:))a", r"(?>(a|aa)){1,2}+b", r"(?>(a?))b",
+]
+# Exercise atomic commitment in combinations of ambiguous alternatives,
+# nested captures, empty alternatives and trailing requirements. These cases
+# are constructed, not a PCRE conformance suite or an external benchmark.
+atomic_bodies = [r'a', r'a?', r'a*', r'(?:a|ab)', r'(?:ab|a)', r'(a|ab)', r'(a?)', r'(?:a|)']
+atomic_suffixes = [r'a', r'b', r'a?b', r'(?:ab|a)']
+patterns += [fr'(?>{body}){suffix}' for body in atomic_bodies for suffix in atomic_suffixes]
+patterns += [fr'(?:{body})++{suffix}' for body in [r'a', r'ab', r'(?:a|ab)', r'(ab|a)'] for suffix in atomic_suffixes]
+patterns += [
+    r'((?>a)a?b|ab)', r'((?>a)a*b|ab)', r'(?:(?>a?)|ab)b',
+    r'(?:(?>ab|a)|a)b', r'(?:(?>a*)|a)b', r'(?:(?>a)?)?a',
+    r'(?>a)(a|aa)+', r'(?>a)(aa|a)+', r'((?>a)|aa)(a?)b',
+    r'(?:(?>a)|b)+?b', r'(?:(?>a)|b)++a', r'(?>(?=(a))a)\1',
 ]
 texts = [
     "", "color=red colour=blue colr=no", "ID-42 REF-71 XYZ-9", "b ab aab aaab aaaab",
     "abx bax bx xx", "甲😀-12 😀-99 甲-7", "aA", "aB", "KK kK", "Σς σΣ",
     "αβΑΒ", "aaB aAb", "AAz Bz AABz BBBz z", "#7 a#8 ab#9 abc#10", "x\ny#4",
     "aaaa", "aAaA", "AaAA", "abab", "AbAB", "abaA",
+    "abc", "ababc", "aaa", "aa", "bbb", "123foo", "123bar", "123456foo",
 ]
+for length in range(1, 6):
+    for chars in itertools.product('ab', repeat=length):
+        text=''.join(chars)
+        if text not in texts:
+            texts.append(text)
 cases=[]
 for pattern in patterns:
     # The Python wrapper enables ALT_BSUX unconditionally, making PCRE2's

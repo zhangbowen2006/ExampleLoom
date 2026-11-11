@@ -268,6 +268,7 @@ pub(all) struct TableSearchReport {
 }
 
 pub(all) enum TableStep {
+  PreserveExtraColumns
   SortRows(Array[SortKey])
   Select(Array[String], Array[String])
   Filter(Condition)
@@ -283,6 +284,7 @@ pub(all) enum TableStep {
   Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
+  PivotRecords(String, String, String)
   CombineColumns(Array[String], String, String)
   SegmentRows(Condition, Bool)
   CarryContext(Condition, Array[String])

@@ -29,6 +29,7 @@ pub(all) enum Instruction {
   Backreference(Int32, ignore_case~ : Bool)
   Look(Array[Instruction], positive~ : Bool, behind~ : Int32?)
   LookBehind(Array[LookBranch], positive~ : Bool)
+  Atomic(Array[Instruction])
   Reset(Array[Int32])
 }
 pub fn Instruction::to_json(Self) -> Json

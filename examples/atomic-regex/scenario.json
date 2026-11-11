@@ -1,0 +1,1 @@
+{"title":"占有量词提取编号","description":"运维人员标注两个带噪声的 ref 编号；使用前后断言和占有量词，避免误选其他数字。","file":"input.csv","patterns":["(?rx)(?<=ref=)(\\d++)(?=;)"],"fields":[{"name":"reference","labels":[{"row":0,"output":"003"},{"row":1,"output":"1047"}],"expected":["003","1047","80001","00009"]}]}

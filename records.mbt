@@ -50,6 +50,60 @@ fn pivot_grid(
   { columns: generic_columns(width), rows, }
 }
 
+///| Turn repeated ordered key/value records into a header row and data rows.
+
+///| A row with the declared marker starts each record; repeating another key
+
+///|
+/// in a record is an error, never an implicit overwrite or aggregation.
+fn pivot_records(
+  table : Table,
+  variable : String,
+  value_name : String,
+  marker : String,
+) -> Table raise LoomError {
+  let indices = column_indices(table, [variable, value_name])
+  let label_col = indices[0]
+  let value_col = indices[1]
+  if table.rows.is_empty() || table.rows[0][label_col] != marker {
+    raise LoomError(
+      "pivot_records expects the first row to start with its marker",
+    )
+  }
+  let labels : Array[String] = []
+  let seen_labels : Map[String, Bool] = Map([])
+  let records : Array[Map[String, String]] = []
+  for row in table.rows {
+    let label = row[label_col]
+    if label.is_empty() {
+      raise LoomError("pivot_records label must be nonempty")
+    }
+    if label == marker {
+      records.push(Map([]))
+    }
+    if records.is_empty() {
+      raise LoomError("pivot_records found data before its marker")
+    }
+    let record = records[records.length() - 1]
+    if record.contains(label) {
+      raise LoomError(
+        "pivot_records encountered a duplicate label within a record",
+      )
+    }
+    record[label] = row[value_col]
+    if !seen_labels.contains(label) {
+      labels.push(label)
+      seen_labels[label] = true
+    }
+    check_growth(records.length() + 1, labels.length())
+  }
+  let rows : Array[Array[String]] = [labels.copy()]
+  for record in records {
+    rows.push(labels.map(label => record.get(label).unwrap_or("")))
+  }
+  { columns: generic_columns(labels.length()), rows, }
+}
+
 ///|
 fn combine_columns(
   table : Table,

@@ -28,6 +28,7 @@ pub(all) enum Ast {
   Alternate(Ast, Ast)
   Backreference(Int32, ignore_case~ : Bool)
   Look(Ast, positive~ : Bool, behind~ : Int32?)
+  Atomic(Ast)
 } derive(Debug)
 
 ///|
@@ -168,6 +169,7 @@ fn Ast::compile_aux(regex : Ast, instructions : Array[Instruction]) -> Unit {
       } else {
         instructions.push(Look(inner.compile_anchored(), positive~, behind~))
       }
+    Atomic(inner) => instructions.push(Atomic(inner.compile_anchored()))
     Backreference(i, ignore_case~) =>
       instructions.push(Backreference(i, ignore_case~))
   }
@@ -209,6 +211,7 @@ pub impl ToJson for Ast with fn to_json(self) {
     Alternate(left, right) => ["Alternate", left, right]
     Look(inner, positive~, behind~) => ["Look", inner, positive, behind]
     Backreference(i, ignore_case~) => ["Backreference", i, ignore_case]
+    Atomic(inner) => ["Atomic", inner]
   }
 }
 
@@ -228,7 +231,8 @@ fn Ast::capture_slots(self : Ast, slots : Array[Int32]) -> Unit {
     | OneOrMore(inner, ..)
     | ZeroOrOne(inner, ..)
     | Repeat(inner, ..)
-    | Look(inner, ..) => inner.capture_slots(slots)
+    | Look(inner, ..)
+    | Atomic(inner) => inner.capture_slots(slots)
     Concat(parts) =>
       for part in parts {
         part.capture_slots(slots)
@@ -271,7 +275,7 @@ pub fn Ast::width_bounds(self : Ast) -> (Int32, Int32)? {
   match self {
     Empty | Assertion(_) | Look(_, ..) => Some((0, 0))
     CharClass(_, ..) => Some((1, 1))
-    Capture(inner, ..) => inner.width_bounds()
+    Capture(inner, ..) | Atomic(inner) => inner.width_bounds()
     Concat(parts) => {
       let mut low = 0
       let mut high = 0
@@ -353,7 +357,7 @@ fn Ast::append_lookbehind_branches(self : Ast, out : Array[LookBranch]) -> Unit 
 /// group. Reject that form rather than silently return forward captures.
 pub fn Ast::lookbehind_captures_safe(self : Ast) -> Bool {
   match self {
-    Capture(inner, ..) => inner.lookbehind_captures_safe()
+    Capture(inner, ..) | Atomic(inner) => inner.lookbehind_captures_safe()
     Repeat(inner, max~, ..) => {
       let slots = []
       inner.capture_slots(slots)

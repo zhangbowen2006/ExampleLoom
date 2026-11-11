@@ -6,7 +6,7 @@ const run=r=>{const out=JSON.parse(handle(JSON.stringify(r)));assert.equal(out.o
 const parse=text=>run({op:'parse',format:'csv',text}).table;
 const evidence={date:new Date().toISOString(),scenarios:[],checks:[]};
 await mkdir('artifacts/advanced',{recursive:true});
-for(const name of ['conditional','regex','rewrite','initials','normalize']){
+for(const name of ['conditional','regex','rewrite','initials','normalize','atomic-regex']){
   const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
   const table=parse(await readFile(`examples/${name}/input.csv`,'utf8'));
   const field=scenario.fields[0];
@@ -14,19 +14,21 @@ for(const name of ['conditional','regex','rewrite','initials','normalize']){
   assert.ok(report.candidates.length>0,name);
   if(name==='rewrite')assert.equal(report.candidates[0].expression[0],'replace');
   if(name==='regex')assert.equal(report.candidates[0].expression[0],'capture','Regex scenario must actually learn regex semantics');
+  if(name==='atomic-regex')assert.equal(report.candidates[0].expression[0],'capture','Possessive regex scenario must actually learn regex semantics');
   const recipe={version:1,columns:table.columns,outputs:[{name:field.name,expression:report.candidates[0].expression}]};
   const applied=run({op:'apply',table,recipe});
   assert.equal(applied.failures,0);
   assert.deepEqual(applied.rows.map(r=>r.values[0]),field.expected,name);
   evidence.scenarios.push({name,selected:report.candidates[0].description,training:field.labels.length,heldout:table.rows.length-field.labels.length,all_values_match:true});
 }
-for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts']){
+for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts','key-value-records']){
   const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
   const input=parse(demo.input), output=parse(demo.target);
   const extra=(demo.additional??[]).map(pair=>({input:parse(pair.input),output:parse(pair.target)}));
   const report=run({op:'synthesize_table',examples:[{input,output},...extra]});
   assert.ok(report.candidates.length>0,name);
   const pipeline=report.candidates[0].pipeline;
+  if(name==='key-value-records')assert.equal(pipeline.steps[0][0],'pivot_records');
   assert.deepEqual(run({op:'transform',pipeline,table:input}).table,output,`${name} training`);
   for (const pair of extra) assert.deepEqual(run({op:'transform',pipeline,table:pair.input}).table,pair.output);
   const actual=run({op:'transform',pipeline,table:parse(demo.next)});
@@ -39,6 +41,13 @@ for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','
 const demo=JSON.parse(await readFile('examples/structures/unpivot.json','utf8'));
 for(const [name,text]of Object.entries({input:demo.input,target:demo.target,next:demo.next}))await writeFile(`artifacts/advanced/${name}.csv`,text);
 const cli=(...args)=>execFileSync(process.execPath,['bin/exampleloom.mjs',...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
+const preserve=JSON.parse(await readFile('examples/structures/preserve-columns.json','utf8'));
+assert.deepEqual(run({op:'transform',pipeline:preserve.pipeline,table:parse(preserve.next)}).table,preserve.expected);
+await writeFile('artifacts/advanced/preserve-input.csv',preserve.next);
+await writeFile('artifacts/advanced/preserve.pipeline.json',JSON.stringify(preserve.pipeline));
+cli('transform','--data','artifacts/advanced/preserve-input.csv','--pipeline','artifacts/advanced/preserve.pipeline.json','--out','artifacts/advanced/preserve-result.csv');
+assert.deepEqual(parse(await readFile('artifacts/advanced/preserve-result.csv','utf8')),preserve.expected);
+evidence.checks.push('Opt-in extra input columns survive explicit recipe and real CLI CSV export');
 cli('learn-table','--data','artifacts/advanced/input.csv','--target','artifacts/advanced/target.csv','--out','artifacts/advanced/report.json');
 cli('pipeline','--report','artifacts/advanced/report.json','--choose','0','--out','artifacts/advanced/selected.json');
 cli('transform','--data','artifacts/advanced/next.csv','--pipeline','artifacts/advanced/selected.json','--out','artifacts/advanced/result.csv');

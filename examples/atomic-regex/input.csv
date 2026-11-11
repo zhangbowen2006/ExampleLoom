@@ -1,0 +1,5 @@
+record
+noise 5 ref=003; note=98
+ref=1047; note=99 extra=2
+noise 812 ref=80001; note=77 extra=6 more=7
+ref=00009; note=88 extra=11

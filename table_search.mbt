@@ -245,6 +245,26 @@ fn structural_neighbors(
         result.push(
           PivotGrid(keys, table.columns[variable], table.columns[value]),
         )
+        if !table.rows.is_empty() &&
+          !target.rows.is_empty() &&
+          !table.rows[0][variable].is_empty() &&
+          table.rows[0][variable] == target.rows[0][0] {
+          let labels : Array[String] = []
+          for row in table.rows {
+            if !labels.contains(row[variable]) {
+              labels.push(row[variable])
+            }
+          }
+          if labels == target.rows[0] {
+            result.push(
+              PivotRecords(
+                table.columns[variable],
+                table.columns[value],
+                labels[0],
+              ),
+            )
+          }
+        }
         let expected_levels = target.columns.filter(n => !keys.contains(n))
         let observed_levels : Array[String] = []
         for row in table.rows {
