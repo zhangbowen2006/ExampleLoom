@@ -1,5 +1,13 @@
 # Changes
 
+## 0.6.0 — 2026-11-11
+
+- Learn single-token literal rewrites and guarded suffix completion from observed inputs and outputs. Whole-field search shares the caller's budget with the complete grammar.
+- Compose packing with projection, splitting with folding, and key-value context propagation with pivoting. Allow row learning from one table row, with the existing ambiguity feedback.
+- Share default separators between the MoonBit API and JSON protocol, including equal-sign records. Prefer key-based grouping over fixed-size packing.
+- Audit identical training calls with incompatible test labels. Correct the string evaluation's training cap from 6 to the supported 32 and retain an explicitly labelled legacy evaluation. Preserve original contradictory source constraints as diagnostic evidence.
+- Add 99 core tests and complete browser demonstrations. Actual external scores, failures and measurement settings are in [the benchmark report](docs/BENCHMARKS.md).
+
 ## 0.5.1 — 2026-11-11
 
 - Learn fixed token prefixes and suffixes, including initials with variable-length names and Unicode scalar boundaries.

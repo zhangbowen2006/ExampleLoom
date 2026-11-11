@@ -129,3 +129,13 @@ The learner uses one or more input/output pairs. At least one training pair must
 The table workbench supports up to eight pairs and optional regex hints. The CLI accepts `learn-table --pairs batches.json --out report.json`. The manifest is an array such as `[{"data":"a.csv","target":"a-out.csv"},{"data":"b.csv","target":"b-out.csv"}]`. File paths are relative to the manifest. Both the single-pair and multiple-pair forms support `--patterns` and `--separators` JSON files. `--depth` sets the structural search depth.
 
 Row learning can emit a whole-cell capture replacement with reordered or repeated groups. Learned templates require at least two nonconstant capture references. Unmatched whole-cell substitutions preserve the input. A full-match predicate can explicitly check a format before selecting a branch. Predicates and replacements continue to use the MoonBit core regex dialect.
+
+## v0.6 learned normalization and compositions
+
+The existing expression and v2 pipeline formats continue to encode the learned programs. Token rewrites and optional suffixes use `replace` and `if`. Optional suffix completion tests for an existing suffix before appending it.
+
+Default structural separators now include `=`. The JSON protocol and MoonBit library use the same default list. Passing an explicit list selects the caller's separators.
+
+Table row mapping accepts a single training row. Packing and projection witnesses are checked across every input/output pair. Split/Fold plans preserve per-record keys. Key-value blocks can be split into two columns, propagated by context and pivoted to a labelled grid. Context keys must identify records consistently. Duplicate key-level cells fail during execution.
+
+A small whole-field search runs before the full row grammar. Both share the configured step budget. Atom values are evaluated once and reused. Search truncation still indicates incomplete candidate coverage.

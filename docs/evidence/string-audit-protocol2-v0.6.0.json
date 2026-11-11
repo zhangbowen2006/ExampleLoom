@@ -1,0 +1,66 @@
+{
+  "revision": "13c8deb68a873635879c9a69bc78caebd340f646",
+  "protocol": 2,
+  "training_cap": 32,
+  "scope": "The learner receives examples and the same fixed options. File names and original SyGuS grammars are not inputs to synthesis in this evaluation.",
+  "meaning": "Identical training calls produce the same ranked program. If an overlapping test input has conflicting reference outputs, those tasks cannot all pass the fixed-first-choice metric. Additional labelled examples or explicit intent can distinguish the requests. This restriction does not apply to reporting multiple candidates or interactive clarification.",
+  "eligible_files": 104,
+  "conflicting_training_groups": 0,
+  "conflicting_test_inputs": 0,
+  "conservative_first_choice_upper_bound": 104,
+  "conflicts": [],
+  "inconsistent_source_constraints": [
+    {
+      "task": "univ_3-long-repeat.sl",
+      "source_sha256": "1bf300e2d73a8b8ff921ebe71c4be8d1df5d5d5b2c981667ceaf81317743e89b",
+      "input_sha256": "d7f7c76754aa186172da8076f2962ecea4980a0d5b70c9742f95edb2f052437c",
+      "constraint_numbers": [
+        3,
+        10
+      ],
+      "output_sha256": [
+        "dbc80c0edb342c5717d60c63ea8a3922470efe690bd68422e8cc07bc9a8ca78f",
+        "95b193e0a95b134a2e5c40f386d9c96ceaad6bbff92325a1630422a9bd838a17"
+      ]
+    },
+    {
+      "task": "univ_4-long-repeat.sl",
+      "source_sha256": "55c8047134b3a7d7490b8b2710512b7ec341dfaa4f9d9b7c8af2dadb38938f86",
+      "input_sha256": "d7f7c76754aa186172da8076f2962ecea4980a0d5b70c9742f95edb2f052437c",
+      "constraint_numbers": [
+        3,
+        10
+      ],
+      "output_sha256": [
+        "dbc80c0edb342c5717d60c63ea8a3922470efe690bd68422e8cc07bc9a8ca78f",
+        "95b193e0a95b134a2e5c40f386d9c96ceaad6bbff92325a1630422a9bd838a17"
+      ]
+    },
+    {
+      "task": "univ_5-long-repeat.sl",
+      "source_sha256": "c4da1b81f6f8e315697558b63696a8d335c8f6021a0468e7087af819edbad61c",
+      "input_sha256": "d7f7c76754aa186172da8076f2962ecea4980a0d5b70c9742f95edb2f052437c",
+      "constraint_numbers": [
+        3,
+        10
+      ],
+      "output_sha256": [
+        "dbc80c0edb342c5717d60c63ea8a3922470efe690bd68422e8cc07bc9a8ca78f",
+        "95b193e0a95b134a2e5c40f386d9c96ceaad6bbff92325a1630422a9bd838a17"
+      ]
+    },
+    {
+      "task": "univ_6-long-repeat.sl",
+      "source_sha256": "6f31479ba8d107a3df008b23b06beeae34d9b1ffdffd06c965884107e2b0134c",
+      "input_sha256": "d7f7c76754aa186172da8076f2962ecea4980a0d5b70c9742f95edb2f052437c",
+      "constraint_numbers": [
+        3,
+        10
+      ],
+      "output_sha256": [
+        "dbc80c0edb342c5717d60c63ea8a3922470efe690bd68422e8cc07bc9a8ca78f",
+        "95b193e0a95b134a2e5c40f386d9c96ceaad6bbff92325a1630422a9bd838a17"
+      ]
+    }
+  ]
+}

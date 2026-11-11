@@ -1,5 +1,12 @@
 # 功能范围与参照系统
 
+## v0.6 可复现能力
+
+- 导入位置字段的三个样例，可只缩写第二个词并补齐缺少的状态后缀。训练中同名地点保持原样，新输入 `Other; North West` 输出 `Other; NW; LIVE`。[工作流](../examples/normalize/scenario.json)
+- 时间和多个读数放在一个分隔字段时，学习拆分、Fold 和选列。新批次可有更多记录、负数和前导零。[回归用例](../search_completion_wbtest.mbt)
+- 重复键值记录可学成 SplitColumn → CarryContext → PivotGrid → MapRows。新批次记录数变化时仍生成标签行和数据行。[工作流](../examples/structures/record-grid.json)
+- 打包后选列的候选在全部训练对匹配目标。按观察键分组优先于固定大小打包，以减少新批次记录数变化时的误判。单行训练允许产生行映射候选，使用者仍需核对新数据。
+
 ## v0.5.1 维护修复
 
 - 新增固定长度的分隔词前缀和后缀学习。在「姓名首字缩写」中用不同长度的姓名演示，未参与训练的 `Amina Smith` 输出 `A.S.`。Unicode 回归覆盖单字和补充平面字符。[示例](../examples/initials/scenario.json)
