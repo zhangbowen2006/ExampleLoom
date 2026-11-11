@@ -53,6 +53,10 @@ test "extended regex rejects invalid syntax and bounds work as errors" {
     attempt(RegexCapture(Field(0), "(?rx)(?<=a+)b", 0, 0), ["ab"]) is Err(_),
   )
   assert_true(
+    attempt(RegexCapture(Field(0), "(?rx)(?<=(a){2})b", 1, 0), ["aab"])
+    is Err(_),
+  )
+  assert_true(
     attempt(RegexReplace(Field(0), "(?rx)(?<n>\\d+)", "${missing}"), ["none"])
     is Err(_),
   )

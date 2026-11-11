@@ -28,6 +28,7 @@ pub(all) enum Ast {
 pub fn Ast::compile(Self) -> Array[@vm.Instruction]
 pub fn Ast::compile_anchored(Self) -> Array[@vm.Instruction]
 pub fn Ast::fixed_width(Self) -> Int32?
+pub fn Ast::lookbehind_captures_safe(Self) -> Bool
 pub fn Ast::to_json(Self) -> Json
 pub fn Ast::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Ast

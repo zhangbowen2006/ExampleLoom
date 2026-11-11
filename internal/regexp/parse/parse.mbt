@@ -372,7 +372,8 @@ fn Parser::parse_factor(self : Parser) -> Ast raise RegexpError {
             )
           }
           self.input = rest
-          guard expr.fixed_width() is Some(width) else {
+          guard expr.fixed_width() is Some(width) &&
+            expr.lookbehind_captures_safe() else {
             raise RegexpError(err=InvalidRepeatSize, source_fragment=capture)
           }
           Look(expr, positive=sign == '=', behind=Some(width))

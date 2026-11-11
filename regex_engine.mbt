@@ -123,10 +123,6 @@ fn extended_pattern(pattern : String) -> CompiledPattern raise LoomError {
   if parsed.captures > 33 {
     raise LoomError("regex exceeds 32 capture groups")
   }
-  // Upstream byte-comparison backreferences do not implement case folding.
-  if parsed.has_backreference && body.contains("(?i") {
-    raise LoomError("case-insensitive backreferences are unsupported")
-  }
   let code = parsed.ast.compile()
   if code.length() > 16384 {
     raise LoomError("regex instruction expansion exceeds 16384")

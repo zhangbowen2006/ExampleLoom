@@ -288,3 +288,28 @@ pub fn Ast::fixed_width(self : Ast) -> Int32? {
     _ => None
   }
 }
+
+///| Backward evaluation would change the selected capture of a repeated
+
+///|
+/// group. Reject that form rather than silently return forward captures.
+pub fn Ast::lookbehind_captures_safe(self : Ast) -> Bool {
+  match self {
+    Capture(inner, ..) => inner.lookbehind_captures_safe()
+    Repeat(inner, max~, ..) => {
+      let slots = []
+      inner.capture_slots(slots)
+      (max == Some(0U) || max == Some(1U) || slots.is_empty()) &&
+      inner.lookbehind_captures_safe()
+    }
+    ZeroOrMore(inner, ..) | OneOrMore(inner, ..) | ZeroOrOne(inner, ..) => {
+      let slots = []
+      inner.capture_slots(slots)
+      slots.is_empty() && inner.lookbehind_captures_safe()
+    }
+    Concat(parts) => parts.all(p => p.lookbehind_captures_safe())
+    Alternate(a, b) =>
+      a.lookbehind_captures_safe() && b.lookbehind_captures_safe()
+    _ => true
+  }
+}
