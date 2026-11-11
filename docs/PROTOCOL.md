@@ -2,6 +2,16 @@
 
 The exported `handle(request: String) -> String` always returns JSON. Ordinary input failures are `{ "ok": false, "error": "..." }`. There is no network, filesystem or host-code execution in this boundary.
 
+## Stable row ordering (v0.7.0)
+
+The additive v2 step is `["sort_rows",[["region","text","asc"],["amount","decimal","desc"]]]`. Each key is exactly `[column,kind,direction]`, with kind `text` or `decimal` and direction `asc` or `desc`. Supply 1–8 distinct, existing column names. Keys are evaluated left-to-right; full ties retain their original input ordinal even in descending order. JSON pipeline v2 and every existing operator encoding remain valid.
+
+Text uses case-sensitive Unicode scalar lexical order with no trimming, normalization or locale collation. Decimal accepts `[+-]?[0-9]+(\.[0-9]+)?` in 1–256 ASCII characters. Comparison is exact for that text range and does not use binary floating point or scaled machine integers. Spelling and cell values are preserved; negative zero compares equal to zero. Blank numeric cells, exponents, NaN, infinities, whitespace and grouping separators fail with row/column context. No invalid-value placement or implicit rounding is performed. The spreadsheet-safe CSV policy still applies to negative or formula-like output cells.
+
+`synthesize_table` can infer up to three keys and mixed directions from complete training permutations. It bounds its ordering exploration to 32 prefixes and two completions per structural state; hitting those limits is reported as truncation. Each completion consumes the existing shared evaluation budget and is replayed on all examples. An already ordered example alone supplies no evidence that an ordering operation was intended. Runtime supports eight explicit keys independently of this learning bound.
+
+See [three complete scenarios](../scripts/sorting-test.mjs), [Python reference generation](../scripts/generate-sort-oracle.py), and [source implementation](../sorting.mbt). This operator can be composed with existing steps; `sorted-measurements` learns Unpivot followed by decimal sorting.
+
 ## Compare retained table programs (v0.6.1, additive operation)
 
 ```json

@@ -51,3 +51,7 @@ ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工�
 | [MoonFrame](https://github.com/ihb2032/MoonFrame)、[moon-databridge](https://github.com/btlqql/moon-databridge)，均为 Apache-2.0 | 可参照其显式表格计算与转换的接口范围 | 保持样例到程序的学习和交互消歧定位；不把相同的 CSV、分组或转换能力单独当作差异，也未将其纳为运行时依赖 |
 
 这里采用的是公开方法与交互思想。本项目的库、浏览器工作台和 CLI 仍独立运行。没有更换项目名、另建重复仓库、扩大“任意数据转换”承诺或更改外部评测分母。能否通过初审仍需组委会根据当前范围和实际材料判断。
+
+## v0.7 范围补齐
+
+本轮重新核对上述仓库、OpenRefine 的排序说明和 PROSE 公共任务分类，逐项区分覆盖与缺口，记录于 [GAP_ANALYSIS](GAP_ANALYSIS.md)。选择补齐可学习的稳定排序，独立实现比较器、训练置换/单调约束见证、管道编码和浏览器流程；没有复制参考项目代码或增加它们的运行时依赖。23 类操作与有限学习范围不等于完整 DataFrame、PROSE 或 OpenRefine。

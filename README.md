@@ -2,6 +2,8 @@
 
 **给出几个样例，生成可检查、可重用的数据转换程序。**
 
+v0.7 增加从样例学习的多字段稳定排序，支持 Unicode 文本序和精确十进制数值序，可与宽表展开等操作组合。执行支持八个排序键，学习至多三个键；相同键保留原始顺序，数值排序保留前导零和小数原文。在表格工作台选择「多字段金额排序」「商品目录排序」「读数展开与排序」可运行完整流程。[覆盖差异与借鉴范围](docs/GAP_ANALYSIS.md) · [排序协议和边界](docs/PROTOCOL.md#stable-row-ordering-v070)
+
 [在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)
 
 ExampleLoom 是使用 MoonBit 实现的程序合成引擎、独立浏览器工作台和 CLI。使用者可以整理编号、名单和按地区汇总的记录。导入 CSV/JSONL，标注输入输出样例，比较候选程序的不同解释，明确选择后保存配方并用于下一批数据。浏览器 Worker 在本机执行合成和转换。
@@ -29,6 +31,8 @@ moon run cmd/demo
 node scripts/build.mjs
 node scripts/serve.mjs
 ```
+
+新增排序验证：`python scripts/generate-sort-oracle.py` 后执行 `node scripts/sorting-test.mjs`，对照 Python Decimal 与稳定排序的 128 组构造任务，并逐格核对三个学习与新批次流程。
 
 打开 <http://127.0.0.1:4173>，点击“供应商编码”“活动名单”或“素材目录”。两个样例已填好；点击生成候选，检查分歧，选用规则，再预览整批结果。切换示例输出字段可继续添加另一条规则。
 

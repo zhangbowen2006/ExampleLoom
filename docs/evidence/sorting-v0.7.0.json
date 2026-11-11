@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-11T07:52:43.895Z",
+  "engine_sha256": "d348cdc42391ad5ecdc2cdcf1c291929bb0f4c325d00ff886cd5342f85fc3edd",
+  "reference": "Python stable sorted + decimal.Decimal",
+  "reference_python": "3.13.7",
+  "scope": "constructed differential validation, not independent external tasks",
+  "explicit_reference_cases": 128,
+  "scenarios": [
+    {
+      "name": "sorted-invoices",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "invoice",
+          "region",
+          "amount"
+        ],
+        "steps": [
+          [
+            "sort_rows",
+            [
+              [
+                "region",
+                "text",
+                "asc"
+              ],
+              [
+                "amount",
+                "decimal",
+                "desc"
+              ]
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 1,
+      "heldout_rows": 6,
+      "all_cells_match": true
+    },
+    {
+      "name": "sorted-catalog",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "code",
+          "label"
+        ],
+        "steps": [
+          [
+            "sort_rows",
+            [
+              [
+                "code",
+                "text",
+                "asc"
+              ]
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 2,
+      "heldout_rows": 4,
+      "all_cells_match": true
+    },
+    {
+      "name": "sorted-measurements",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "id",
+          "Jan",
+          "Feb"
+        ],
+        "steps": [
+          [
+            "unpivot",
+            [
+              "id"
+            ],
+            [
+              "Jan",
+              "Feb"
+            ],
+            "month",
+            "value"
+          ],
+          [
+            "sort_rows",
+            [
+              [
+                "value",
+                "decimal",
+                "asc"
+              ]
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 1,
+      "heldout_rows": 6,
+      "all_cells_match": true
+    }
+  ]
+}
