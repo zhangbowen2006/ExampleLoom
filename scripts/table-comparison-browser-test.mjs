@@ -36,6 +36,12 @@ try {
   assert.equal(await page.locator('#apply').isDisabled(), true);
   assert.equal(await page.locator('#export').isDisabled(), true);
   checks.push('Real Worker compares all retained table programs on an unlabelled batch without choosing or exporting a result.');
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth>innerWidth), false);
+  await mkdir('artifacts', {recursive:true});
+  await page.screenshot({path:'artifacts/table-comparison-mobile.png',fullPage:true});
+  await page.setViewportSize({width:1280,height:900});
+  checks.push('Visible alternative-output tables fit a 390px viewport with their own horizontal scrolling.');
 
   await page.locator('#refine-table').click();
   const pair = page.locator('#extra-pairs fieldset').last();
@@ -61,6 +67,15 @@ try {
   const expectedCsv = [demo.after_refinement.expected.columns, ...demo.after_refinement.expected.rows].map(row => row.join(',')).join('\r\n')+'\r\n';
   assert.equal(await readFile('artifacts/table-comparison-browser.csv','utf8'), expectedCsv);
   checks.push('Refinement copies only the input, leaves the target blank, invalidates old programs, relearns from the supplied target and downloads the correct third batch.');
+
+  await page.locator('#next').fill('other\none\n');
+  await page.locator('#compare-table').click();
+  await page.locator('.comparison-group').first().waitFor();
+  assert.match(await page.locator('#comparison-summary').innerText(), /没有候选成功/);
+  assert.equal(await page.locator('.comparison-group table').count(), 0);
+  assert.equal(await page.locator('#export').isDisabled(), true);
+  checks.push('Missing input columns produce an explicit all-failed comparison without a successful-output preview or CSV export.');
+  await page.locator('#next').fill(demo.after_refinement.input);
 
   await page.evaluate(() => {window.holdComparisons = true;});
   await page.locator('#compare-table').click();

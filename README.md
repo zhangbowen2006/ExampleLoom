@@ -16,6 +16,8 @@ v0.5 可以从混用两种格式的编号学出条件分支，从样例推导捕
 
 v0.6 新增从样例学习的指定分隔词替换、可选后缀，以及拆分转长表、记录打包后选列和键值记录还原网格。完整字段的快速搜索与全语法搜索共享原有步数预算。工作台的「字段缩写与后缀」「键值记录还原网格」提供完整训练和新批次流程。当前成绩、未通过任务及评测口径见[基准报告](docs/BENCHMARKS.md)。
 
+v0.6.1 在现有表格工作台补齐交互消歧。选择「候选歧义与补样」，先搜索，再比较下一批结果：同一个训练样例可产生不同表格或执行错误。点击补充训练只复制输入，期望输出由使用者填写；重新学习后，可在第三批数据上重放。该过程不自动选择答案，也不改变原有搜索排名。[初审核验事实](docs/INITIAL_REVIEW.md) · [来源与借鉴范围](docs/RESEARCH.md#v061-维护调研2026-11-11)
+
 ## 快速体验
 
 要求 MoonBit（验证版本 `moonc 0.10.17+093cb8f9c`、`moon 0.1.20261021`），工作台/CLI 另需 Node.js ≥20。没有 npm 运行时依赖。
@@ -66,7 +68,7 @@ node scripts/benchmark.mjs
 node scripts/serve.mjs
 ```
 
-本地打开 <http://127.0.0.1:4173/structure.html>。六个完整结构场景的数据、下一批输入与预期输出位于 `examples/structures/`。动态透视允许下一批新增类别；带标签单元格会自动组合 Fold、拆列与透视。条件与正则场景分别在 `examples/conditional/`、`examples/regex/`。以上演示是构造数据；外部评估使用上游原有任务，完整成功、失败和限额记录见 [BENCHMARKS.md](docs/BENCHMARKS.md)。
+本地打开 <http://127.0.0.1:4173/structure.html>。结构场景的数据、下一批输入与预期输出位于 `examples/structures/`。动态透视允许下一批新增类别；带标签单元格会自动组合 Fold、拆列与透视。条件与正则场景分别在 `examples/conditional/`、`examples/regex/`。以上演示是构造数据；外部评估使用上游原有任务，完整成功、失败和限额记录见 [BENCHMARKS.md](docs/BENCHMARKS.md)。
 
 结构 CLI 在 `learn-table --data input.csv --target target.csv --out report.json` 后，使用 `pipeline --report report.json --choose 0 --out pipeline.json` 明确选择，再执行 `transform --data next.csv --pipeline pipeline.json --out result.csv`；命令均以 `node bin/exampleloom.mjs` 开头。逐行 `learn` 可选 `--patterns patterns.json` 和 `--depth 0..3`。
 

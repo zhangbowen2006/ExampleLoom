@@ -1,0 +1,89 @@
+{
+  "version": "0.6.1",
+  "measured_core_source": "0090a94b685e83376ebbaf17aca49e09bc960b1e",
+  "engine_sha256": "898a98b54879fd6fb2b9a96191f35c07a12c94bb63fb5d2754234953944290ac",
+  "scope": "Additive table comparison and explicit refinement; no search, ranking, operator, evaluation-budget or split-policy changes.",
+  "foofah": {
+    "summary": {
+      "tasks": 250,
+      "families": 50,
+      "holdout_available": 225,
+      "missing_holdout_gold": 25,
+      "reference_conflicts": 0,
+      "training_solved": 231,
+      "top1_holdout": 179,
+      "any_holdout": 191,
+      "timeouts": 0,
+      "errors": 5,
+      "unexpected_errors": 0,
+      "truncated": 245,
+      "p50_ms": 142.08669999999995,
+      "p95_ms": 238.69850000000042,
+      "max_ms": 437.94750000000204
+    },
+    "compared_with": "benchmark-v0.6.0.json",
+    "per_task_fields_compared": [
+      "training_solved",
+      "top1_holdout",
+      "any_holdout",
+      "candidates",
+      "status",
+      "truncated",
+      "top1_pipeline",
+      "top1_error"
+    ],
+    "per_task_changes": [],
+    "remaining_top1_failures": 46,
+    "raw_artifact_sha256": "de93c1740fccd69bda15ac5c73d02c640e1f39cfde674a510efa4f4f299bdece"
+  },
+  "strings": {
+    "protocol": 2,
+    "training_cap": 32,
+    "inventory": 108,
+    "eligible": 104,
+    "distinct_splits": 51,
+    "current": {
+      "sha256": "898a98b54879fd6fb2b9a96191f35c07a12c94bb63fb5d2754234953944290ac",
+      "by_file": {
+        "files": 104,
+        "training": 104,
+        "top1": 104,
+        "any": 104,
+        "truncated": 100,
+        "timeouts": 0,
+        "errors": 0,
+        "p50_ms": 56.25540000000001,
+        "p95_ms": 96.53570000000036
+      },
+      "unique_splits": {
+        "files": 51,
+        "training": 51,
+        "top1": 51,
+        "any": 51,
+        "truncated": 49,
+        "timeouts": 0,
+        "errors": 0,
+        "p50_ms": 53.32590000000005,
+        "p95_ms": 96.60200000000077
+      }
+    },
+    "compared_with": "sygus-protocol2-v0.6.0.json",
+    "identical_split_hashes_and_exclusions": true,
+    "per_task_fields_compared": [
+      "training",
+      "top1",
+      "any",
+      "error",
+      "timeout"
+    ],
+    "per_task_changes": [],
+    "raw_artifact_sha256": "ae2b772d7734954e38d2f6b57622d4d1fc417afcdb6f77885c806402f2f5e5b0"
+  },
+  "limitations": [
+    "Development-exposed tasks; original SyGuS grammar is not enforced.",
+    "The 32-example string cap differs from the historical six-example protocol.",
+    "One current replay, not a paired speed comparison.",
+    "Any-candidate correctness does not select a correct program.",
+    "Four original internally contradictory string files are not counted as passed; missing table gold remains in the inventory."
+  ]
+}

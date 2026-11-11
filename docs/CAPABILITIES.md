@@ -1,5 +1,13 @@
 # 功能范围与参照系统
 
+## v0.6.1：表格候选的比较与补样
+
+`compare_table_candidates` 把最多八条保留管道用于同一批未标注数据，按完整列名、行序和全部单元格分组；执行错误保留为独立结果。报告前两组的首个差异，不自动调整排名、选择管道或把预测当作训练标签。全部执行失败单独返回 `all_failed`，单组成功的一致只描述有限观察。
+
+工作台「候选歧义与补样」从一条记录开始，展示转置、打包等解释在新批次上的差异。添加训练时目标留空；使用者提供正确目标后再学习，再对第三批不同数量的记录运行。[完整数据与目标](../examples/structures/ambiguous-records.json) · [API 与外部任务验证](../scripts/table-comparison-test.mjs) · [浏览器流程](../scripts/table-comparison-browser-test.mjs)
+
+比较使用完整批次，不截断记录。输入及每个成功输出各限 2000 行、20000 单元格、250000 UTF-16 单位；超限使比较整体失败。原有转换限额不变。两道 Foofah 原题暴露了首候选失败和可用替代结果；这项诊断不将表格首候选成功率从 179/225 改为全部通过。[本轮重放](evidence/maintenance-v0.6.1.json)
+
 ## v0.6 可复现能力
 
 - 导入位置字段的三个样例，可只缩写第二个词并补齐缺少的状态后缀。训练中同名地点保持原样，新输入 `Other; North West` 输出 `Other; NW; LIVE`。[工作流](../examples/normalize/scenario.json)

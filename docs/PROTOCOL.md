@@ -2,6 +2,20 @@
 
 The exported `handle(request: String) -> String` always returns JSON. Ordinary input failures are `{ "ok": false, "error": "..." }`. There is no network, filesystem or host-code execution in this boundary.
 
+## Compare retained table programs (v0.6.1, additive operation)
+
+```json
+{"op":"compare_table_candidates","pipelines":[{"version":2,"columns":["x"],"steps":[]},{"version":2,"columns":["x"],"steps":[["pack_rows",2,false]]}],"table":{"columns":["x"],"rows":[["a"],["b"],["c"]]}}
+```
+
+The request contains 1–8 pipelines and one complete, unlabelled table. It has no target field. Unknown request fields are rejected. `groups` preserves candidate order and contains `{candidates:[zeroBasedIndices],prediction:{ok:true,table:...}}` or `{candidates:[...],prediction:{ok:false,error:...}}`. Equality includes every header, row position and cell; previews are not used for grouping.
+
+`status` is `consistent` for one successful outcome group, `disagreement` for multiple groups with at least one successful program, and `all_failed` when no program succeeds. `successful_candidates` counts programs, not outcome groups. `first_difference` describes the first two groups: `{kind:"columns"}`, `{kind:"row_count"}`, `{kind:"cell",row_index:0,column_index:0}` or `{kind:"error"}`; a single group has `null`. Cell coordinates are zero-based data indices excluding the header.
+
+Input and each successful output are limited to 2000 rows, 20000 cells and 250000 UTF-16 units including column names. Exceeding a comparison budget aborts the operation with `ok:false`; it is not counted as an execution failure of that program. The engine does not sample partial tables. Normal transformation limits are unchanged. Comparison does not learn, rerank, select, export CSV or establish correctness. Use a smaller complete batch if necessary.
+
+Native API: `compare_table_candidates(Array[Pipeline], Table) -> TableComparison raise LoomError`. See [the refinement workflow](../scripts/table-comparison-test.mjs) and [candidate types](../pkg.generated.mbti).
+
 ## Parse
 
 ```json

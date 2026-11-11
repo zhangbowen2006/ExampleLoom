@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-11T03:42:05.919Z",
+  "engine": "898a98b54879fd6fb2b9a96191f35c07a12c94bb63fb5d2754234953944290ac",
+  "checks": [
+    "One training record permits multiple programs; a complete unlabelled batch exposes different predictions without changing ranking.",
+    "Only a separately supplied correct target refines the version space; every retained program fits both training pairs.",
+    "The selected refined pipeline survives serialization and transforms a third batch with an unseen record count.",
+    "Execution failures remain explicit prediction groups; identical failures cannot masquerade as successful consensus.",
+    "Two unchanged Foofah tasks expose fixed-pack/pivot failures alongside alternative successful outcomes; oracle validation never chooses the program."
+  ],
+  "initial_candidates": 8,
+  "initial_prediction_groups": 4,
+  "refined_candidates": 7,
+  "selected": {
+    "version": 2,
+    "columns": [
+      "c0"
+    ],
+    "steps": [
+      [
+        "pack_rows",
+        2,
+        true
+      ]
+    ]
+  },
+  "expected": {
+    "columns": [
+      "c0",
+      "c1"
+    ],
+    "rows": [
+      [
+        "D",
+        "orange"
+      ],
+      [
+        "E",
+        "purple"
+      ],
+      [
+        "F",
+        "white"
+      ]
+    ]
+  },
+  "external": [
+    {
+      "task": "exp0_27_4.txt",
+      "groups": 4,
+      "successful_candidates": 4,
+      "exposes_execution_failure": true,
+      "oracle_correct_group_present": true
+    },
+    {
+      "task": "exp0_25_1.txt",
+      "groups": 5,
+      "successful_candidates": 2,
+      "exposes_execution_failure": true,
+      "oracle_correct_group_present": true
+    }
+  ]
+}

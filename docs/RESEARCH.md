@@ -1,4 +1,4 @@
-# 选题与来源核对（2026-11-10 更新）
+# 选题与来源核对（2026-11-11 更新）
 
 这是技术调研记录，不是参赛申报书。实现代码由 AI 辅助编写，维护者需理解、验证并负责。
 
@@ -32,7 +32,7 @@ ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工�
 
 [当前报名表](https://bxup9uklfcb.feishu.cn/share/base/form/shrcnWUMlgpbwHaXgzV7HmNhNhg) 已显示 11 月：可提交三次、重复修改；新项目季度赛道要求一页以内 Markdown、本人撰写且不要使用 AI、至少三个完整预期场景、公开仓库至少十个有效提交。提交数与既有报名的剩余名额需要本人在表单查看记录确认。
 
-[官网](https://moonbitlang.github.io/Hackathon2026/)仍显示十月日期。用户提供的十一月公告说明十一月为新季度首月，十月截止后修改转入十一月，季度为十一月至次年一月。十一月确切报名/验收截止、当前账号剩余名额、Mooncakes 发布的最新强制口径仍待官方确认。正式提交由参赛者本人完成；申报正文的辅助方式以参赛者向组委会确认的口径处理，不由本仓库推断公开规则已改变。
+[官网](https://moonbitlang.github.io/Hackathon2026/)于 2026-11-11 实际加载的页面已显示十一月，报名时间以通过审核前最后一次有效提交或修改为准，未通过项目可修改。页面将报名与验收截止标为以官方通知为准，没有给出可确认的具体日期。十一月确切截止、当前账号剩余名额、Mooncakes 发布的最新强制口径仍待官方确认。正式提交由参赛者本人完成；本轮实际展开报名表的新项目季度选项后，仍看到本人撰写、不要使用 AI 的一页 Markdown 要求。本仓库只整理技术事实与核验材料，不代替本人提交。
 
 
 ## v0.4 补充核对
@@ -40,3 +40,14 @@ ExampleLoom：MIT。运行时基础库 `moonbitlang/core`：Apache-2.0（以工�
 本次独立扩展 4 类算子、有限自动正则上下文与组合结构搜索，没有移植 Foofah/PROSE 源码。Foofah 测试数据中的 25 份 TestAnswer 为字面占位 `NOT AVAILABLE, SORRY`，需单列而不是视作模型预测错误；原始文件及 v0.3 历史记录保留。新的比较同时保留任务总数、有效答案分母和所有回退案例，不利用测试答案挑选首候选。
 
 差分验证调用 [pandas](https://github.com/pandas-dev/pandas) 的 pivot、melt、groupby、ffill、concat 等成熟实现，输入与输出为本项目构造的随机表。pandas 仅在验证环境运行，不构成业务引擎依赖；不能把该构造验证称为新的独立外部盲测。实测与复现见 BENCHMARKS、VALIDATION。
+
+## v0.6.1 维护调研（2026-11-11）
+
+| 已查证的来源与许可 | 可以借鉴的地方 | 本轮采用范围 |
+| --- | --- | --- |
+| [microsoft/prose](https://github.com/microsoft/prose)，仓库样例 [MIT](https://github.com/microsoft/prose/blob/main/LICENSE)；SDK 二进制另受其许可约束 | [交互文档](https://www.microsoft.com/en-us/research/project/prose-framework/interactivity/)将候选运行、结果检查和有区分力的新样例纳入学习过程 | 独立实现表格候选的完整预测分组、差异位置和手工补样。没有引入 SDK、复用源码或声称该思路首创。其 README 说明自 2025-10-14 停止发布新 SDK 版本，不能称其为当前持续发布的依赖 |
+| [Foofah](https://github.com/umich-dbgroup/foofah)，MIT | 保留整表结构语义，对新输入重放可执行程序 | 沿用许可内的完整任务集，另外在两道首候选失败的原题上核验新比较接口。搜索算子、预算和评分方法未改变 |
+| [OpenRefine](https://github.com/OpenRefine/OpenRefine)，BSD-3-Clause | [操作历史导出和重用](https://openrefine.org/docs/manual/exporting)将一次数据处理变成可重复执行的工作流 | 保留本项目已有的版本化管道，补样后重新学习并序列化，在第三批数据上验证。没有复制历史系统、引入 Java 服务或声称等价覆盖其能力 |
+| [MoonFrame](https://github.com/ihb2032/MoonFrame)、[moon-databridge](https://github.com/btlqql/moon-databridge)，均为 Apache-2.0 | 可参照其显式表格计算与转换的接口范围 | 保持样例到程序的学习和交互消歧定位；不把相同的 CSV、分组或转换能力单独当作差异，也未将其纳为运行时依赖 |
+
+这里采用的是公开方法与交互思想。本项目的库、浏览器工作台和 CLI 仍独立运行。没有更换项目名、另建重复仓库、扩大“任意数据转换”承诺或更改外部评测分母。能否通过初审仍需组委会根据当前范围和实际材料判断。
