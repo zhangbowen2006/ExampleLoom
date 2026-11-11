@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-11T15:42:08.738Z",
+  "seed": "0x6e624531",
+  "constructed_cases": 250,
+  "rejected_invalid_cases": 5,
+  "engine_sha256": "d1cf97d1b6a01848fa64537e2228a1d70a96e8feac7f47e6876db7f4eb37e6b4",
+  "scope": "Constructed independently from original records; no external or blind benchmark claim."
+}
