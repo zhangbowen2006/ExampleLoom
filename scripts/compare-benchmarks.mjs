@@ -5,7 +5,7 @@ import {fileURLToPath}from'node:url';
 import {createHash}from'node:crypto';
 import assert from'node:assert/strict';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
-const baselineVersion = process.env.BASELINE_VERSION ?? '0.5.0';
+const baselineVersion = process.env.BASELINE_VERSION ?? '0.5.1';
 const currentVersion = JSON.parse(await readFile(resolve(root, 'package.json'))).version;
 const metadata = JSON.parse(await readFile(resolve(root, 'scripts/baselines.json')))[baselineVersion];
 assert.ok(metadata && baselineVersion !== currentVersion, 'Choose a distinct recorded release');

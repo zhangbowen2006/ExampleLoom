@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import quote
 from urllib.request import urlopen
 import json
+import os
 import re
 import time
 
@@ -13,6 +14,9 @@ CACHE = ROOT / "artifacts" / "sygus-2017"
 REV = "13c8deb68a873635879c9a69bc78caebd340f646"
 TRACK = "comp/2017/PBE_Strings_Track"
 REPO = "SyGuS-Org/benchmarks"
+TRAIN_CAP = int(os.environ.get("SYGUS_TRAIN_LIMIT", "32"))
+if TRAIN_CAP not in (6, 32):
+    raise ValueError("SYGUS_TRAIN_LIMIT must be 6 or 32")
 TOKEN = re.compile(r'\s+|;[^\n]*|"(?:[^"]|"")*"|[()]|[^\s();"]+')
 
 
@@ -86,7 +90,7 @@ def split_task(text):
     def order(args):
         return sha256(json.dumps(args, ensure_ascii=False, separators=(",", ":")).encode()).digest()
     ordered = [{"input": args, "output": observations[args]} for args in sorted(observations, key=order)]
-    count = min(6, len(ordered) - 1, (2 * len(ordered) + 2) // 3)
+    count = min(TRAIN_CAP, len(ordered) - 1, (2 * len(ordered) + 2) // 3)
     return {"train": ordered[:count], "holdout": ordered[count:]}
 
 
@@ -121,7 +125,10 @@ def main():
     index_path.write_text(json.dumps(index), encoding="utf-8")
     with ThreadPoolExecutor(max_workers=6) as pool:
         tasks = list(pool.map(import_task, files))
-    (CACHE / "tasks.json").write_text(json.dumps({"revision": REV, "tasks": tasks}), encoding="utf-8")
+    (CACHE / "tasks.json").write_text(json.dumps({
+        "revision": REV, "protocol": 2 if TRAIN_CAP == 32 else 1, "training_cap": TRAIN_CAP,
+        "tasks": tasks,
+    }), encoding="utf-8")
     print(f"Imported {len(tasks)} files, {sum('train' in t for t in tasks)} eligible")
 
 

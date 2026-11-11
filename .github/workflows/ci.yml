@@ -47,6 +47,7 @@ jobs:
       - name: External string-task benchmark
         run: |
           python3 scripts/import-sygus.py
+          python3 scripts/audit-string-benchmark.py
           node scripts/benchmark-strings.mjs
       - name: Independent pandas reference validation
         run: |

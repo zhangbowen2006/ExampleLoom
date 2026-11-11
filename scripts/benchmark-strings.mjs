@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { cpus } from 'node:os';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 
@@ -62,11 +62,14 @@ function summarize(results) {
 }
 
 async function benchmark() {
-  const dataset = JSON.parse(await readFile('artifacts/sygus-2017/tasks.json'));
+  const dataset = JSON.parse(await readFile(process.env.STRING_BENCHMARK_DATA ?? 'artifacts/sygus-2017/tasks.json'));
+  const destination = resolve(process.env.STRING_BENCHMARK_RESULTS ?? 'artifacts/sygus-2017-results.json');
+  assert.ok(destination.startsWith(resolve('artifacts') + sep), 'Results must remain in artifacts');
+  const trainingCap = dataset.training_cap ?? 6;
   const {version} = JSON.parse(await readFile('package.json'));
   const variants = [{version, path: resolve('dist/engine.js')}];
   if (process.argv.includes('--paired')) {
-    const old = process.env.BASELINE_VERSION ?? '0.5.0';
+    const old = process.env.BASELINE_VERSION ?? '0.5.1';
     const path = resolve('artifacts/baselines/v' + old + '-engine.mjs');
     const known = JSON.parse(await readFile('scripts/baselines.json'))[old];
     assert.equal(hash(await readFile(path)), known.engine);
@@ -96,11 +99,13 @@ async function benchmark() {
       unique_splits: summarize(unique.map(r => r.engines[v.version]))};
   }
   const record = {date: new Date().toISOString(), upstream: dataset.revision, track: '2017/PBE_Strings_Track',
-    methodology: 'Entire pinned track. Deduplicate identical inputs per file, exclude contradictory targets. Order inputs by SHA-256 of the compact JSON UTF-8 input tuple. Train on the first min(6,n-1,ceil(2n/3)); withhold all others. No gold or probes are sent to synthesis. One task passes only if all withheld outputs match. Any is an oracle diagnostic. Variants can share constraints; exact duplicate splits are also reported once. This is an I/O transformation study; the competition grammar is not enforced. Latency is one timed synthesis invocation per file and engine; wall-clock timeout includes worker startup and replay.',
+    protocol: dataset.protocol ?? 1, training_cap: trainingCap,
+    methodology: 'Entire pinned track. Deduplicate identical inputs per file, exclude contradictory targets. Order inputs by SHA-256 of the compact JSON UTF-8 input tuple. Train on the first min(training_cap,n-1,ceil(2n/3)); withhold all others. No gold or probes are sent to synthesis. One task passes only if all withheld outputs match. Any is an oracle diagnostic. Variants can share constraints; exact duplicate splits are also reported once. This is an I/O transformation study; the competition grammar is not enforced. Latency is one timed synthesis invocation per file and engine; wall-clock timeout includes worker startup and replay.',
+    split_policy: 'Train first min(training_cap,n-1,ceil(2n/3)) distinct inputs ordered by input-tuple hash. Cap 6 is legacy protocol 1; cap 32 is protocol 2. Changing this cap changes the workload and the held-out examples.',
     options, timeout_ms: timeoutMs, machine: {cpu: cpus()[0].model, node: process.version, platform: process.platform},
     inventory: results.length, eligible: eligible.length, distinct_splits: unique.length, engines, results};
   console.log(JSON.stringify({inventory: record.inventory, eligible: record.eligible, engines}, null, 2));
-  await writeFile('artifacts/sygus-2017-results.json', JSON.stringify(record, null, 2) + '\n');
+  await writeFile(destination, JSON.stringify(record, null, 2) + '\n');
   if (Object.values(engines).some(v => v.by_file.errors)) process.exitCode = 1;
 }
 

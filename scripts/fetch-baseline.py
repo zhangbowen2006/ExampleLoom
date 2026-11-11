@@ -8,7 +8,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-version = os.environ.get("BASELINE_VERSION", "0.5.0")
+version = os.environ.get("BASELINE_VERSION", "0.5.1")
 record = json.loads((root / "scripts/baselines.json").read_text())[version]
 destination = root / f"artifacts/baselines/v{version}-engine.mjs"
 if destination.exists():
