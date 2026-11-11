@@ -1,0 +1,8 @@
+{
+  "title":"键值记录还原网格",
+  "description":"分析人员把重复的 ID、weight、color 记录段还原为带标签的二维网格，新批次的记录数量可以变化。",
+  "input":"line\nID=A\nweight=03\ncolor=red\nID=B\nweight=7\ncolor=blue\n",
+  "target":"c0,c1,c2\nID,weight,color\nA,03,red\nB,7,blue\n",
+  "next":"line\nID=C\nweight=0\ncolor=green\n",
+  "expected":{"columns":["c0","c1","c2"],"rows":[["ID","weight","color"],["C","0","green"]]}
+}

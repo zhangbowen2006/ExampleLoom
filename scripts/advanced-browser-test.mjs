@@ -10,7 +10,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
   await page.goto(base+'/');
   await page.locator('details').evaluate(e=>{e.open=true;});
-  for(const name of ['conditional','regex','rewrite','initials']){
+  for(const name of ['conditional','regex','rewrite','initials','normalize']){
     const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
     await page.locator(`[data-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-choose="0"]').waitFor();
@@ -26,7 +26,7 @@ try{
     checks.push(`${name}: real Worker learning, top1 program, all held-out rows and stale-hint invalidation`);
   }
   await page.goto(base+'/structure.html');
-  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals']){
+  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid']){
     const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
     await page.locator(`[data-table-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-table-choose="0"]').waitFor();await page.locator('[data-table-choose="0"]').click();

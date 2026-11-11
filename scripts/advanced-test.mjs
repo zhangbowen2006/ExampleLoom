@@ -6,7 +6,7 @@ const run=r=>{const out=JSON.parse(handle(JSON.stringify(r)));assert.equal(out.o
 const parse=text=>run({op:'parse',format:'csv',text}).table;
 const evidence={date:new Date().toISOString(),scenarios:[],checks:[]};
 await mkdir('artifacts/advanced',{recursive:true});
-for(const name of ['conditional','regex','rewrite','initials']){
+for(const name of ['conditional','regex','rewrite','initials','normalize']){
   const scenario=JSON.parse(await readFile(`examples/${name}/scenario.json`,'utf8'));
   const table=parse(await readFile(`examples/${name}/input.csv`,'utf8'));
   const field=scenario.fields[0];
@@ -20,7 +20,7 @@ for(const name of ['conditional','regex','rewrite','initials']){
   assert.deepEqual(applied.rows.map(r=>r.values[0]),field.expected,name);
   evidence.scenarios.push({name,selected:report.candidates[0].description,training:field.labels.length,heldout:table.rows.length-field.labels.length,all_values_match:true});
 }
-for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals']){
+for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid']){
   const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
   const input=parse(demo.input), output=parse(demo.target);
   const extra=(demo.additional??[]).map(pair=>({input:parse(pair.input),output:parse(pair.target)}));

@@ -1,0 +1,10 @@
+{
+  "title":"位置字段规范化",
+  "description":"导入来自多个来源的位置字段，只缩写第二个分隔词，并按需补充状态后缀。保留同名地点和已有后缀。",
+  "file":"input.csv",
+  "fields":[{
+    "name":"normalized",
+    "labels":[{"row":0,"output":"North West; NW; LIVE"},{"row":1,"output":"Lake; NW; LIVE"},{"row":2,"output":"Hill; SE; LIVE"}],
+    "expected":["North West; NW; LIVE","Lake; NW; LIVE","Hill; SE; LIVE","Other; NW; LIVE","New; SW; LIVE"]
+  }]
+}
