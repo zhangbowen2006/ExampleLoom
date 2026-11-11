@@ -14,6 +14,13 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 await cp(resolve(root, '_build/js/release/build/api/api.js'), resolve(root, 'dist/engine.js'));
 await cp(resolve(root, 'web'), resolve(root, 'dist'), { recursive: true });
+const version=JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version;
+for (const name of ['index.html', 'structure.html']) {
+  const page = resolve(dist, name);
+  const html = await readFile(page, 'utf8');
+  await writeFile(page, html.replaceAll('{{VERSION}}', version));
+}
+
 await cp(resolve(root, 'examples'), resolve(root, 'dist/examples'), { recursive: true });
 await cp(resolve(root, 'LICENSE'), resolve(root, 'dist/LICENSE'));
 await cp(resolve(root, 'LICENSES'), resolve(root, 'dist/LICENSES'), { recursive: true });
@@ -24,7 +31,6 @@ const git = args => {
 const top=git(['rev-parse','--show-toplevel']);
 const ownsRepository=top!==null && resolve(top)===root;
 const status=ownsRepository?git(['status','--porcelain']):null;
-const version=JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version;
 const metadata={version,built_at:new Date().toISOString(),git_head:ownsRepository?git(['rev-parse','HEAD']):null,dirty:status===null?null:status!=='',engine_sha256:createHash('sha256').update(await readFile(resolve(dist,'engine.js'))).digest('hex')};
 await writeFile(resolve(dist,'BUILD.json'),JSON.stringify(metadata,null,2)+'\n');
 console.log('Built dist/ — MoonBit engine and standalone workbench.');
