@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ExampleLoom · 多表任务</title><link rel="stylesheet" href="style.css"><script type="module" src="jobs.js"></script></head>
+<body><header class="topbar"><a class="brand" href="./">≋ ExampleLoom</a><a href="structure.html">从样例学习表格程序 ↗</a></header><main>
+<section class="intro"><div><p class="eyebrow">MULTI-SOURCE DATA JOBS / {{VERSION}}</p><h1>连接多张表，<br>保存整套处理任务。</h1><p class="lede">明确指定连接键、合表规则和后续变换。导入本地 CSV 后，在浏览器中执行、核对并保存任务，供下一批数据重用。</p></div></section>
+<nav class="demo-strip" aria-label="多表案例"><span>完整案例</span><button data-job-demo="product-enrichment">订单与商品主数据</button><button data-job-demo="monthly-settlement">跨月供应商结算</button><button data-job-demo="catalogue-reconcile">库存目录对账</button></nav>
+<div id="notice" class="notice" role="status" aria-live="polite">选择案例或载入任务，再填写各张源表。连接和合表规则需要明确声明。</div>
+<section class="panel"><h2>1 · 选择或配置任务</h2><p id="job-description"></p><div id="stages"></div><details><summary>编辑任务规则 JSON</summary><textarea id="job" rows="12" aria-label="任务 JSON" spellcheck="false"></textarea><button id="configure" class="secondary">应用任务配置</button></details><label class="file-button">载入任务<input id="load-job" type="file" accept=".json"></label> <button id="save-job" class="secondary" disabled>下载任务规则</button><p class="hint">任务规则可包含连接、按列名合表和已选定的表格程序。数据文件不包含在下载的规则中；不会自动推断连接关系。</p></section>
+<h2>2 · 填写或打开源表 CSV</h2><section id="sources" class="workspace"></section>
+<section class="panel"><h2>3 · 执行并核对结果</h2><button id="run-job" class="primary" disabled>运行整套任务</button> <button id="cancel" class="plain" hidden>取消</button> <button id="export-job" class="secondary" disabled>下载结果 CSV</button><p id="stats" class="hint"></p><div id="results" class="table-wrap"></div></section>
+<footer>所有案例为构造数据。默认连接要求右键唯一，空键不匹配；结果中的匹配状态区分缺失与真实空值。修改任务或源表后，需重新运行。</footer></main></body></html>

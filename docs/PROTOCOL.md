@@ -197,3 +197,7 @@ A small whole-field search runs before the full row grammar. Both share the conf
 ## v0.12: explicit layouts and input proposals
 
 `normalize_layouts` (first step only) and `synthesize_table.layouts` use strictly validated explicit rules, not learned rules. `propose_table_input` accepts only `op`, `pipelines`, `inputs` and returns `suggestion: null` or an input-only suggestion with zero-based `source_index`, `mutation`, `input`, `csv`, `score`, `groups`. Mutations are `duplicate_rows`, `reverse_rows`, `drop_first`, `drop_last`, `first_row`, with at most 8 unique comparisons in source order. All-failed or consistent probes do not produce a suggestion; null does not prove equivalence. No target label is returned. Full limits and schema binding semantics: [v0.12](V012.md#接口与边界).
+
+## v0.13 multi-source operations
+
+Strict requests: `join_tables {left,right,spec}`, `concat_tables {sources,spec}`, `execute_table {pipelines,table,chosen?}`, `validate_data_job {job}`, `run_data_job {job,sources}` (all also require `op`). Named sources use `{name,table}`. Decimal aggregate metrics are `sum_decimal`, `min_decimal`, `max_decimal`. DataJob version1 statically validates all ordered stages and returns only the final table. Full codecs, default policies, source binding and limits are documented in [v0.13](V013.md#协议确定性及边界).

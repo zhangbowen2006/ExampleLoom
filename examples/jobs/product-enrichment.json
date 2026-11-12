@@ -1,0 +1,104 @@
+{
+  "title": "订单连接商品主数据并精确汇总",
+  "description": "按SKU和仓库两个键匹配，未知商品保留left_only状态；金额精确求和。",
+  "sources": [
+    {
+      "name": "orders",
+      "csv": "sku,warehouse,amount\n001,W1,0.10\n001,W1,0.20\n002,W2,1.25\nX,W1,2.50\n"
+    },
+    {
+      "name": "catalog",
+      "csv": "code,site,category\n001,W1,食品\n002,W2,图书\n"
+    }
+  ],
+  "job": {
+    "version": 1,
+    "sources": [
+      "orders",
+      "catalog"
+    ],
+    "stages": [
+      {
+        "name": "enriched",
+        "kind": "join",
+        "left": "orders",
+        "right": "catalog",
+        "spec": {
+          "left_keys": [
+            "sku",
+            "warehouse"
+          ],
+          "right_keys": [
+            "code",
+            "site"
+          ],
+          "indicator": "catalog_match"
+        }
+      },
+      {
+        "name": "totals",
+        "kind": "transform",
+        "source": "enriched",
+        "pipeline": {
+          "version": 2,
+          "columns": [
+            "sku",
+            "warehouse",
+            "amount",
+            "category",
+            "catalog_match"
+          ],
+          "steps": [
+            [
+              "aggregate",
+              [
+                "category",
+                "catalog_match"
+              ],
+              [
+                [
+                  "total",
+                  "sum_decimal",
+                  "amount"
+                ],
+                [
+                  "orders",
+                  "count"
+                ]
+              ]
+            ]
+          ]
+        }
+      }
+    ],
+    "output": "totals"
+  },
+  "expected": {
+    "columns": [
+      "category",
+      "catalog_match",
+      "total",
+      "orders"
+    ],
+    "rows": [
+      [
+        "食品",
+        "both",
+        "0.3",
+        "2"
+      ],
+      [
+        "图书",
+        "both",
+        "1.25",
+        "1"
+      ],
+      [
+        "",
+        "left_only",
+        "2.5",
+        "1"
+      ]
+    ]
+  }
+}

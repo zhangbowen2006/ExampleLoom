@@ -50,6 +50,11 @@ jobs:
           node scripts/table-probe-test.mjs
           node scripts/assisted-diagnostic.mjs
           node scripts/audit-remaining.mjs
+          node scripts/multisource-test.mjs
+          python3 scripts/generate-decimal-oracle.py
+          node scripts/decimal-test.mjs
+          node scripts/confirmed-test.mjs
+          node scripts/data-job-test.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs
           node scripts/public-data-test.mjs
@@ -94,6 +99,8 @@ jobs:
           node scripts/table-comparison-browser-test.mjs
           node scripts/table-probe-browser-test.mjs
           node scripts/sorting-browser-test.mjs
+          node scripts/confirmed-browser-test.mjs
+          node scripts/data-job-browser-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,111 @@
+{
+  "title": "库存和目录全连接对账",
+  "description": "保留两侧未匹配记录，空键不匹配，来源状态区分缺失和真实空值。",
+  "sources": [
+    {
+      "name": "inventory",
+      "csv": "sku,qty\n001,10\n002,0\n,3\n"
+    },
+    {
+      "name": "catalog",
+      "csv": "item,title\n001,文具\n003,新商品\n,空白标签\n"
+    }
+  ],
+  "job": {
+    "version": 1,
+    "sources": [
+      "inventory",
+      "catalog"
+    ],
+    "stages": [
+      {
+        "name": "reconciled",
+        "kind": "join",
+        "left": "inventory",
+        "right": "catalog",
+        "spec": {
+          "left_keys": [
+            "sku"
+          ],
+          "right_keys": [
+            "item"
+          ],
+          "kind": "full",
+          "indicator": "match"
+        }
+      },
+      {
+        "name": "report",
+        "kind": "transform",
+        "source": "reconciled",
+        "pipeline": {
+          "version": 2,
+          "columns": [
+            "sku",
+            "qty",
+            "title",
+            "match"
+          ],
+          "steps": [
+            [
+              "select",
+              [
+                "sku",
+                "title",
+                "qty",
+                "match"
+              ],
+              [
+                "sku",
+                "title",
+                "qty",
+                "status"
+              ]
+            ]
+          ]
+        }
+      }
+    ],
+    "output": "report"
+  },
+  "expected": {
+    "columns": [
+      "sku",
+      "title",
+      "qty",
+      "status"
+    ],
+    "rows": [
+      [
+        "001",
+        "文具",
+        "10",
+        "both"
+      ],
+      [
+        "002",
+        "",
+        "0",
+        "left_only"
+      ],
+      [
+        "",
+        "",
+        "3",
+        "left_only"
+      ],
+      [
+        "003",
+        "新商品",
+        "",
+        "right_only"
+      ],
+      [
+        "",
+        "空白标签",
+        "",
+        "right_only"
+      ]
+    ]
+  }
+}

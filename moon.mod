@@ -1,6 +1,6 @@
 name = "zhangbowen2006/exampleloom"
 
-version = "0.12.0"
+version = "0.13.0"
 
 readme = "README.md"
 
@@ -14,6 +14,6 @@ keywords = [
   "data-transformation",
 ]
 
-description = "Bounded example-guided string and table program synthesis, conditional expressions, regex captures and portable pipelines in MoonBit."
+description = "Bounded example-guided transformations and explicit multi-source jobs with exact decimal aggregates in MoonBit."
 
 preferred_target = "wasm-gc"

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { readFile, writeFile } from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
+import { readFile, writeFile, rename, rm, open } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, basename } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const help = `ExampleLoom — examples to portable string and table programs
@@ -16,6 +17,8 @@ node bin/exampleloom.mjs probe-table --data training.csv --report candidates.jso
 node bin/exampleloom.mjs execute-table --data next.csv --report candidates.json --out checked.csv
 node bin/exampleloom.mjs pipeline --report candidates.json --choose 0 --out pipeline.json
 node bin/exampleloom.mjs transform --data next.csv --pipeline pipeline.json --out result.csv
+node bin/exampleloom.mjs validate-job --job task.json --out checked-task.json
+node bin/exampleloom.mjs run-job --job task.json --sources files.json --out result.csv
 node bin/exampleloom.mjs run request.json
 
 Examples: [{"row":0,"output":"0012"},{"row":1,"output":"0081"}]
@@ -38,7 +41,7 @@ try {
       if (!/^--[a-z]+$/.test(args[i]) || args[i + 1] == null || args[i + 1].startsWith('--')) throw new Error('Expected --flag value pairs');
       const key = args[i].slice(2);
       if (Object.hasOwn(flags, key)) throw new Error(`Duplicate flag: ${key}`);
-      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs','intent','layouts'].includes(key)) throw new Error(`Unknown flag: ${key}`);
+      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs','intent','layouts','job','sources'].includes(key)) throw new Error(`Unknown flag: ${key}`);
       flags[key] = args[i + 1];
     }
   }
@@ -48,12 +51,29 @@ try {
   const readTable = (key='data') => readTableFile(requireFlag(key));
   const emit = async value => {
     const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2) + '\n';
-    if (flags.out) { await writeFile(flags.out, text, 'utf8'); console.error(`Wrote ${resolve(flags.out)}`); }
+    if (flags.out) {
+      const target=resolve(flags.out),temporary=resolve(dirname(target),'.'+basename(target)+'.'+randomUUID()+'.tmp');
+      let created=false;
+      try {const file=await open(temporary,'wx');created=true;try {await file.writeFile(text,'utf8');}finally{await file.close();}await rename(temporary,target);created=false;}
+      finally {if(created)await rm(temporary,{force:true});}
+      console.error(`Wrote ${target}`);
+    }
     else process.stdout.write(text);
   };
   if (command === 'run') {
     if (args.length !== 1) throw new Error('run requires one request JSON file');
     await emit(request(await readJson(args[0])));
+  } else if(command==='validate-job') {
+    await emit(request({op:'validate_data_job',job:await readJson(requireFlag('job'))}).job);
+  } else if(command==='run-job') {
+    const job=await readJson(requireFlag('job')),bindings=await readJson(requireFlag('sources'));
+    if(!Array.isArray(bindings)||bindings.length<1||bindings.length>8)throw new Error('Expected 1..8 named source files');
+    const directory=dirname(resolve(flags.sources)),sources=[];
+    for(const binding of bindings){
+      if(!binding||Object.keys(binding).some(k=>!['name','file'].includes(k))||typeof binding.name!=='string'||typeof binding.file!=='string'||!binding.file)throw new Error('Each binding requires name and file');
+      sources.push({name:binding.name,table:await readTableFile(resolve(directory,binding.file))});
+    }
+    const result=request({op:'run_data_job',job,sources});await emit(result.csv);console.error(`Completed ${result.completed_stages} explicit stages.`);
   } else if (command === 'learn') {
     const table = await readTable();
     const labels = await readJson(requireFlag('examples'));

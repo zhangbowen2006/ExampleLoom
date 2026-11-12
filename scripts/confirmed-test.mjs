@@ -25,4 +25,4 @@ assert.notEqual(cli().status,0);assert.equal(await readFile('artifacts/confirmed
 const selected=cli('--choose','1');assert.equal(selected.status,0,selected.stderr);assert.match(selected.stderr,/explicit_choice/);
 assert.equal(await readFile('artifacts/confirmed/result.csv','utf8'),explicit.csv);
 await writeFile('artifacts/confirmed-results.json',JSON.stringify({timestamp:new Date().toISOString(),checks:['all retained programs on the complete batch','no error candidate dropped','independent new-batch check','strict no-target request','explicit zero-based choice','real CLI failure preserves prior artifact'],source:'Constructed checks, not a guarantee of unknown input correctness.'},null,2)+'\n');
-console.log('Confirmed execution API/CLI agreement, failure and atomic artifact checks passed.');
+console.log('Confirmed execution API/CLI agreement, failure and validation-failure artifact preservation checks passed.');

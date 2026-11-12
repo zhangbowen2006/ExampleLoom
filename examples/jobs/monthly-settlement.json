@@ -1,0 +1,93 @@
+{
+  "title": "合并不同月份列布局的供应商结算",
+  "description": "按名称对齐额外备注列，保留月份来源，再按供应商和币种精确汇总。",
+  "sources": [
+    {
+      "name": "jan",
+      "csv": "supplier,currency,amount\nS1,CNY,0.1\nS2,USD,9007199254740993.01\n"
+    },
+    {
+      "name": "feb",
+      "csv": "amount,currency,supplier,memo\n0.2,CNY,S1,补款\n-0.01,USD,S2,调整\n"
+    }
+  ],
+  "job": {
+    "version": 1,
+    "sources": [
+      "jan",
+      "feb"
+    ],
+    "stages": [
+      {
+        "name": "months",
+        "kind": "concat",
+        "sources": [
+          "jan",
+          "feb"
+        ],
+        "spec": {
+          "mode": "union",
+          "source_column": "month"
+        }
+      },
+      {
+        "name": "totals",
+        "kind": "transform",
+        "source": "months",
+        "pipeline": {
+          "version": 2,
+          "columns": [
+            "supplier",
+            "currency",
+            "amount",
+            "memo",
+            "month"
+          ],
+          "steps": [
+            [
+              "aggregate",
+              [
+                "supplier",
+                "currency"
+              ],
+              [
+                [
+                  "total",
+                  "sum_decimal",
+                  "amount"
+                ],
+                [
+                  "records",
+                  "count"
+                ]
+              ]
+            ]
+          ]
+        }
+      }
+    ],
+    "output": "totals"
+  },
+  "expected": {
+    "columns": [
+      "supplier",
+      "currency",
+      "total",
+      "records"
+    ],
+    "rows": [
+      [
+        "S1",
+        "CNY",
+        "0.3",
+        "2"
+      ],
+      [
+        "S2",
+        "USD",
+        "9007199254740993",
+        "2"
+      ]
+    ]
+  }
+}

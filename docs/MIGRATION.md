@@ -1,4 +1,4 @@
-# v0.12.0 迁移说明
+# v0.13.0 迁移说明
 
 旧行配方v1、表格管道v2编码继续可读，默认自动学习仍为`infer`。新增操作需新引擎执行；旧引擎会拒绝未知操作。
 
@@ -11,3 +11,7 @@
 ## v0.12 新增
 
 公开 TableStep 增加 NormalizeLayouts；原生穷举匹配需新增分支。LayoutRule、synthesize_table_with_layouts 与 propose_table_input 为新公开接口。旧管道格式可继续读取；新规范化操作只能位于首步，其 Pipeline.columns 为历史输入元数据，由显式规则按名称绑定实际源列。规则不自动学习，新增源列不隐式保留。详见 [v0.12协议与边界](V012.md#接口与边界)。
+
+## v0.13 新增
+
+GroupMetric 增加 SumDecimal/MinDecimal/MaxDecimal；下游穷举匹配需加分支。旧Int64指标和旧JSON配方继续支持。新增 JoinSpec、UnionSpec、DataJob及确认式执行API，均可独立使用，不要求现有用户迁移到多源任务。详细合同与限制见 [v0.13](V013.md)。
