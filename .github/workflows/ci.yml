@@ -65,6 +65,7 @@ jobs:
           node scripts/audit-table-order.mjs
           python3 scripts/import-autotables.py
           node scripts/autotables-benchmark.mjs
+          TABLE_INTENT=transpose_all AUTO_BENCHMARK_RESULTS=artifacts/autotables/assisted.json node scripts/autotables-benchmark.mjs
       - name: External string-task benchmark
         run: |
           python3 scripts/import-sygus.py

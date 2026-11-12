@@ -16,9 +16,10 @@
 | 条件及正则 | 已列明的条件、捕获、替换、有界断言、反向引用；[范围](REGEX_PROFILE.md)不宣称完整PCRE或自动发明任意正则 |
 | 单表及多批学习 | 有界单表结构程序及小数聚合学习；多表学习支持有限一或两个等值连接键和一步后续操作，按名合表及规范化规则仍需显式声明 |
 | 多源实际功能 | 多键连接、按名合表、匹配/来源标记和DataJob；有限多表搜索及两个构造案例见[关联学习](JOIN_LEARNING.md)，既有[多源场景](V013.md) |
-| 发布与测试 | v0.13.0四后端各175项测试，[CI](https://github.com/zhangbowen2006/ExampleLoom/actions/runs/43241617005)已通过；全新Mooncakes消费项目三后端各29项。最新补丁见[CI](https://github.com/zhangbowen2006/ExampleLoom/actions)和[版本](https://github.com/zhangbowen2006/ExampleLoom/releases) |
+| 发布与测试 | v0.14.0本地 js、wasm、wasm-gc 各180项测试通过；四后端及浏览器以最新[CI](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。v0.13.0四后端各175项及独立包消费项目三后端各29项已通过；最新版包发布与消费测试见[版本](https://github.com/zhangbowen2006/ExampleLoom/releases) |
 | 独立验证 | 500组连接、250组合表、350组高精度小数、PCRE2构造对照及真实Worker流程；不等于外部盲测或客户采用 |
-| 原始外部评估 | 自动首选198/225、事后候选上界211/225、仍27道未通过。[逐题记录](evidence/v0130-benchmark.json)；辅助13/13另列 |
+| 原始外部评估 | 本机v0.14.0自动首选198/225、事后候选上界211/225、仍27道未通过。[逐题记录](evidence/v0140-benchmark.json)；辅助13/13另列 |
+| 新增外部任务 | Auto-Tables 转置28题：自动首选0/28，明确指定转置后23/28，5题超过列数上限；任务已用于开发，探针由本项目合成，非盲测。[复现与逐题结果](TRANSPOSE_EVALUATION.md) |
 | 来源与许可 | 主体MIT，附带采用并修改的Apache-2.0正则及NOTICE；数据与成熟系统参考均披露。[来源](RESEARCH.md)、[本轮比较](V013.md) |
 
 ## 本人仍须处理

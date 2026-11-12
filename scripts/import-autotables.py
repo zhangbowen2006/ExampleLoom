@@ -40,6 +40,9 @@ with zipfile.ZipFile(io.BytesIO(data)) as z:
             # rows, not a second upstream gold example or real user validation.
             changed=[['probe:'+v for v in row] for row in rows[:min(4,len(rows))]]
             changed.append(['new:'+v for v in rows[-1]])
+            if len(changed)==len(rows):
+                changed.append(['extra:'+v for v in rows[0]])
+            assert len(changed)!=len(rows), 'Probe must change the source row count'
             heldout=[list(row) for row in zip(*changed)]
             entry.update(input=rows,output=expected,holdout=changed,holdout_output=heldout,
                          upstream_matches_transpose=(expected==[list(row) for row in zip(*rows)]))

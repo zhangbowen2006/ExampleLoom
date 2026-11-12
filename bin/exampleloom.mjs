@@ -25,6 +25,7 @@ node bin/exampleloom.mjs run request.json
 
 Examples: [{"row":0,"output":"0012"},{"row":1,"output":"0081"}]
 --format csv|jsonl overrides extension inference. JSON reports go to stdout if --out is absent.
+--intent infer|flatten_all|transpose_all lets learn-table check a user-specified whole-table operation.
 --choose is explicit: candidate rank is not confidence. CSV export stops if any row fails.
 Saved recipes can contain several output fields; the workbench can construct them interactively.`;
 const args = process.argv.slice(2);

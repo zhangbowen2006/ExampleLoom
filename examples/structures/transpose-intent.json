@@ -1,0 +1,9 @@
+{
+  "title": "明确选择整表转置",
+  "description": "表格方向需要整体交换时，使用者明确选择转置；训练样例必须与该意图一致，再检查另一批行数不同的数据。",
+  "intent": "transpose_all",
+  "input": "c0,c1\nA,B\nC,D\n",
+  "target": "c0,c1\nA,C\nB,D\n",
+  "next": "c0,c1\nX,Y\nZ,Q\nM,N\n",
+  "expected": {"columns":["c0","c1","c2"],"rows":[["X","Z","M"],["Y","Q","N"]]}
+}

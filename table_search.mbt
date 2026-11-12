@@ -419,8 +419,8 @@ fn validate_table_search_config(
   patterns : Array[String],
   intent : String,
 ) -> Unit raise LoomError {
-  if intent != "infer" && intent != "flatten_all" {
-    raise LoomError("table intent must be infer or flatten_all")
+  if intent != "infer" && intent != "flatten_all" && intent != "transpose_all" {
+    raise LoomError("table intent must be infer, flatten_all or transpose_all")
   }
   if options.max_depth < 0 ||
     options.max_depth > 6 ||
@@ -459,7 +459,13 @@ pub fn synthesize_table(
   for e in examples {
     validate_table(e.before)
     validate_table(e.after)
-    if e.before.rows.length() > 128 ||
+    if intent == "transpose_all" {
+      // This path checks exactly one operation rather than exploring states.
+      // The transpose result itself is still limited to 64 columns.
+      if e.before.rows.length() > 64 || e.after.rows.length() > 64 {
+        raise LoomError("transpose training limit: 64 rows and 64 columns")
+      }
+    } else if e.before.rows.length() > 128 ||
       e.after.rows.length() > 512 ||
       e.before.columns.length() > 16 ||
       e.after.columns.length() > 32 {
@@ -473,8 +479,9 @@ pub fn synthesize_table(
   }
   let inputs = examples.map(e => e.before)
   let targets = examples.map(e => e.after)
-  if intent == "flatten_all" {
-    let p : Pipeline = { columns: inputs[0].columns, steps: [FlattenRows], }
+  if intent == "flatten_all" || intent == "transpose_all" {
+    let step = if intent == "flatten_all" { FlattenRows } else { Transpose }
+    let p : Pipeline = { columns: inputs[0].columns, steps: [step], }
     let within = options.max_depth >= 1
     let matches = within &&
       examples.all(e => {

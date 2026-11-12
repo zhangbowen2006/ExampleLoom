@@ -21,7 +21,7 @@ for(const name of ['conditional','regex','rewrite','initials','normalize','atomi
   assert.deepEqual(applied.rows.map(r=>r.values[0]),field.expected,name);
   evidence.scenarios.push({name,selected:report.candidates[0].description,training:field.labels.length,heldout:table.rows.length-field.labels.length,all_values_match:true});
 }
-for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts','key-value-records','flatten-batch','sparse-names','flatten-intent','optional-parts','layout-people','layout-inventory','layout-readings']){
+for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts','key-value-records','flatten-batch','sparse-names','flatten-intent','transpose-intent','optional-parts','layout-people','layout-inventory','layout-readings']){
   const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
   const input=parse(demo.input), output=parse(demo.target);
   const extra=(demo.additional??[]).map(pair=>({input:parse(pair.input),output:parse(pair.target)}));

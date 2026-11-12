@@ -5,7 +5,9 @@ const run=q=>{const r=JSON.parse(handle(JSON.stringify(q)));if(!r.ok)throw new E
 const grid=rows=>({columns:Array.from({length:rows[0].length},(_,i)=>`c${i}`),rows});
 try{
  const task=workerData.task,input=grid(task.input),output=grid(task.output);
- const start=performance.now();const report=run({op:'synthesize_table',examples:[{input,output}],options:{max_depth:4,max_states:128,max_evaluations:2000,max_candidates:8}});const ms=performance.now()-start;
+ const query={op:'synthesize_table',examples:[{input,output}],options:{max_depth:4,max_states:128,max_evaluations:2000,max_candidates:8}};
+ if(workerData.intent)query.intent=workerData.intent;
+ const start=performance.now();const report=run(query);const ms=performance.now()-start;
  const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
  for(const c of report.candidates)if(!equal(run({op:'transform',pipeline:c.pipeline,table:input}).table,output))throw new Error('Returned candidate does not replay training');
  // The derived probe and expected output are used only after the ranking exists.
