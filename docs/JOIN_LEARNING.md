@@ -25,4 +25,4 @@ CLI格式：`learn-join --pairs pairs.json --out report.json`；`job --report re
 
 [PROSE](https://www.microsoft.com/en-us/research/project/prose-framework/) 提供从示例合成受DSL约束程序的框架；[Foofah](https://github.com/umich-dbgroup/foofah)提供示例驱动的数据转换合成；[PATSQL](https://github.com/NAIST-SE/PATSQL)提供由示例推导 SQL。这里参考其问题定义，独立实现有限 MoonBit 候选搜索和原 DataJob 重放；没有移植三者代码，也没有宣称覆盖其完整语言、SQL或算法创新。三者在输入、DSL及运行环境上存在差异；若未在相同任务和环境实际运行，不给出跨工具性能结论。
 
-原 Foofah 单表任务口径保持不变，198/225 是历史单表首候选结果；多表构造案例的测试结果不能加到该分子或分母。多表结果与真实用户采用、盲测及比赛审核均为不同问题。
+原 Foofah 单表任务口径保持不变，v0.14 本机复测首候选仍为198/225；多表构造案例的测试结果不能加到该分子或分母。多表结果与真实用户采用、盲测及比赛审核均为不同问题。
