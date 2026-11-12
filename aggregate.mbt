@@ -189,8 +189,11 @@ fn aggregate_witnesses(
   // Every supported numeric result has a canonical base-ten representation.
   if !target.rows.all(r => {
       let value = r[width - 1]
-      try decimal_text(exact_decimal(decimal_order(value))) == value catch {
-        _ => false
+      try decimal_cell(value).to_string() == value catch {
+        _ =>
+          try decimal_text(exact_decimal(decimal_order(value))) == value catch {
+            _ => false
+          }
       }
     }) {
     return (result, false)
@@ -223,16 +226,16 @@ fn aggregate_witnesses(
           let index = column_index(t, col) catch { _ => return false }
           t.rows.any(row => {
             try {
-              ignore(decimal_order(row[index]))
-              row[index].contains(".") ||
-              (try {
-                ignore(decimal_cell(row[index]))
-                false
-              } catch {
-                _ => true
-              })
+              ignore(decimal_cell(row[index]))
+              false
             } catch {
-              _ => false
+              _ =>
+                try {
+                  ignore(decimal_order(row[index]))
+                  true
+                } catch {
+                  _ => false
+                }
             }
           })
         })
