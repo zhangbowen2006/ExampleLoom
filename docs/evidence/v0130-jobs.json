@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-11-12T14:50:42.581Z",
+  "engine_sha256": "c66190f2942de7e3610489f7881e4e67e5030d07e364caadff7c6fecd977a68d",
+  "results": [
+    {
+      "name": "product-enrichment",
+      "stages": 2,
+      "rows": 3,
+      "api": true,
+      "real_cli": true,
+      "reordered_sources": true
+    },
+    {
+      "name": "monthly-settlement",
+      "stages": 2,
+      "rows": 2,
+      "api": true,
+      "real_cli": true,
+      "reordered_sources": true
+    },
+    {
+      "name": "catalogue-reconcile",
+      "stages": 2,
+      "rows": 5,
+      "api": true,
+      "real_cli": true,
+      "reordered_sources": true
+    }
+  ],
+  "methodology": "Three complete constructed multi-source workflows, explicit specifications rather than learned joins. No external adoption or blind-evaluation claim."
+}

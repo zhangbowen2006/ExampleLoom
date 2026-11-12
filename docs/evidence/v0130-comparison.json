@@ -1,0 +1,41 @@
+{
+  "baseline_engine_sha256": "79bbba7c263f6a5637c2baaaee01ff164166aaba500c58ea095784fc47dd7b87",
+  "current_engine_sha256": "c66190f2942de7e3610489f7881e4e67e5030d07e364caadff7c6fecd977a68d",
+  "current_source_commit": "04bc9370dec0a41a66073f9d9ddc019182b672ea",
+  "baseline_summary": {
+    "tasks": 250,
+    "families": 50,
+    "holdout_available": 225,
+    "missing_holdout_gold": 25,
+    "reference_conflicts": 0,
+    "training_solved": 242,
+    "top1_holdout": 198,
+    "any_holdout": 211,
+    "timeouts": 0,
+    "errors": 5,
+    "unexpected_errors": 0,
+    "truncated": 245,
+    "p50_ms": 63.59530000000086,
+    "p95_ms": 99.63540000000285,
+    "max_ms": 132.80330000000004
+  },
+  "current_summary": {
+    "tasks": 250,
+    "families": 50,
+    "holdout_available": 225,
+    "missing_holdout_gold": 25,
+    "reference_conflicts": 0,
+    "training_solved": 242,
+    "top1_holdout": 198,
+    "any_holdout": 211,
+    "timeouts": 0,
+    "errors": 5,
+    "unexpected_errors": 0,
+    "truncated": 245,
+    "p50_ms": 104.5028999999995,
+    "p95_ms": 204.71529999999984,
+    "max_ms": 333.4874999999993
+  },
+  "top1_regressed": [],
+  "methodology": "Same pinned corpus and evaluator. Historical v0.12 evidence is not a paired timing experiment; do not claim speedup from these timings. Original labels and denominator remain unchanged."
+}

@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-11-12T14:50:41.448Z",
+  "engine_sha256": "c66190f2942de7e3610489f7881e4e67e5030d07e364caadff7c6fecd977a68d",
+  "constructed_join_cases": 500,
+  "constructed_concat_cases": 250,
+  "methodology": "Fixed-seed constructed tables checked against separate nested-loop join and by-name alignment references. This is not external or blind evaluation."
+}

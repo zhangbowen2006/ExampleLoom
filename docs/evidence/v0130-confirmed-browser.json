@@ -1,0 +1,9 @@
+{
+  "browser": "157.0.4341.46",
+  "checks": [
+    "Observed batch consensus exports without silently selecting or saving a program.",
+    "Different new-batch predictions block unattended export.",
+    "An in-flight old consensus cannot restore export after a batch edit.",
+    "Explicit user selection remains available for a disagreeing batch."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-11-12T14:45:52.720Z",
+  "browser": "157.0.4341.46",
+  "checks": [
+    "product-enrichment: real Worker, complete expected rows, downloaded CSV and saved/reloaded task.",
+    "monthly-settlement: real Worker, complete expected rows, downloaded CSV and saved/reloaded task.",
+    "catalogue-reconcile: real Worker, complete expected rows, downloaded CSV and saved/reloaded task.",
+    "Duplicate master keys fail without partial export.",
+    "An edited source invalidates an in-flight result.",
+    "Cancel terminates the Worker; retry starts a new Worker and succeeds.",
+    "Dirty or invalid configurations cannot reuse old task results.",
+    "390px page fits and sends no source data off-origin."
+  ]
+}

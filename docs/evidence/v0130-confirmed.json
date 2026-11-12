@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-11-12T14:50:41.905Z",
+  "checks": [
+    "all retained programs on the complete batch",
+    "no error candidate dropped",
+    "independent new-batch check",
+    "strict no-target request",
+    "explicit zero-based choice",
+    "real CLI failure preserves prior artifact"
+  ],
+  "source": "Constructed checks, not a guarantee of unknown input correctness."
+}
