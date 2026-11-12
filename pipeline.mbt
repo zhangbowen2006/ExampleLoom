@@ -76,6 +76,13 @@ pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
     UpdateColumns(r) => Json::array([Json("update_columns"), recipe_to_json(r)])
     SplitColumn(name, sep, names) =>
       Json::array([Json("split_column"), Json(name), Json(sep), Json(names)])
+    SplitColumnPadded(name, sep, names) =>
+      Json::array([
+        Json("split_column_padded"),
+        Json(name),
+        Json(sep),
+        Json(names),
+      ])
     Explode(name, sep) => Json::array([Json("explode"), Json(name), Json(sep)])
     Unpivot(keys, values, variable, value_name) =>
       Json::array([
@@ -139,6 +146,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     | "carry_context" => 3
     "melt" => 6
     "split_column"
+    | "split_column_padded"
     | "fold"
     | "pivot_grid"
     | "pivot_records"
@@ -181,6 +189,8 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
       )
     "pivot_grid" => PivotGrid(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
     "pivot_records" => PivotRecords(j_text(a[1]), j_text(a[2]), j_text(a[3]))
+    "split_column_padded" =>
+      SplitColumnPadded(j_text(a[1]), j_text(a[2]), json_strings(a[3]))
     "combine_columns" =>
       CombineColumns(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
     "segment_rows" => {
@@ -323,7 +333,7 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     Filter(c) => ignore(condition_to_json(c))
     MapRows(r) => ignore(recipe_to_json(r))
     UpdateColumns(r) => ignore(recipe_to_json(r))
-    SplitColumn(col, sep, output) => {
+    SplitColumn(col, sep, output) | SplitColumnPadded(col, sep, output) => {
       names([col], false)
       separator(sep)
       names(output, false)

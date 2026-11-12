@@ -136,6 +136,17 @@ fn structural_neighbors(
         continue
       }
       result.push(Explode(col, sep))
+      let desired = target.columns.length() - table.columns.length() + 1
+      let counts = table.rows.map(row => row[i].split(sep).count())
+      if desired >= 2 &&
+        desired <= 8 &&
+        counts.all(n => n <= desired) &&
+        counts.any(n => n < desired) &&
+        counts.any(n => n == desired) {
+        result.push(
+          SplitColumnPadded(col, sep, Array::makei(desired, j => "\{col}_\{j}")),
+        )
+      }
       let count = if table.rows.is_empty() {
         0
       } else {

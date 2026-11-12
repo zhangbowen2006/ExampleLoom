@@ -42,6 +42,57 @@ test "whole table flattening uses the new batch size and preserves cells" {
 }
 
 ///|
+test "padded split retains empty fields and rejects excess fields" {
+  let t : Table = {
+    columns: ["id", "parts"],
+    rows: [["1", "a;"], ["2", "😀"], ["3", "甲;;乙"]],
+  }
+  let p : Pipeline = {
+    columns: t.columns,
+    steps: [SplitColumnPadded("parts", ";", ["a", "b", "c"])],
+  }
+  assert_eq(apply_pipeline(pipeline_from_json(pipeline_to_json(p)), t).rows, [
+    ["1", "a", "", ""],
+    ["2", "😀", "", ""],
+    ["3", "甲", "", "乙"],
+  ])
+  assert_true(
+    try {
+      ignore(transform_table(t, [SplitColumn("parts", ";", ["a", "b", "c"])]))
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+  assert_true(
+    try {
+      ignore(apply_pipeline(p, { ..t, rows: [["4", "a;b;c;d"]], }))
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+}
+
+///|
+test "padded split learning requires observed optional fields" {
+  let before : Table = {
+    columns: ["parts"],
+    rows: [["A;B;C"], ["D"], ["E;F"]],
+  }
+  let after : Table = {
+    columns: ["a", "b", "c"],
+    rows: [["A", "B", "C"], ["D", "", ""], ["E", "F", ""]],
+  }
+  let r = synthesize_table([{ before, after, }])
+  assert_true(!r.candidates.is_empty())
+  assert_eq(
+    apply_pipeline(r.candidates[0], { ..before, rows: [["G;H"], ["I"]], }).rows,
+    [["G", "H", ""], ["I", "", ""]],
+  )
+}
+
+///|
 test "explicit whole table intent is checked rather than inferred from holdout" {
   let t : Table = { columns: ["c0"], rows: [["A"], ["B"]], }
   let target : Table = { columns: ["c0", "c1"], rows: [["A", "B"]], }

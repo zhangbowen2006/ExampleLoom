@@ -275,6 +275,7 @@ pub(all) enum TableStep {
   MapRows(Recipe)
   UpdateColumns(Recipe)
   SplitColumn(String, String, Array[String])
+  SplitColumnPadded(String, String, Array[String])
   Explode(String, String)
   Unpivot(Array[String], Array[String], String, String)
   Fold(Array[String], Array[String], String)

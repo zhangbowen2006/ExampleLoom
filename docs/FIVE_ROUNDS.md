@@ -17,3 +17,7 @@
 ## 第三轮：显式意图约束
 
 参考PROSE的语言空间约束思路（https://www.microsoft.com/en-us/research/project/prose-framework/tutorial/），独立实现infer/flatten_all选择；没有引入SDK。native、JSON、CLI和真实网页共同使用该约束，全部训练一致才返回程序，非法意图和预算超限有明确结果。3后端各150项、26项高级浏览器检查通过；默认完整基准198/225，未修改评分或使用显式意图夸大自动成绩。
+
+## 第四轮：可选字段补空拆列
+
+参考Foofah的split语义，增加显式SplitColumnPadded；学习只在训练中实际出现短行和满宽字段时提出。保留Unicode、尾分隔符和空片，多余字段报错而非截断；旧strict不变。三后端各152项、27项高级浏览器流程通过，完整Foofah198/225无既有通过回退。

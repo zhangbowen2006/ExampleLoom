@@ -9,6 +9,7 @@ pub(all) enum TableStep {
   MapRows(Recipe)
   UpdateColumns(Recipe)
   SplitColumn(String, String, Array[String])
+  SplitColumnPadded(String, String, Array[String])
   Explode(String, String)
   Unpivot(Array[String], Array[String], String, String)
   Fold(Array[String], Array[String], String)
@@ -154,7 +155,8 @@ fn apply_step_unchecked(
       }
       { columns: table.columns.copy(), rows, }
     }
-    SplitColumn(name, separator, names) => {
+    SplitColumn(name, separator, names)
+    | SplitColumnPadded(name, separator, names) => {
       if separator.is_empty() || separator.char_length() > 16 {
         raise LoomError("split requires a literal separator of 1..16 chars")
       }
@@ -172,8 +174,13 @@ fn apply_step_unchecked(
       validate_columns(columns)
       let rows = table.rows.map(row => {
         let parts = row[col].split(separator).map(v => v.to_owned()).collect()
-        if parts.length() != names.length() {
+        let padded = step is SplitColumnPadded(_, _, _)
+        if parts.length() > names.length() ||
+          (!padded && parts.length() != names.length()) {
           raise LoomError("split row has unexpected number of fields")
+        }
+        while parts.length() < names.length() {
+          parts.push("")
         }
         let result : Array[String] = []
         for i, value in row {

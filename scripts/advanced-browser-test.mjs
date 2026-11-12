@@ -26,7 +26,7 @@ try{
     checks.push(`${name}: real Worker learning, top1 program, all held-out rows and stale-hint invalidation`);
   }
   await page.goto(base+'/structure.html');
-  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts','key-value-records','flatten-batch','sparse-names','flatten-intent']){
+  for(const name of ['unpivot','records','melt','dynamic-pivot','header-details','labelled-grid','mixed-tags','regional-totals','record-grid','variable-records','context-metrics','labelled-contacts','key-value-records','flatten-batch','sparse-names','flatten-intent','optional-parts']){
     const demo=JSON.parse(await readFile(`examples/structures/${name}.json`,'utf8'));
     await page.locator(`[data-table-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn').disabled);
     await page.locator('#learn').click();await page.locator('[data-table-choose="0"]').waitFor();await page.locator('[data-table-choose="0"]').click();

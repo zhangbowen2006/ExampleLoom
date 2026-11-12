@@ -58,6 +58,7 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       GroupRows(_, _) => 9
       Aggregate(_, measures) => 11 + measures.length()
       SplitColumn(_, _, _) | Explode(_, _) => 7
+      SplitColumnPadded(_, _, _) => 9
       CombineColumns(names, sep, _) => 5 + names.length() + sep.char_length()
       // A witnessed start marker states where records begin. Prefer that
       // reusable boundary over guessing a fixed record size from one block.

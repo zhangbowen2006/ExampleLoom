@@ -4,6 +4,8 @@ The exported `handle(request: String) -> String` always returns JSON. Ordinary i
 
 ## Explicit table intent (maintenance round 3)
 
+`["split_column_padded", column, literalSeparator, outputNames]` is an explicit alternative to strict `split_column`. Short rows are padded with empty strings to the declared width; empty input, consecutive separators and a trailing separator retain their empty parts. Too many parts is an error, not truncation. The learner proposes the padded alternative only when the training table exhibits both short and full-width splits. The strict operator's behavior remains unchanged.
+
 `synthesize_table` accepts optional `intent: "infer" | "flatten_all"` (default `infer`). The latter is a user-declared restriction to exactly one `flatten_rows` operation, not a prediction from unlabelled data. It returns `intent_checked` only when the operation matches every training table, otherwise no candidates and `intent_inconsistent`. A depth budget of zero still prevents execution. This mode has no general search or hidden-answer selection. CLI: `learn-table --intent flatten_all`; the table workbench exposes the same explicit choice. The saved pipeline itself contains the operation and replays without the intent flag.
 
 `["flatten_rows"]` consumes all rows in row-major order, creates generic column names and preserves empty cells. Empty input or output wider than 64 columns is rejected. For inference without a declared intent, different-sized training batches can distinguish this operation from fixed-size packing; one observed block cannot in general do so.

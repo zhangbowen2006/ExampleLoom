@@ -1,0 +1,8 @@
+{
+ "title":"可选字段拆列",
+ "description":"名单的第二、第三个分号字段可缺省。用含完整与缺省字段的样例学习补空拆列；超过声明宽度仍报错。",
+ "input":"parts\nA;B;C\nD\nE;F\n",
+ "target":"a,b,c\nA,B,C\nD,,\nE,F,\n",
+ "next":"parts\n甲;😀\nI\nJ;;K\n",
+ "expected":{"columns":["a","b","c"],"rows":[["甲","😀",""],["I","",""],["J","","K"]]}
+}
