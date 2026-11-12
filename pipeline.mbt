@@ -42,6 +42,9 @@ pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
               SumInt64(s) => Json([m.name, "sum", s])
               MinInt64(s) => Json([m.name, "min", s])
               MaxInt64(s) => Json([m.name, "max", s])
+              SumDecimal(s) => Json([m.name, "sum_decimal", s])
+              MinDecimal(s) => Json([m.name, "min_decimal", s])
+              MaxDecimal(s) => Json([m.name, "max_decimal", s])
             }
           }),
         ),
@@ -262,6 +265,9 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
           [name, "sum", col] => { name, metric: SumInt64(col), }
           [name, "min", col] => { name, metric: MinInt64(col), }
           [name, "max", col] => { name, metric: MaxInt64(col), }
+          [name, "sum_decimal", col] => { name, metric: SumDecimal(col), }
+          [name, "min_decimal", col] => { name, metric: MinDecimal(col), }
+          [name, "max_decimal", col] => { name, metric: MaxDecimal(col), }
           _ => raise LoomError("invalid aggregate measure")
         }
       })
@@ -304,7 +310,12 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
       for m in measures {
         match m.metric {
           RowCount => ()
-          SumInt64(col) | MinInt64(col) | MaxInt64(col) => names([col], false)
+          SumInt64(col)
+          | MinInt64(col)
+          | MaxInt64(col)
+          | SumDecimal(col)
+          | MinDecimal(col)
+          | MaxDecimal(col) => names([col], false)
         }
       }
     }

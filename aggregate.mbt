@@ -4,6 +4,9 @@ pub(all) enum GroupMetric {
   SumInt64(String)
   MinInt64(String)
   MaxInt64(String)
+  SumDecimal(String)
+  MinDecimal(String)
+  MaxDecimal(String)
 }
 
 ///|
@@ -61,9 +64,20 @@ fn group_values(
   groups : Groups,
   metric : GroupMetric,
 ) -> Array[String] raise LoomError {
+  match metric {
+    SumDecimal(c) => return decimal_group_values(table, groups, c, "sum")
+    MinDecimal(c) => return decimal_group_values(table, groups, c, "min")
+    MaxDecimal(c) => return decimal_group_values(table, groups, c, "max")
+    _ => ()
+  }
   let values : Array[Int64] = Array::make(groups.keys.length(), 0L)
   let column = match metric {
-    MinInt64(s) | MaxInt64(s) | SumInt64(s) => Some(column_index(table, s))
+    MinInt64(s)
+    | MaxInt64(s)
+    | SumInt64(s)
+    | SumDecimal(s)
+    | MinDecimal(s)
+    | MaxDecimal(s) => Some(column_index(table, s))
     RowCount => None
   }
   let present = Array::make(groups.keys.length(), false)
@@ -90,6 +104,8 @@ fn group_values(
       }
       MinInt64(_) => if !present[id] || n < old { n } else { old }
       MaxInt64(_) => if !present[id] || n > old { n } else { old }
+      SumDecimal(_) | MinDecimal(_) | MaxDecimal(_) =>
+        raise LoomError("internal decimal dispatch mismatch")
     }
     present[id] = true
   }
@@ -108,16 +124,44 @@ fn aggregate_rows(
   keys : Array[String],
   measures : Array[Measure],
 ) -> Table raise LoomError {
+  let decimals = measures.any(m => {
+    m.metric is SumDecimal(_) ||
+    m.metric is MinDecimal(_) ||
+    m.metric is MaxDecimal(_)
+  })
+  if decimals {
+    validate_sources([table])
+  }
   let groups = key_groups(table, keys)
   let columns = keys + measures.map(m => m.name)
   check_growth(groups.keys.length(), columns.length())
+  let mut output_units = columns.fold(init=0, (n, s) => n + s.length())
+  if decimals {
+    for row in groups.keys {
+      for cell in row {
+        output_units += cell.length()
+      }
+    }
+  }
   for m in measures {
     let values = group_values(table, groups, m.metric)
     for i, row in groups.keys {
+      if decimals {
+        output_units += values[i].length()
+        if output_units > 2000000 {
+          raise LoomError(
+            "decimal aggregate output exceeds 2000000 UTF-16 units",
+          )
+        }
+      }
       row.push(values[i])
     }
   }
-  { columns, rows: groups.keys, }
+  let result : Table = { columns, rows: groups.keys, }
+  if decimals {
+    validate_sources([result])
+  }
+  result
 }
 
 ///|
@@ -145,7 +189,7 @@ fn aggregate_witnesses(
   // Every supported numeric result has a canonical base-ten representation.
   if !target.rows.all(r => {
       let value = r[width - 1]
-      try decimal_cell(value).to_string() == value catch {
+      try decimal_text(exact_decimal(decimal_order(value))) == value catch {
         _ => false
       }
     }) {
@@ -175,6 +219,26 @@ fn aggregate_witnesses(
     for col in table.columns {
       if !keys.contains(col) {
         pool.push_iter([SumInt64(col), MinInt64(col), MaxInt64(col)].iter())
+        let index = column_index(table, col) catch { _ => continue }
+        let has_decimal = table.rows.any(row => {
+          try {
+            ignore(decimal_order(row[index]))
+            row[index].contains(".") ||
+            (try {
+              ignore(decimal_cell(row[index]))
+              false
+            } catch {
+              _ => true
+            })
+          } catch {
+            _ => false
+          }
+        })
+        if has_decimal {
+          pool.push_iter(
+            [SumDecimal(col), MinDecimal(col), MaxDecimal(col)].iter(),
+          )
+        }
       }
     }
     let fits : Array[Array[Measure]] = Array::makei(width - k, _ => [])

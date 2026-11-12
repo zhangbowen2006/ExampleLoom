@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {handle} from '../dist/engine.js';
+const run=q=>{const r=JSON.parse(handle(JSON.stringify(q)));assert.equal(r.ok,true,r.error);return r;};
+const oracle=JSON.parse(await readFile('artifacts/decimal-oracle.json','utf8'));
+const pipeline={version:2,columns:['group','amount'],steps:[['aggregate',['group'],[['total','sum_decimal','amount'],['min','min_decimal','amount'],['max','max_decimal','amount'],['n','count']]]]};
+for(const [i,c] of oracle.cases.entries())assert.deepEqual(run({op:'transform',pipeline,table:c.input}).table,c.expected,`independent decimal case ${i}`);
+const input={columns:['group','amount'],rows:[['A','0.1'],['A','0.2'],['B','2.1'],['B','0.15']]};
+const output={columns:['group','total'],rows:[['A','0.3'],['B','2.25']]};
+const learned=run({op:'synthesize_table',examples:[{input,output}]});assert.ok(learned.candidates.length);
+assert.ok(learned.candidates[0].pipeline.steps.some(s=>s[0]==='aggregate'&&s[2].some(m=>m[1]==='sum_decimal')));
+const saved=run({op:'validate_pipeline',pipeline:learned.candidates[0].pipeline}).pipeline;
+assert.deepEqual(run({op:'transform',pipeline:saved,table:{...input,rows:[['Z','999.99'],['Z','0.01']]}}).table,{columns:['group','total'],rows:[['Z','1000']]});
+await writeFile('artifacts/decimal-results.json',JSON.stringify({timestamp:new Date().toISOString(),engine_sha256:JSON.parse(await readFile('dist/BUILD.json','utf8')).engine_sha256,reference:'Python Decimal, precision 1024, Inexact trapped',constructed_cases:oracle.cases.length,learned_new_batch:true,methodology:'Constructed independent references, not external or blind performance evaluation.'},null,2)+'\n');
+console.log(`${oracle.cases.length} independent exact Decimal group sum/min/max/count comparisons and learned new-batch workflow passed.`);

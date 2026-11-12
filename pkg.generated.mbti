@@ -159,6 +159,9 @@ pub(all) enum GroupMetric {
   SumInt64(String)
   MinInt64(String)
   MaxInt64(String)
+  SumDecimal(String)
+  MinDecimal(String)
+  MaxDecimal(String)
 }
 
 pub(all) struct JoinSpec {
