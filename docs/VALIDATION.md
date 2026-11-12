@@ -1,4 +1,17 @@
-# v0.11.0 验证记录
+# 当前验证：v0.13 系列
+
+v0.13.1只修正文档，执行核心与v0.13.0相同。已核验的v0.13.0 [CI](https://github.com/zhangbowen2006/ExampleLoom/actions/runs/43241617005)在JS、Wasm GC、Wasm、native各175项测试全部通过；最新文档修订的CI以[运行记录](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。全新Mooncakes消费项目在三个后端各29项测试通过。
+
+当前另外有500组独立连接、250组合表、350组高精度Decimal构造参考、88852项PCRE2共享语法构造对照，以及三个多源任务的API/CLI/真实Worker保存重载、取消重试和错误处理。构造测试不等于客户采用、完整PCRE兼容或外部任务全对。完整Foofah仍198/225，候选上界211/225。
+
+- [五轮实现、修正和边界](V013.md)
+- [连接/合表证据](evidence/v0130-multisource.json)、[精确小数证据](evidence/v0130-decimal.json)
+- [多源任务与真实浏览器](evidence/v0130-jobs.json)、[浏览器逐项记录](evidence/v0130-job-browser.json)
+- [外部任务逐题结果](evidence/v0130-benchmark.json)
+
+以下保留历史版本记录，其中“本轮”“当前”仅指相应历史版本，不是本页的最新统计。
+
+## v0.11.0 历史验证记录
 
 五轮本地JS、Wasm GC、Wasm测试数依次为148、149、150、152、153；各轮全部通过。最终完整Foofah198/225；高级浏览器28项，包含默认推导、明确意图选择、补空拆列及显式重复字段JSON列表。列表另有250组固定种子构造参考与真实CLI。PCRE2 88,852项仍通过。远程Linux native及持续集成以各提交的[CI](https://github.com/zhangbowen2006/ExampleLoom/actions)实际状态为准。[五轮记录](FIVE_ROUNDS.md)
 
