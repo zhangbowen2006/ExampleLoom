@@ -8,6 +8,7 @@ const checks=[];try{
  await page.addInitScript(()=>{const Original=window.Worker;window.Worker=class extends Original{};const send=Worker.prototype.postMessage;window.holdExecution=false;window.heldExecution=[];Worker.prototype.postMessage=function(m,...args){if(window.holdExecution&&m.request?.op==='execute_table')window.heldExecution.push(()=>send.call(this,m,...args));else send.call(this,m,...args);};});
  await page.goto((process.env.BASE_URL??'http://127.0.0.1:4173')+'/structure.html');
  await page.locator('#training').fill('c0\nA\n');await page.locator('#target').fill('c0\nA\n');await page.locator('#learn').click();await page.locator('[data-table-choose="0"]').waitFor();
+ await page.locator('#pipeline').fill(JSON.stringify({version:2,columns:['c0'],steps:[['map_rows',{version:1,columns:['c0'],outputs:[{name:'c0',expression:['literal','different']}]}]]}));
  await page.locator('#next').fill('c0\nA\n');await page.locator('#apply-consensus').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);
  assert.equal(await page.locator('#pipeline').inputValue(),'');assert.equal(await page.locator('#save').isDisabled(),true);
  assert.match(await page.locator('#notice').innerText(),/新批次必须重新检查/);

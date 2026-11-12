@@ -182,6 +182,7 @@ $('apply-consensus').onclick=()=>task(async()=>{
   resetOutput();const generation=revision,pipelines=retained.slice(),table=await parse($('next').value);
   const result=await call({op:'execute_table',pipelines,table});
   if(revision!==generation){notice('数据或候选已修改，请重新检查这一批。');return;}
+  chosen=false;$('pipeline').value='';
   showTable(result);notice('所有保留候选在这一整批数据上执行成功且结果相同。请核对后下载；新批次必须重新检查。');
 });
 $('save').onclick=()=>task(async()=>{
