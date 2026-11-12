@@ -1,0 +1,19 @@
+{
+  "title": "从示例学习连接后汇总",
+  "description": "根据两批订单与商品分类的输入输出，推断连接键和精确小数分组求和。",
+  "examples": [
+    {"sources":[
+      {"name":"orders","csv":"sku,amount\nA,0.1\nA,0.2\nB,1.25\n"},
+      {"name":"catalog","csv":"sku,category\nA,food\nB,book\n"}
+    ],"output":"category,total\nfood,0.3\nbook,1.25\n"},
+    {"sources":[
+      {"name":"orders","csv":"amount,sku\n5.5,C\n2.5,C\n1.3,D\n"},
+      {"name":"catalog","csv":"category,sku\ntool,C\nart,D\n"}
+    ],"output":"category,total\ntool,8\nart,1.3\n"}
+  ],
+  "next":[
+    {"name":"orders","csv":"sku,amount\nE,0.02\nE,0.03\nF,12.5\n"},
+    {"name":"catalog","csv":"sku,category\nE,toy\nF,media\n"}
+  ],
+  "expected":{"columns":["category","total"],"rows":[["toy","0.05"],["media","12.5"]]}
+}

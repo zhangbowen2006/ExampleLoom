@@ -55,6 +55,7 @@ jobs:
           node scripts/decimal-test.mjs
           node scripts/confirmed-test.mjs
           node scripts/data-job-test.mjs
+          node scripts/join-learning-test.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs
           node scripts/public-data-test.mjs
@@ -62,6 +63,8 @@ jobs:
           python3 scripts/verify-grouping.py
           node scripts/benchmark.mjs
           node scripts/audit-table-order.mjs
+          python3 scripts/import-autotables.py
+          node scripts/autotables-benchmark.mjs
       - name: External string-task benchmark
         run: |
           python3 scripts/import-sygus.py
@@ -101,6 +104,7 @@ jobs:
           node scripts/sorting-browser-test.mjs
           node scripts/confirmed-browser-test.mjs
           node scripts/data-job-browser-test.mjs
+          node scripts/join-learning-browser-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -108,6 +112,8 @@ jobs:
           path: |
             artifacts/
             !artifacts/sygus-2017/**
+            !artifacts/auto-tables-reference.zip
+            !artifacts/autotables/tasks.json
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:

@@ -58,6 +58,56 @@ fn options_from_json(value : Json) -> SearchOptions raise LoomError {
 fn dispatch(request : Json) -> Json raise LoomError {
   let obj = j_object(request)
   match j_text(required(obj, "op")) {
+    "synthesize_join_jobs" => {
+      fields_only(obj, ["op", "examples", "options"])
+      let examples = j_array(required(obj, "examples")).map(v => {
+        let e = j_object(v)
+        fields_only(e, ["sources", "output"])
+        let sources = j_array(required(e, "sources")).map(v => {
+          let s = j_object(v)
+          fields_only(s, ["name", "table"])
+          NamedTable::{
+            name: j_text(required(s, "name")),
+            table: table_from_json(required(s, "table")),
+          }
+        })
+        JoinExample::{ sources, after: table_from_json(required(e, "output")), }
+      })
+      let defaults = default_join_search_options()
+      let options = match obj.get("options") {
+        None => defaults
+        Some(v) => {
+          let o = j_object(v)
+          fields_only(o, ["max_evaluations", "max_candidates", "max_keys"])
+          JoinSearchOptions::{
+            max_evaluations: option_int(
+              o,
+              "max_evaluations",
+              defaults.max_evaluations,
+            ),
+            max_candidates: option_int(
+              o,
+              "max_candidates",
+              defaults.max_candidates,
+            ),
+            max_keys: option_int(o, "max_keys", defaults.max_keys),
+          }
+        }
+      }
+      let report = synthesize_join_jobs(examples, options~)
+      Json::object({
+        "ok": Json(true),
+        "status": Json(report.status),
+        "truncated": Json(report.truncated),
+        "evaluations": Json(report.evaluations),
+        "rejected": Json(report.rejected),
+        "candidates": Json::array(
+          report.candidates.map(job => {
+            Json::object({ "job": data_job_to_json(job) })
+          }),
+        ),
+      })
+    }
     "validate_data_job" => {
       fields_only(obj, ["op", "job"])
       Json::object({

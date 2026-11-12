@@ -14,6 +14,8 @@ node bin/exampleloom.mjs apply --data next.csv --recipe recipe.json --out result
 node bin/exampleloom.mjs learn-table --data input.csv --target target.csv --out candidates.json
 node bin/exampleloom.mjs learn-table --pairs batches.json --layouts layouts.json --out candidates.json
 node bin/exampleloom.mjs probe-table --data training.csv --report candidates.json --out input-suggestion.json
+node bin/exampleloom.mjs learn-join --pairs join-examples.json --out join-report.json
+node bin/exampleloom.mjs job --report join-report.json --choose 0 --out task.json
 node bin/exampleloom.mjs execute-table --data next.csv --report candidates.json --out checked.csv
 node bin/exampleloom.mjs pipeline --report candidates.json --choose 0 --out pipeline.json
 node bin/exampleloom.mjs transform --data next.csv --pipeline pipeline.json --out result.csv
@@ -113,6 +115,24 @@ try {
     if (flags.layouts) query.layouts = await readJson(flags.layouts);
     if (flags.depth) query.options = {max_depth:Number(flags.depth)};
     await emit(request(query));
+  } else if(command==='learn-join') {
+    const path=requireFlag('pairs'),pairs=await readJson(path),directory=dirname(resolve(path));
+    if(!Array.isArray(pairs)||pairs.length<1||pairs.length>4)throw new Error('--pairs requires 1..4 examples');
+    const examples=[];
+    for(const pair of pairs){
+      if(!pair||!Array.isArray(pair.sources)||pair.sources.length!==2||typeof pair.target!=='string'||!pair.target)throw new Error('Each example requires two named sources and a target');
+      const sources=[];
+      for(const binding of pair.sources){
+        if(!binding||typeof binding.name!=='string'||typeof binding.file!=='string'||!binding.file)throw new Error('Each source requires name and file');
+        sources.push({name:binding.name,table:await readTableFile(resolve(directory,binding.file))});
+      }
+      examples.push({sources,output:await readTableFile(resolve(directory,pair.target))});
+    }
+    await emit(request({op:'synthesize_join_jobs',examples}));
+  } else if(command==='job') {
+    const report=await readJson(requireFlag('report')),choice=Number(requireFlag('choose'));
+    if(!Number.isInteger(choice)||choice<0||!report.candidates?.[choice]?.job)throw new Error('Invalid job candidate index');
+    await emit(request({op:'validate_data_job',job:report.candidates[choice].job}).job);
   } else if(command==='probe-table') {
     const report=await readJson(requireFlag('report'));
     await emit(request({op:'propose_table_input',pipelines:report.candidates.map(c=>c.pipeline),inputs:[await readTable()]}));

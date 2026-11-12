@@ -28,6 +28,8 @@ pub fn data_job_to_json(DataJob) -> Json raise LoomError
 
 pub fn date_formats() -> Array[String]
 
+pub fn default_join_search_options() -> JoinSearchOptions
+
 pub fn default_join_spec(Array[String], Array[String]) -> JoinSpec
 
 pub fn default_options() -> SearchOptions
@@ -79,6 +81,8 @@ pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
 pub fn run_data_job(DataJob, Array[NamedTable]) -> Table raise LoomError
 
 pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String], patterns? : Array[String], branch_depth? : Int32) -> SearchReport raise LoomError
+
+pub fn synthesize_join_jobs(Array[JoinExample], options? : JoinSearchOptions) -> JoinSearchReport raise LoomError
 
 pub fn synthesize_table(Array[TableExample], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String], intent? : String) -> TableSearchReport raise LoomError
 
@@ -193,6 +197,25 @@ pub(all) enum GroupMetric {
   SumDecimal(String)
   MinDecimal(String)
   MaxDecimal(String)
+}
+
+pub(all) struct JoinExample {
+  sources : Array[NamedTable]
+  after : Table
+}
+
+pub(all) struct JoinSearchOptions {
+  max_evaluations : Int32
+  max_candidates : Int32
+  max_keys : Int32
+}
+
+pub(all) struct JoinSearchReport {
+  candidates : Array[DataJob]
+  evaluations : Int32
+  rejected : Int32
+  truncated : Bool
+  status : String
 }
 
 pub(all) struct JoinSpec {

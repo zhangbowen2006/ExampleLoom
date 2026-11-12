@@ -201,3 +201,7 @@ A small whole-field search runs before the full row grammar. Both share the conf
 ## v0.13 multi-source operations
 
 Strict requests: `join_tables {left,right,spec}`, `concat_tables {sources,spec}`, `execute_table {pipelines,table,chosen?}`, `validate_data_job {job}`, `run_data_job {job,sources}` (all also require `op`). Named sources use `{name,table}`. Decimal aggregate metrics are `sum_decimal`, `min_decimal`, `max_decimal`. DataJob version1 statically validates all ordered stages and returns only the final table. Full codecs, default policies, source binding and limits are documented in [v0.13](V013.md#协议确定性及边界).
+
+## v0.14 bounded join synthesis
+
+`{op:"synthesize_join_jobs", examples:[{sources:[{name,table},{name,table}],output}], options?:{max_evaluations,max_candidates,max_keys}}` returns candidate `job` values, counts, status and truncation. All input fields are strict; examples are replayed on every candidate. No held-out table or answer is accepted as a training parameter. [Detailed limits and examples](JOIN_LEARNING.md).

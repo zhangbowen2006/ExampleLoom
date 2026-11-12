@@ -1,0 +1,25 @@
+{
+  "title": "从多批示例学习商品与仓库关联",
+  "description": "不预先填写连接键。两批示例展示双键、列重排、未匹配记录和输出顺序。",
+  "examples": [
+    {
+      "sources": [
+        {"name":"orders","csv":"sku,warehouse,qty\nA,W1,3\nA,W2,7\nB,W1,5\n"},
+        {"name":"catalog","csv":"sku,warehouse,category\nA,W1,food\nA,W2,book\nB,W1,tool\n"}
+      ],
+      "output":"sku,category,qty\nA,food,3\nA,book,7\nB,tool,5\n"
+    },
+    {
+      "sources": [
+        {"name":"catalog","csv":"category,warehouse,sku\ntool,W2,C\nart,W1,C\nother,W4,E\n"},
+        {"name":"orders","csv":"warehouse,qty,sku\nW1,11,C\nW2,12,C\nW3,13,D\n"}
+      ],
+      "output":"sku,category,qty\nC,art,11\nC,tool,12\nD,,13\n"
+    }
+  ],
+  "next": [
+    {"name":"orders","csv":"qty,sku,warehouse\n4,F,W1\n8,F,W2\n9,Z,W3\n"},
+    {"name":"catalog","csv":"sku,category,warehouse\nF,music,W2\nF,paint,W1\n"}
+  ],
+  "expected": {"columns":["sku","category","qty"],"rows":[["F","paint","4"],["F","music","8"],["Z","","9"]]}
+}

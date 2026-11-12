@@ -15,7 +15,7 @@ await mkdir(dist, { recursive: true });
 await cp(resolve(root, '_build/js/release/build/api/api.js'), resolve(root, 'dist/engine.js'));
 await cp(resolve(root, 'web'), resolve(root, 'dist'), { recursive: true });
 const version=JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version;
-for (const name of ['index.html', 'structure.html', 'jobs.html']) {
+for (const name of ['index.html', 'structure.html', 'jobs.html', 'join.html']) {
   const page = resolve(dist, name);
   const html = await readFile(page, 'utf8');
   await writeFile(page, html.replaceAll('{{VERSION}}', version));
