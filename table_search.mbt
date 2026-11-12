@@ -496,6 +496,9 @@ pub fn synthesize_table(
     if projection_step(state.tables, targets) is Some(step) {
       neighbors.push(step)
     }
+    if sparse_routing_witness(state.tables, targets) is Some(step) {
+      neighbors.push(step)
+    }
     if neighbors.is_empty() &&
       row_searches < 16 &&
       state.tables[0].rows.length() == targets[0].rows.length() {

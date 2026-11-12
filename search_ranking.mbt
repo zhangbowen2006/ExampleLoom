@@ -67,7 +67,9 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       SegmentRows(c, _) => 8 + condition_cost(c)
       CarryContext(c, _) => 9 + condition_cost(c)
       MapRows(r) =>
-        r.outputs.fold(init=8, (n, o) => n + expression_cost(o.expression))
+        sparse_routing_cost(r).unwrap_or_else(fn() {
+          r.outputs.fold(init=8, (n, o) => n + expression_cost(o.expression))
+        })
       UpdateColumns(r) =>
         r.outputs.fold(init=8, (n, o) => n + expression_cost(o.expression))
     })

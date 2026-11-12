@@ -1,0 +1,8 @@
+{
+ "title":"混合姓名布局分发",
+ "description":"第二列为空时第一列是完整名称，否则两列是分开的名称。输出三个互斥布局字段并保留原始内容。两种空值状态都需示范。",
+ "input":"name,detail\nFull name,\nFirst,Last\n",
+ "target":"full,first,last\nFull name,,\n,First,Last\n",
+ "next":"detail,name\n,甲😀\nFamily,Other\n,007\n",
+ "expected":{"columns":["full","first","last"],"rows":[["甲😀","",""],["","Other","Family"],["007","",""]]}
+}
