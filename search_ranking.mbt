@@ -46,6 +46,8 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
       Deduplicate(_) => 6
       DropRows(n) => 4 + n
       PackRows(n, _) => 10 + n / 16
+      // One observed block cannot identify whole-table versus fixed-block intent.
+      FlattenRows => 12
       Transpose => 18
       PromoteHeaders | DemoteHeaders => 7
       Unpivot(_, _, _, _) | Fold(_, _, _) => 8

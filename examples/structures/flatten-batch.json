@@ -1,0 +1,9 @@
+{
+ "title":"整批展平而非固定分组",
+ "description":"两批不同数量的记录示范整表展平，避免把第一批的行数误当作固定组大小。空单元格保留，最多输出64列。",
+ "input":"left,right\nA,1\nB,2\n",
+ "target":"c0,c1,c2,c3\nA,1,B,2\n",
+ "additional":[{"input":"left,right\nC,3\nD,4\nE,5\n","target":"c0,c1,c2,c3,c4,c5\nC,3,D,4,E,5\n"}],
+ "next":"right,left\n6,F\n7,G\n8,H\n9,I\n",
+ "expected":{"columns":["c0","c1","c2","c3","c4","c5","c6","c7"],"rows":[["F","6","G","7","H","8","I","9"]]}
+}

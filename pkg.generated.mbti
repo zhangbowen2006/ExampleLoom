@@ -280,6 +280,7 @@ pub(all) enum TableStep {
   Fold(Array[String], Array[String], String)
   Melt(Array[String], Array[String], String, String, Bool)
   PackRows(Int32, Bool)
+  FlattenRows
   GroupRows(Array[String], Array[String])
   Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])

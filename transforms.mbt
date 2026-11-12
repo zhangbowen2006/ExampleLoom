@@ -14,6 +14,7 @@ pub(all) enum TableStep {
   Fold(Array[String], Array[String], String)
   Melt(Array[String], Array[String], String, String, Bool)
   PackRows(Int32, Bool)
+  FlattenRows
   GroupRows(Array[String], Array[String])
   Aggregate(Array[String], Array[Measure])
   Pivot(Array[String], String, String, Array[String])
@@ -266,6 +267,18 @@ fn apply_step_unchecked(
         }
       }
       { columns, rows, }
+    }
+    FlattenRows => {
+      if table.rows.is_empty() {
+        raise LoomError("flatten_rows requires at least one row")
+      }
+      let width = table.rows.length() * table.columns.length()
+      check_growth(1, width)
+      let row : Array[String] = []
+      for values in table.rows {
+        row.push_iter(values.iter())
+      }
+      { columns: generic_columns(width), rows: [row], }
     }
     PackRows(size, columnwise) => {
       if size < 1 || size > 64 || table.rows.length() % size != 0 {

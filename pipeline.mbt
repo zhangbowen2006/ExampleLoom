@@ -8,6 +8,7 @@ pub(all) struct Pipeline {
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
     PreserveExtraColumns => Json::array([Json("preserve_extra_columns")])
+    FlattenRows => Json::array([Json("flatten_rows")])
     SortRows(keys) =>
       Json::array([
         Json("sort_rows"),
@@ -144,6 +145,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     | "combine_columns" => 4
     "unpivot" | "pivot" => 5
     "transpose"
+    | "flatten_rows"
     | "promote_headers"
     | "demote_headers"
     | "preserve_extra_columns" => 1
@@ -154,6 +156,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
   }
   let step = match op {
     "preserve_extra_columns" => PreserveExtraColumns
+    "flatten_rows" => FlattenRows
     "sort_rows" =>
       SortRows(
         j_array(a[1]).map(value => {
@@ -367,7 +370,11 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
       if n < 0 || n > 20000 {
         raise LoomError("drop_rows count outside 0..20000")
       }
-    Transpose | PromoteHeaders | DemoteHeaders | PreserveExtraColumns => ()
+    Transpose
+    | PromoteHeaders
+    | DemoteHeaders
+    | PreserveExtraColumns
+    | FlattenRows => ()
   }
 }
 

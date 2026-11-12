@@ -92,7 +92,12 @@ fn structural_neighbors(
   target : Table,
   separators : Array[String],
 ) -> Array[TableStep] {
-  let result : Array[TableStep] = [Transpose, PromoteHeaders, DemoteHeaders]
+  let result : Array[TableStep] = [
+    Transpose,
+    PromoteHeaders,
+    DemoteHeaders,
+    FlattenRows,
+  ]
   let wanted : Map[String, Bool] = Map([])
   for row in target.rows {
     for value in row {
