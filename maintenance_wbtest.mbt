@@ -42,6 +42,40 @@ test "whole table flattening uses the new batch size and preserves cells" {
 }
 
 ///|
+test "explicit whole table intent is checked rather than inferred from holdout" {
+  let t : Table = { columns: ["c0"], rows: [["A"], ["B"]], }
+  let target : Table = { columns: ["c0", "c1"], rows: [["A", "B"]], }
+  let r = synthesize_table(
+    [{ before: t, after: target, }],
+    intent="flatten_all",
+  )
+  assert_eq(r.status, "intent_checked")
+  assert_eq(
+    apply_pipeline(r.candidates[0], { ..t, rows: [["X"], ["Y"], ["Z"]], }).rows,
+    [["X", "Y", "Z"]],
+  )
+  let wrong = synthesize_table([{ before: t, after: t, }], intent="flatten_all")
+  assert_eq(wrong.status, "intent_inconsistent")
+  assert_true(wrong.candidates.is_empty())
+  let limited = synthesize_table(
+    [{ before: t, after: target, }],
+    intent="flatten_all",
+    options={ ..default_table_options(), max_depth: 0, },
+  )
+  assert_true(limited.truncated && limited.candidates.is_empty())
+  assert_true(
+    try {
+      ignore(
+        synthesize_table([{ before: t, after: target, }], intent="mystery"),
+      )
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+}
+
+///|
 test "sparse routing learns a complete empty-state partition without losing fields" {
   let before : Table = {
     columns: ["name", "detail"],

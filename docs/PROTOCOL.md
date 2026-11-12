@@ -2,6 +2,12 @@
 
 The exported `handle(request: String) -> String` always returns JSON. Ordinary input failures are `{ "ok": false, "error": "..." }`. There is no network, filesystem or host-code execution in this boundary.
 
+## Explicit table intent (maintenance round 3)
+
+`synthesize_table` accepts optional `intent: "infer" | "flatten_all"` (default `infer`). The latter is a user-declared restriction to exactly one `flatten_rows` operation, not a prediction from unlabelled data. It returns `intent_checked` only when the operation matches every training table, otherwise no candidates and `intent_inconsistent`. A depth budget of zero still prevents execution. This mode has no general search or hidden-answer selection. CLI: `learn-table --intent flatten_all`; the table workbench exposes the same explicit choice. The saved pipeline itself contains the operation and replays without the intent flag.
+
+`["flatten_rows"]` consumes all rows in row-major order, creates generic column names and preserves empty cells. Empty input or output wider than 64 columns is rejected. For inference without a declared intent, different-sized training batches can distinguish this operation from fixed-size packing; one observed block cannot in general do so.
+
 ## Atomic regex and repeated records (v0.10.0)
 
 The extended `(?rx)` profile accepts `(?>...)` and possessive quantifiers such as `*+`, `++`, `?+`, and `{m,n}+`. An atomic group commits to its selected internal match and cannot later backtrack inside it. Atomic groups and lookarounds share the runtime nesting limit of eight and the execution budget; this remains a bounded subset rather than full PCRE. See [the profile and measured PCRE2 comparisons](REGEX_PROFILE.md).

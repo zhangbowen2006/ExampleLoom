@@ -36,7 +36,7 @@ try {
       if (!/^--[a-z]+$/.test(args[i]) || args[i + 1] == null || args[i + 1].startsWith('--')) throw new Error('Expected --flag value pairs');
       const key = args[i].slice(2);
       if (Object.hasOwn(flags, key)) throw new Error(`Duplicate flag: ${key}`);
-      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs'].includes(key)) throw new Error(`Unknown flag: ${key}`);
+      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs','intent'].includes(key)) throw new Error(`Unknown flag: ${key}`);
       flags[key] = args[i + 1];
     }
   }
@@ -87,6 +87,7 @@ try {
     const query = {op:'synthesize_table',examples};
     if (flags.separators) query.separators = await readJson(flags.separators);
     if (flags.patterns) query.patterns = await readJson(flags.patterns);
+    if (flags.intent) query.intent = flags.intent;
     if (flags.depth) query.options = {max_depth:Number(flags.depth)};
     await emit(request(query));
   } else if(command==='pipeline') {

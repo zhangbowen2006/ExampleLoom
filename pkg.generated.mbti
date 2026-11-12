@@ -58,7 +58,7 @@ pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
 
 pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String], patterns? : Array[String], branch_depth? : Int32) -> SearchReport raise LoomError
 
-pub fn synthesize_table(Array[TableExample], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String]) -> TableSearchReport raise LoomError
+pub fn synthesize_table(Array[TableExample], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String], intent? : String) -> TableSearchReport raise LoomError
 
 pub fn table_step_from_json(Json) -> TableStep raise LoomError
 

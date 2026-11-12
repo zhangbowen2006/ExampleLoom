@@ -68,6 +68,9 @@ fn dispatch(request : Json) -> Json raise LoomError {
       Json::object({ "ok": Json(true), "table": table_json(table) })
     }
     "synthesize_table" => {
+      fields_only(obj, [
+        "op", "examples", "options", "patterns", "separators", "intent",
+      ])
       let examples = j_array(required(obj, "examples")).map(v => {
         let e = j_object(v)
         TableExample::{
@@ -107,7 +110,17 @@ fn dispatch(request : Json) -> Json raise LoomError {
         Some(v) => json_strings(v)
         None => default_table_separators()
       }
-      let r = synthesize_table(examples, options~, separators~, patterns~)
+      let intent = match obj.get("intent") {
+        Some(v) => j_text(v)
+        None => "infer"
+      }
+      let r = synthesize_table(
+        examples,
+        options~,
+        separators~,
+        patterns~,
+        intent~,
+      )
       Json::object({
         "ok": Json(true),
         "status": Json(r.status),

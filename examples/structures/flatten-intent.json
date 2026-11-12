@@ -1,0 +1,9 @@
+{
+ "title":"明确选择整批展平意图",
+ "description":"仅一行样例无法区分保持原表与整批展平。本例由使用者明确选择整批展平，程序仍必须与全部训练表一致。",
+ "intent":"flatten_all",
+ "input":"c0\nA\n",
+ "target":"c0\nA\n",
+ "next":"c0\nX\nY\nZ\n",
+ "expected":{"columns":["c0","c1","c2"],"rows":[["X","Y","Z"]]}
+}

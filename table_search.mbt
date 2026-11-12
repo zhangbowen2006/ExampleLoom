@@ -409,7 +409,11 @@ pub fn synthesize_table(
   options~ : TableSearchOptions = default_table_options(),
   separators~ : Array[String] = default_table_separators(),
   patterns~ : Array[String] = [],
+  intent~ : String = "infer",
 ) -> TableSearchReport raise LoomError {
+  if intent != "infer" && intent != "flatten_all" {
+    raise LoomError("table intent must be infer or flatten_all")
+  }
   if examples.is_empty() || examples.length() > 8 {
     raise LoomError("expected 1..8 table pairs")
   }
@@ -448,6 +452,42 @@ pub fn synthesize_table(
   }
   let inputs = examples.map(e => e.before)
   let targets = examples.map(e => e.after)
+  if intent == "flatten_all" {
+    let p : Pipeline = { columns: inputs[0].columns, steps: [FlattenRows], }
+    let within = options.max_depth >= 1
+    let matches = within &&
+      examples.all(e => {
+        (Some(apply_pipeline(p, e.before)) catch { LoomError(_) => None }) ==
+        Some(e.after)
+      })
+    return {
+      candidates: if matches {
+        [p]
+      } else {
+        []
+      },
+      truncated: !within,
+      status: if !within {
+        "table_search_limit"
+      } else if matches {
+        "intent_checked"
+      } else {
+        "intent_inconsistent"
+      },
+      states: 1,
+      evaluations: if within {
+        1
+      } else {
+        0
+      },
+      rejected: if within && !matches {
+        1
+      } else {
+        0
+      },
+      row_searches: 0,
+    }
+  }
   let profiles = targets.map(target_profile)
   let input_key = tables_key(inputs)
   let queue : Array[TableState] = [

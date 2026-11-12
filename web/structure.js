@@ -39,7 +39,7 @@ const call=request=>new Promise((resolve,reject)=>{
 });
 async function task(action){if(busy)return;busy=true;controls();try{await action();}catch(error){resetOutput();notice(error.message,true);}finally{busy=false;controls();}}
 const invalidate=()=>{revision++;chosen=false;retained=[];$('pipeline').value='';$('candidates').replaceChildren();$('stats').textContent='';resetComparison();resetOutput();controls();};
-for(const id of ['training','target','table-patterns'])$(id).oninput=invalidate;
+for(const id of ['training','target','table-patterns','table-intent'])$(id).oninput=invalidate;
 const extraPairs = $('extra-pairs');
 function addPair(input = '', target = '') {
   if (extraPairs.children.length >= 7) return;
@@ -72,13 +72,14 @@ for(const button of document.querySelectorAll('[data-table-demo]'))button.onclic
   const response=await fetch(`examples/structures/${button.dataset.tableDemo}.json`);if(!response.ok)throw new Error('示例加载失败');const demo=await response.json();
   extraPairs.replaceChildren();$('add-pair').disabled=false;
   for (const pair of demo.additional ?? []) addPair(pair.input, pair.target);
+  $('table-intent').value=demo.intent??'infer';
   $('table-patterns').value=(demo.patterns ?? []).join('\n');
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;notice(`${demo.title}：${demo.description}`);
 });
 for(const button of document.querySelectorAll('[data-pipeline-demo]'))button.onclick=()=>task(async()=>{
   const response=await fetch(`examples/structures/${button.dataset.pipelineDemo}.json`);if(!response.ok)throw new Error('示例加载失败');
   const demo=await response.json();
-  extraPairs.replaceChildren();$('add-pair').disabled=false;$('table-patterns').value='';
+  extraPairs.replaceChildren();$('add-pair').disabled=false;$('table-patterns').value='';$('table-intent').value='infer';
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;
   $('pipeline').value=JSON.stringify(demo.pipeline,null,2);chosen=true;controls();
   notice(`${demo.title}：${demo.description}示例管道已经填好，请预览并核对。`);
@@ -94,7 +95,7 @@ $('learn').onclick=()=>task(async()=>{
     if (!input.trim() || !target.trim()) throw new Error('请为每对训练表填写输入和期望输出。');
     examples.push({input: await parse(input), output: await parse(target)});
   }
-  const start=performance.now();const report=await call({op:'synthesize_table',examples,patterns});
+  const start=performance.now();const report=await call({op:'synthesize_table',examples,patterns,intent:$('table-intent').value});
   if(revision!==generation){notice('数据已修改，请重新搜索。');return;}
   retained=report.candidates.map(candidate=>candidate.pipeline);
   chosen=false;$('pipeline').value='';resetOutput();$('candidates').replaceChildren();
