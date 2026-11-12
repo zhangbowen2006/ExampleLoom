@@ -1,0 +1,400 @@
+{
+  "timestamp": "2026-11-12T08:38:22.682Z",
+  "engine_sha256": "79bbba7c263f6a5637c2baaaee01ff164166aaba500c58ea095784fc47dd7b87",
+  "methodology": "250 seeded constructed cases independently expected from conceptual person records, not blind external tasks. Rules are explicitly supplied, never claimed inferred. Three complete multi-schema workflows replay every training pair and a new batch through API, serialization and CLI.",
+  "constructed_cases": 250,
+  "workflows": [
+    {
+      "name": "layout-people",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "legacy"
+        ],
+        "steps": [
+          [
+            "normalize_layouts",
+            [
+              {
+                "name": "legacy",
+                "when": [
+                  "matches",
+                  [
+                    "field",
+                    0
+                  ],
+                  "^([^,]+),([^,]+)$",
+                  true
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "legacy"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "first",
+                      "expression": [
+                        "trim",
+                        [
+                          "capture",
+                          [
+                            "field",
+                            0
+                          ],
+                          "^([^,]+),([^,]+)$",
+                          2,
+                          0
+                        ]
+                      ]
+                    },
+                    {
+                      "name": "last",
+                      "expression": [
+                        "trim",
+                        [
+                          "capture",
+                          [
+                            "field",
+                            0
+                          ],
+                          "^([^,]+),([^,]+)$",
+                          1,
+                          0
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "separate",
+                "when": [
+                  "all",
+                  [
+                    [
+                      "not",
+                      [
+                        "empty",
+                        [
+                          "field",
+                          0
+                        ]
+                      ]
+                    ],
+                    [
+                      "not",
+                      [
+                        "empty",
+                        [
+                          "field",
+                          1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "first",
+                    "last"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "first",
+                      "expression": [
+                        "field",
+                        0
+                      ]
+                    },
+                    {
+                      "name": "last",
+                      "expression": [
+                        "field",
+                        1
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          ],
+          [
+            "combine_columns",
+            [
+              "first",
+              "last"
+            ],
+            " ",
+            "merged_0_1"
+          ],
+          [
+            "select",
+            [
+              "merged_0_1"
+            ],
+            [
+              "badge"
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 2,
+      "new_batch_rows": 2
+    },
+    {
+      "name": "layout-inventory",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "group",
+          "units"
+        ],
+        "steps": [
+          [
+            "normalize_layouts",
+            [
+              {
+                "name": "old",
+                "when": [
+                  "not",
+                  [
+                    "empty",
+                    [
+                      "field",
+                      0
+                    ]
+                  ]
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "group",
+                    "units"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "category",
+                      "expression": [
+                        "upper",
+                        [
+                          "trim",
+                          [
+                            "field",
+                            0
+                          ]
+                        ]
+                      ]
+                    },
+                    {
+                      "name": "qty",
+                      "expression": [
+                        "field",
+                        1
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "new",
+                "when": [
+                  "not",
+                  [
+                    "empty",
+                    [
+                      "field",
+                      0
+                    ]
+                  ]
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "category",
+                    "amount"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "category",
+                      "expression": [
+                        "upper",
+                        [
+                          "trim",
+                          [
+                            "field",
+                            0
+                          ]
+                        ]
+                      ]
+                    },
+                    {
+                      "name": "qty",
+                      "expression": [
+                        "field",
+                        1
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          ],
+          [
+            "aggregate",
+            [
+              "category"
+            ],
+            [
+              [
+                "total",
+                "sum",
+                "qty"
+              ]
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 2,
+      "new_batch_rows": 2
+    },
+    {
+      "name": "layout-readings",
+      "pipeline": {
+        "version": 2,
+        "columns": [
+          "record"
+        ],
+        "steps": [
+          [
+            "normalize_layouts",
+            [
+              {
+                "name": "joined",
+                "when": [
+                  "matches",
+                  [
+                    "field",
+                    0
+                  ],
+                  "^([A-Z]+):([[:digit:]]+)$",
+                  true
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "record"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "kind",
+                      "expression": [
+                        "capture",
+                        [
+                          "field",
+                          0
+                        ],
+                        "^([A-Z]+):([[:digit:]]+)$",
+                        1,
+                        0
+                      ]
+                    },
+                    {
+                      "name": "value",
+                      "expression": [
+                        "capture",
+                        [
+                          "field",
+                          0
+                        ],
+                        "^([A-Z]+):([[:digit:]]+)$",
+                        2,
+                        0
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "split",
+                "when": [
+                  "all",
+                  [
+                    [
+                      "matches",
+                      [
+                        "field",
+                        0
+                      ],
+                      "^[A-Z]+$",
+                      true
+                    ],
+                    [
+                      "matches",
+                      [
+                        "field",
+                        1
+                      ],
+                      "^[[:digit:]]+$",
+                      true
+                    ]
+                  ]
+                ],
+                "recipe": {
+                  "version": 1,
+                  "columns": [
+                    "kind",
+                    "value"
+                  ],
+                  "outputs": [
+                    {
+                      "name": "kind",
+                      "expression": [
+                        "field",
+                        0
+                      ]
+                    },
+                    {
+                      "name": "value",
+                      "expression": [
+                        "field",
+                        1
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          ],
+          [
+            "filter",
+            [
+              "equals",
+              [
+                "field",
+                0
+              ],
+              [
+                "literal",
+                "OK"
+              ]
+            ]
+          ],
+          [
+            "sort_rows",
+            [
+              [
+                "value",
+                "decimal",
+                "asc"
+              ]
+            ]
+          ]
+        ]
+      },
+      "training_pairs": 2,
+      "new_batch_rows": 3
+    }
+  ]
+}

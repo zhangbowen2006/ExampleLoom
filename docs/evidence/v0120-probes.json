@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-11-12T08:38:22.992Z",
+  "engine_sha256": "79bbba7c263f6a5637c2baaaee01ff164166aaba500c58ea095784fc47dd7b87",
+  "methodology": "Constructed input suggestion using only known inputs and retained candidates. An independent simulated user supplies the whole-table target. This is not an unassisted external benchmark.",
+  "suggestion": {
+    "ok": true,
+    "attempted": 2,
+    "skipped": 0,
+    "suggestion": {
+      "source_index": 0,
+      "mutation": "duplicate_rows",
+      "input": {
+        "columns": [
+          "c0"
+        ],
+        "rows": [
+          [
+            "A"
+          ],
+          [
+            "A"
+          ]
+        ]
+      },
+      "csv": "c0\r\nA\r\nA\r\n",
+      "score": 38,
+      "groups": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6
+        ],
+        [
+          7
+        ]
+      ]
+    }
+  },
+  "refined_candidates": 8,
+  "checks": [
+    "bounded input-only proposal",
+    "no ranking or label mutation",
+    "independent user refinement",
+    "unseen third batch",
+    "no all-failed suggestion",
+    "invalid declarations rejected",
+    "real CLI"
+  ]
+}

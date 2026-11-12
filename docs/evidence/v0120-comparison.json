@@ -1,0 +1,46 @@
+{
+  "baseline_engine_sha256": "2ebca55d3425bda2f47cf664eecc53b1d929f2b407c83cbde54d94b1a820a178",
+  "current_engine_sha256": "79bbba7c263f6a5637c2baaaee01ff164166aaba500c58ea095784fc47dd7b87",
+  "current_clean_source_commit": "de4f79b8cba20e672d0051fc7f4b5d38ea48df4f",
+  "baseline_summary": {
+    "tasks": 250,
+    "families": 50,
+    "holdout_available": 225,
+    "missing_holdout_gold": 25,
+    "reference_conflicts": 0,
+    "training_solved": 242,
+    "top1_holdout": 198,
+    "any_holdout": 209,
+    "timeouts": 0,
+    "errors": 5,
+    "unexpected_errors": 0,
+    "truncated": 245,
+    "p50_ms": 80.40549999999712,
+    "p95_ms": 129.1131000000005,
+    "max_ms": 178.51129999999966
+  },
+  "current_summary": {
+    "tasks": 250,
+    "families": 50,
+    "holdout_available": 225,
+    "missing_holdout_gold": 25,
+    "reference_conflicts": 0,
+    "training_solved": 242,
+    "top1_holdout": 198,
+    "any_holdout": 211,
+    "timeouts": 0,
+    "errors": 5,
+    "unexpected_errors": 0,
+    "truncated": 245,
+    "p50_ms": 63.59530000000086,
+    "p95_ms": 99.63540000000285,
+    "max_ms": 132.80330000000004
+  },
+  "top1_regressed": [],
+  "any_regressed": [],
+  "any_gained": [
+    "exp0_27_1.txt",
+    "exp0_40_1.txt"
+  ],
+  "methodology": "Per-task comparison against historical immutable v0.11 evidence, not a paired timing experiment. Same unchanged corpus and evaluator options. Any is oracle coverage, not automatic accuracy."
+}

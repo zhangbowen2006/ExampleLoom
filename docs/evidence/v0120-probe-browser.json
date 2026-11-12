@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-11-12T08:38:35.973Z",
+  "browser": "157.0.4341.46",
+  "checks": [
+    "Input-only constructed suggestion leaves target, choice and export untouched.",
+    "Independent target refinement learns a reusable whole-table program and runs an unseen third batch.",
+    "Delayed suggestions cannot survive training, explicit layout or intent edits.",
+    "Multi-schema refinement preserves explicit rules and always leaves a new target blank."
+  ]
+}

@@ -1,0 +1,1344 @@
+{
+  "timestamp": "2026-11-12T08:38:23.771Z",
+  "engine_sha256": "79bbba7c263f6a5637c2baaaee01ff164166aaba500c58ea095784fc47dd7b87",
+  "methodology": "Separate assisted diagnostic on a development-exposed, explicitly selected 13-task ambiguity subset. Extra intentions are prescribed in this script, not inferred. Up to three source-only input probes are labelled by independent JS references. Gold is only scored after top1 is frozen. Do not add this score to the unassisted 198/225, and do not describe this as independent human field validation.",
+  "summary": {
+    "tasks": 13,
+    "assisted_top1": 13,
+    "extra_pairs": 19
+  },
+  "results": [
+    {
+      "task": "exp0_27_1.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "1",
+                "1"
+              ],
+              [
+                "1",
+                "1"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "1",
+                "1"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_27_2.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "2",
+                "2"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "2",
+                "2"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "1",
+                "1"
+              ],
+              [
+                "2",
+                "2"
+              ],
+              [
+                "1",
+                "1"
+              ],
+              [
+                "2",
+                "2"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "2",
+                "2",
+                "1",
+                "1",
+                "2",
+                "2"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 3,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_27_4.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "2",
+                "2"
+              ],
+              [
+                "3",
+                "3"
+              ],
+              [
+                "4",
+                "4"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5"
+            ],
+            "rows": [
+              [
+                "2",
+                "2",
+                "3",
+                "3",
+                "4",
+                "4"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_27_5.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "2",
+                "2"
+              ],
+              [
+                "3",
+                "3"
+              ],
+              [
+                "4",
+                "4"
+              ],
+              [
+                "9",
+                "7"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7"
+            ],
+            "rows": [
+              [
+                "2",
+                "2",
+                "3",
+                "3",
+                "4",
+                "4",
+                "9",
+                "7"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_33_1.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ],
+              [
+                "Alice"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1"
+            ],
+            "rows": [
+              [
+                "Alice",
+                "Alice"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_33_2.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ],
+              [
+                "Bob"
+              ],
+              [
+                "Alice"
+              ],
+              [
+                "Bob"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "Alice",
+                "Bob",
+                "Alice",
+                "Bob"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Bob"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Bob"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 3,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_33_4.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "first_row",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_33_5.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ],
+              [
+                "Bob"
+              ],
+              [
+                "Carol"
+              ],
+              [
+                "Dan"
+              ],
+              [
+                "James"
+              ],
+              [
+                "Alice"
+              ],
+              [
+                "Bob"
+              ],
+              [
+                "Carol"
+              ],
+              [
+                "Dan"
+              ],
+              [
+                "James"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "c8",
+              "c9"
+            ],
+            "rows": [
+              [
+                "Alice",
+                "Bob",
+                "Carol",
+                "Dan",
+                "James",
+                "Alice",
+                "Bob",
+                "Carol",
+                "Dan",
+                "James"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Bob"
+              ],
+              [
+                "Carol"
+              ],
+              [
+                "Dan"
+              ],
+              [
+                "James"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "Bob",
+                "Carol",
+                "Dan",
+                "James"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0"
+            ],
+            "rows": [
+              [
+                "Alice"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "first_row",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 4,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_40_1.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_40_2.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ],
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "c8",
+              "c9",
+              "c10",
+              "c11",
+              "c12",
+              "c13",
+              "c14",
+              "c15"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "sod",
+                "spouse",
+                "38",
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 3,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_40_4.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ],
+              [
+                "123",
+                "dos",
+                "son",
+                "18"
+              ],
+              [
+                "544",
+                "doj",
+                "daughter",
+                "20"
+              ],
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ],
+              [
+                "123",
+                "dos",
+                "son",
+                "18"
+              ],
+              [
+                "544",
+                "doj",
+                "daughter",
+                "20"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "c8",
+              "c9",
+              "c10",
+              "c11",
+              "c12",
+              "c13",
+              "c14",
+              "c15",
+              "c16",
+              "c17",
+              "c18",
+              "c19",
+              "c20",
+              "c21",
+              "c22",
+              "c23",
+              "c24",
+              "c25",
+              "c26",
+              "c27",
+              "c28",
+              "c29",
+              "c30",
+              "c31"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "sod",
+                "spouse",
+                "38",
+                "123",
+                "dos",
+                "son",
+                "18",
+                "544",
+                "doj",
+                "daughter",
+                "20",
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "sod",
+                "spouse",
+                "38",
+                "123",
+                "dos",
+                "son",
+                "18",
+                "544",
+                "doj",
+                "daughter",
+                "20"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        },
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ],
+              [
+                "123",
+                "dos",
+                "son",
+                "18"
+              ],
+              [
+                "544",
+                "doj",
+                "daughter",
+                "20"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "c8",
+              "c9",
+              "c10",
+              "c11"
+            ],
+            "rows": [
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38",
+                "123",
+                "dos",
+                "son",
+                "18",
+                "544",
+                "doj",
+                "daughter",
+                "20"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "drop_first",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 3,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_40_5.txt",
+      "intention": "flatten_rows",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48"
+              ],
+              [
+                "123",
+                "sod",
+                "spouse",
+                "38"
+              ],
+              [
+                "123",
+                "dos",
+                "son",
+                "18"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7",
+              "c8",
+              "c9",
+              "c10",
+              "c11"
+            ],
+            "rows": [
+              [
+                "123",
+                "Dok",
+                "Self",
+                "48",
+                "123",
+                "sod",
+                "spouse",
+                "38",
+                "123",
+                "dos",
+                "son",
+                "18"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "user_short_batch_from_known_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "steps": [
+          [
+            "segment_rows",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ],
+            false
+          ]
+        ]
+      },
+      "top1_holdout": true
+    },
+    {
+      "task": "exp0_15_1.txt",
+      "intention": "group_c0_values_c5",
+      "extra_queries": [
+        {
+          "input": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5"
+            ],
+            "rows": [
+              [
+                "001-001",
+                "1",
+                "",
+                "",
+                "",
+                " $-"
+              ],
+              [
+                "001-001",
+                "1",
+                "",
+                "",
+                "",
+                " $-"
+              ]
+            ]
+          },
+          "output": {
+            "columns": [
+              "c0",
+              "c1",
+              "c2"
+            ],
+            "rows": [
+              [
+                "001-001",
+                " $-",
+                " $-"
+              ]
+            ]
+          },
+          "source_index": 0,
+          "mutation": "duplicate_rows",
+          "label_source": "Independent JS reference implementing the declared extra intention; never TestAnswer or engine predictions"
+        }
+      ],
+      "training_pairs": 2,
+      "top1_pipeline": {
+        "version": 2,
+        "columns": [
+          "c0",
+          "c1",
+          "c2",
+          "c3",
+          "c4",
+          "c5"
+        ],
+        "steps": [
+          [
+            "select",
+            [
+              "c0",
+              "c5"
+            ],
+            [
+              "c0",
+              "c5"
+            ]
+          ],
+          [
+            "group_rows",
+            [
+              "c0"
+            ],
+            [
+              "c5"
+            ]
+          ]
+        ]
+      },
+      "top1_holdout": true
+    }
+  ]
+}
