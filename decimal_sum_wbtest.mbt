@@ -112,3 +112,29 @@ test "decimal output limit is checked while appending each measure" {
     },
   )
 }
+
+///|
+test "decimal learning observes every training batch regardless of order" {
+  let a : TableExample = {
+    before: { columns: ["g", "a"], rows: [["A", "1"], ["A", "2"]], },
+    after: { columns: ["g", "total"], rows: [["A", "3"]], },
+  }
+  let b : TableExample = {
+    before: { columns: ["g", "a"], rows: [["B", "0.1"], ["B", "0.2"]], },
+    after: { columns: ["g", "total"], rows: [["B", "0.3"]], },
+  }
+  for examples in [[a, b], [b, a]] {
+    let r = synthesize_table(examples)
+    assert_true(!r.candidates.is_empty())
+    for e in examples {
+      assert_eq(apply_pipeline(r.candidates[0], e.before), e.after)
+    }
+    assert_eq(
+      apply_pipeline(r.candidates[0], {
+        columns: ["g", "a"],
+        rows: [["C", "-1.2"], ["C", "1.3"]],
+      }).rows,
+      [["C", "0.1"]],
+    )
+  }
+}

@@ -219,20 +219,22 @@ fn aggregate_witnesses(
     for col in table.columns {
       if !keys.contains(col) {
         pool.push_iter([SumInt64(col), MinInt64(col), MaxInt64(col)].iter())
-        let index = column_index(table, col) catch { _ => continue }
-        let has_decimal = table.rows.any(row => {
-          try {
-            ignore(decimal_order(row[index]))
-            row[index].contains(".") ||
-            (try {
-              ignore(decimal_cell(row[index]))
-              false
+        let has_decimal = tables.any(t => {
+          let index = column_index(t, col) catch { _ => return false }
+          t.rows.any(row => {
+            try {
+              ignore(decimal_order(row[index]))
+              row[index].contains(".") ||
+              (try {
+                ignore(decimal_cell(row[index]))
+                false
+              } catch {
+                _ => true
+              })
             } catch {
-              _ => true
-            })
-          } catch {
-            _ => false
-          }
+              _ => false
+            }
+          })
         })
         if has_decimal {
           pool.push_iter(
