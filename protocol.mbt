@@ -58,6 +58,19 @@ fn options_from_json(value : Json) -> SearchOptions raise LoomError {
 fn dispatch(request : Json) -> Json raise LoomError {
   let obj = j_object(request)
   match j_text(required(obj, "op")) {
+    "join_tables" => {
+      fields_only(obj, ["op", "left", "right", "spec"])
+      let table = join_tables(
+        table_from_json(required(obj, "left")),
+        table_from_json(required(obj, "right")),
+        join_spec_from_json(required(obj, "spec")),
+      )
+      Json::object({
+        "ok": Json(true),
+        "table": table_json(table),
+        "csv": Json(render_csv(table)),
+      })
+    }
     "parse" => {
       let text = j_text(required(obj, "text"))
       let table = match j_text(required(obj, "format")) {

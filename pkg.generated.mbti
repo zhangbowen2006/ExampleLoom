@@ -22,6 +22,8 @@ pub fn convert_date(String, String, String) -> String raise LoomError
 
 pub fn date_formats() -> Array[String]
 
+pub fn default_join_spec(Array[String], Array[String]) -> JoinSpec
+
 pub fn default_options() -> SearchOptions
 
 pub fn default_table_options() -> TableSearchOptions
@@ -39,6 +41,12 @@ pub fn expression_from_json(Json) -> Expr raise LoomError
 pub fn expression_to_json(Expr) -> Json raise LoomError
 
 pub fn handle(String) -> String
+
+pub fn join_spec_from_json(Json) -> JoinSpec raise LoomError
+
+pub fn join_spec_to_json(JoinSpec) -> Json raise LoomError
+
+pub fn join_tables(Table, Table, JoinSpec) -> Table raise LoomError
 
 pub fn parse_csv(String) -> Table raise LoomError
 
@@ -143,6 +151,17 @@ pub(all) enum GroupMetric {
   SumInt64(String)
   MinInt64(String)
   MaxInt64(String)
+}
+
+pub(all) struct JoinSpec {
+  left_keys : Array[String]
+  right_keys : Array[String]
+  kind : String
+  relationship : String
+  empty_keys : String
+  right_suffix : String
+  missing_value : String
+  indicator : String
 }
 
 pub(all) struct LayoutRule {
