@@ -69,7 +69,7 @@ fn dispatch(request : Json) -> Json raise LoomError {
     }
     "synthesize_table" => {
       fields_only(obj, [
-        "op", "examples", "options", "patterns", "separators", "intent",
+        "op", "examples", "options", "patterns", "separators", "intent", "layouts",
       ])
       let examples = j_array(required(obj, "examples")).map(v => {
         let e = j_object(v)
@@ -114,13 +114,19 @@ fn dispatch(request : Json) -> Json raise LoomError {
         Some(v) => j_text(v)
         None => "infer"
       }
-      let r = synthesize_table(
-        examples,
-        options~,
-        separators~,
-        patterns~,
-        intent~,
-      )
+      let r = match obj.get("layouts") {
+        None =>
+          synthesize_table(examples, options~, separators~, patterns~, intent~)
+        Some(v) =>
+          synthesize_table_with_layouts(
+            examples,
+            layout_rules_from_json(v),
+            options~,
+            separators~,
+            patterns~,
+            intent~,
+          )
+      }
       Json::object({
         "ok": Json(true),
         "status": Json(r.status),
@@ -140,6 +146,30 @@ fn dispatch(request : Json) -> Json raise LoomError {
             })
           }),
         ),
+      })
+    }
+    "propose_table_input" => {
+      fields_only(obj, ["op", "pipelines", "inputs"])
+      let report = propose_table_input(
+        j_array(required(obj, "pipelines")).map(pipeline_from_json),
+        j_array(required(obj, "inputs")).map(table_from_json),
+      )
+      Json::object({
+        "ok": Json(true),
+        "attempted": Json(report.attempted),
+        "skipped": Json(report.skipped),
+        "suggestion": match report.suggestion {
+          None => Json::null()
+          Some(s) =>
+            Json::object({
+              "source_index": Json(s.source_index),
+              "mutation": Json(s.mutation),
+              "input": table_json(s.table),
+              "csv": Json(render_csv(s.table, spreadsheet_safe=false)),
+              "score": Json(s.score),
+              "groups": Json(s.groups),
+            })
+        },
       })
     }
     "compare_table_candidates" => {

@@ -7,6 +7,8 @@ pub(all) struct Pipeline {
 ///|
 pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
   match step {
+    NormalizeLayouts(rules) =>
+      Json::array([Json("normalize_layouts"), layout_rules_to_json(rules)])
     PreserveExtraColumns => Json::array([Json("preserve_extra_columns")])
     FlattenRows => Json::array([Json("flatten_rows")])
     SortRows(keys) =>
@@ -171,6 +173,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     raise LoomError("wrong table operator arity")
   }
   let step = match op {
+    "normalize_layouts" => NormalizeLayouts(layout_rules_from_json(a[1]))
     "preserve_extra_columns" => PreserveExtraColumns
     "flatten_rows" => FlattenRows
     "sort_rows" =>
@@ -291,6 +294,7 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
     }
   }
   match step {
+    NormalizeLayouts(rules) => validate_layout_rules(rules)
     SortRows(keys) => validate_sort_keys(keys)
     Aggregate(keys, measures) => {
       if measures.is_empty() {
@@ -414,6 +418,9 @@ pub fn pipeline_from_json(v : Json) -> Pipeline raise LoomError {
   }
   let steps = values.map(table_step_from_json)
   for i, step in steps {
+    if step is NormalizeLayouts(_) && i != 0 {
+      raise LoomError("normalize_layouts must be the first pipeline step")
+    }
     if step is PreserveExtraColumns && i != 0 {
       raise LoomError(
         "preserve_extra_columns must occur only as the first step",
@@ -441,6 +448,11 @@ pub fn pipeline_to_json(p : Pipeline) -> Json raise LoomError {
 /// columns always fail. Later projection or reshaping may still remove extras.
 pub fn apply_pipeline(p : Pipeline, table : Table) -> Table raise LoomError {
   ignore(pipeline_to_json(p))
+  // A first layout operation is an explicit schema-adaptive entry point.
+  // Its own named rule bindings replace the fixed saved input projection.
+  if !p.steps.is_empty() && p.steps[0] is NormalizeLayouts(_) {
+    return transform_table(table, p.steps)
+  }
   let names = p.columns.copy()
   if !p.steps.is_empty() && p.steps[0] is PreserveExtraColumns {
     for name in table.columns {

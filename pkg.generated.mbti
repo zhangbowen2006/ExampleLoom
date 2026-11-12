@@ -50,6 +50,8 @@ pub fn pipeline_from_json(Json) -> Pipeline raise LoomError
 
 pub fn pipeline_to_json(Pipeline) -> Json raise LoomError
 
+pub fn propose_table_input(Array[Pipeline], Array[Table]) -> TableProbeReport raise LoomError
+
 pub fn recipe_from_json(Json) -> Recipe raise LoomError
 
 pub fn recipe_to_json(Recipe) -> Json raise LoomError
@@ -59,6 +61,8 @@ pub fn render_csv(Table, spreadsheet_safe? : Bool) -> String raise LoomError
 pub fn synthesize(Array[Example], options? : SearchOptions, separators? : Array[String], patterns? : Array[String], branch_depth? : Int32) -> SearchReport raise LoomError
 
 pub fn synthesize_table(Array[TableExample], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String], intent? : String) -> TableSearchReport raise LoomError
+
+pub fn synthesize_table_with_layouts(Array[TableExample], Array[LayoutRule], options? : TableSearchOptions, separators? : Array[String], patterns? : Array[String], intent? : String) -> TableSearchReport raise LoomError
 
 pub fn table_step_from_json(Json) -> TableStep raise LoomError
 
@@ -139,6 +143,12 @@ pub(all) enum GroupMetric {
   SumInt64(String)
   MinInt64(String)
   MaxInt64(String)
+}
+
+pub(all) struct LayoutRule {
+  name : String
+  when : Condition
+  recipe : Recipe
 }
 
 pub(all) struct Measure {
@@ -250,6 +260,20 @@ pub(all) struct TablePredictionGroup {
   candidates : Array[Int32]
 }
 
+pub(all) struct TableProbe {
+  table : Table
+  source_index : Int32
+  mutation : String
+  score : Int32
+  groups : Array[Array[Int32]]
+}
+
+pub(all) struct TableProbeReport {
+  suggestion : TableProbe?
+  attempted : Int32
+  skipped : Int32
+}
+
 pub(all) struct TableSearchOptions {
   max_depth : Int32
   max_states : Int32
@@ -269,6 +293,7 @@ pub(all) struct TableSearchReport {
 
 pub(all) enum TableStep {
   PreserveExtraColumns
+  NormalizeLayouts(Array[LayoutRule])
   SortRows(Array[SortKey])
   Select(Array[String], Array[String])
   Filter(Condition)

@@ -1,0 +1,115 @@
+{
+  "title": "多版本库存到分类总量",
+  "description": "显式布局按列名规范化，再学习分类Int64求和。不同版本不能同时命中，非法数量报错。",
+  "layouts": [
+    {
+      "name": "old",
+      "when": [
+        "not",
+        [
+          "empty",
+          [
+            "field",
+            0
+          ]
+        ]
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "group",
+          "units"
+        ],
+        "outputs": [
+          {
+            "name": "category",
+            "expression": [
+              "upper",
+              [
+                "trim",
+                [
+                  "field",
+                  0
+                ]
+              ]
+            ]
+          },
+          {
+            "name": "qty",
+            "expression": [
+              "field",
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "new",
+      "when": [
+        "not",
+        [
+          "empty",
+          [
+            "field",
+            0
+          ]
+        ]
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "category",
+          "amount"
+        ],
+        "outputs": [
+          {
+            "name": "category",
+            "expression": [
+              "upper",
+              [
+                "trim",
+                [
+                  "field",
+                  0
+                ]
+              ]
+            ]
+          },
+          {
+            "name": "qty",
+            "expression": [
+              "field",
+              1
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "input": "group,units\na,2\na,3\nb,4\n",
+  "target": "category,total\nA,5\nB,4\n",
+  "additional": [
+    {
+      "input": "amount,category\n5,b\n7,a\n6,b\n",
+      "target": "category,total\nB,11\nA,7\n"
+    }
+  ],
+  "next": "group,units,category,amount\na,2,,\n,,a,3\n,,b,4\n",
+  "expected": {
+    "columns": [
+      "category",
+      "total"
+    ],
+    "rows": [
+      [
+        "A",
+        "5"
+      ],
+      [
+        "B",
+        "4"
+      ]
+    ]
+  }
+}

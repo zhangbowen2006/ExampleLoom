@@ -1,0 +1,131 @@
+{
+  "title": "多版本名单到统一姓名",
+  "description": "显式声明两种源布局，再从两批输入输出学习姓名组合；下一批可在同表混用两种布局。",
+  "layouts": [
+    {
+      "name": "legacy",
+      "when": [
+        "matches",
+        [
+          "field",
+          0
+        ],
+        "^([^,]+),([^,]+)$",
+        true
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "legacy"
+        ],
+        "outputs": [
+          {
+            "name": "first",
+            "expression": [
+              "trim",
+              [
+                "capture",
+                [
+                  "field",
+                  0
+                ],
+                "^([^,]+),([^,]+)$",
+                2,
+                0
+              ]
+            ]
+          },
+          {
+            "name": "last",
+            "expression": [
+              "trim",
+              [
+                "capture",
+                [
+                  "field",
+                  0
+                ],
+                "^([^,]+),([^,]+)$",
+                1,
+                0
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "separate",
+      "when": [
+        "all",
+        [
+          [
+            "not",
+            [
+              "empty",
+              [
+                "field",
+                0
+              ]
+            ]
+          ],
+          [
+            "not",
+            [
+              "empty",
+              [
+                "field",
+                1
+              ]
+            ]
+          ]
+        ]
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "first",
+          "last"
+        ],
+        "outputs": [
+          {
+            "name": "first",
+            "expression": [
+              "field",
+              0
+            ]
+          },
+          {
+            "name": "last",
+            "expression": [
+              "field",
+              1
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "input": "legacy\n\"Stone, Mia\"\n\"Park, Ada\"\n",
+  "target": "badge\nMia Stone\nAda Park\n",
+  "additional": [
+    {
+      "input": "last,first\nLee,Bo\nXu,Yan\n",
+      "target": "badge\nBo Lee\nYan Xu\n"
+    }
+  ],
+  "next": "first,legacy,last\n,\"王,博文\",\nMia,,Stone\n",
+  "expected": {
+    "columns": [
+      "badge"
+    ],
+    "rows": [
+      [
+        "博文 王"
+      ],
+      [
+        "Mia Stone"
+      ]
+    ]
+  }
+}

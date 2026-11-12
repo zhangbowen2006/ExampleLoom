@@ -193,3 +193,7 @@ Default structural separators now include `=`. The JSON protocol and MoonBit lib
 Table row mapping accepts a single training row. Packing and projection witnesses are checked across every input/output pair. Split/Fold plans preserve per-record keys. Key-value blocks can be split into two columns, propagated by context and pivoted to a labelled grid. Context keys must identify records consistently. Duplicate key-level cells fail during execution.
 
 A small whole-field search runs before the full row grammar. Both share the configured step budget. Atom values are evaluated once and reused. Search truncation still indicates incomplete candidate coverage.
+
+## v0.12: explicit layouts and input proposals
+
+`normalize_layouts` (first step only) and `synthesize_table.layouts` use strictly validated explicit rules, not learned rules. `propose_table_input` accepts only `op`, `pipelines`, `inputs` and returns `suggestion: null` or an input-only suggestion with zero-based `source_index`, `mutation`, `input`, `csv`, `score`, `groups`. Mutations are `duplicate_rows`, `reverse_rows`, `drop_first`, `drop_last`, `first_row`, with at most 8 unique comparisons in source order. All-failed or consistent probes do not produce a suggestion; null does not prove equivalence. No target label is returned. Full limits and schema binding semantics: [v0.12](V012.md#接口与边界).

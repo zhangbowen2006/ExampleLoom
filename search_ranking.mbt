@@ -39,6 +39,7 @@ pub fn pipeline_cost(p : Pipeline) -> Int32 {
     cost +
     (match step {
       PreserveExtraColumns => 0
+      NormalizeLayouts(rules) => 30 + rules.length() * 8
       SortRows(keys) => 18 + keys.length() * 3
       Select(_, _) => 3
       FillDown(_) => 4

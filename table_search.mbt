@@ -413,20 +413,14 @@ fn learned_map(
 }
 
 ///|
-/// Bounded best-first search over structural programs with observational state
-/// deduplication on every training table. No test/holdout rows are inspected.
-pub fn synthesize_table(
-  examples : Array[TableExample],
-  options~ : TableSearchOptions = default_table_options(),
-  separators~ : Array[String] = default_table_separators(),
-  patterns~ : Array[String] = [],
-  intent~ : String = "infer",
-) -> TableSearchReport raise LoomError {
+fn validate_table_search_config(
+  options : TableSearchOptions,
+  separators : Array[String],
+  patterns : Array[String],
+  intent : String,
+) -> Unit raise LoomError {
   if intent != "infer" && intent != "flatten_all" {
     raise LoomError("table intent must be infer or flatten_all")
-  }
-  if examples.is_empty() || examples.length() > 8 {
-    raise LoomError("expected 1..8 table pairs")
   }
   if options.max_depth < 0 ||
     options.max_depth > 6 ||
@@ -445,6 +439,22 @@ pub fn synthesize_table(
   }
   for p in patterns {
     ignore(compiled_regex(p))
+  }
+}
+
+///|
+/// Bounded best-first search over structural programs with observational state
+/// deduplication on every training table. No test/holdout rows are inspected.
+pub fn synthesize_table(
+  examples : Array[TableExample],
+  options~ : TableSearchOptions = default_table_options(),
+  separators~ : Array[String] = default_table_separators(),
+  patterns~ : Array[String] = [],
+  intent~ : String = "infer",
+) -> TableSearchReport raise LoomError {
+  validate_table_search_config(options, separators, patterns, intent)
+  if examples.is_empty() || examples.length() > 8 {
+    raise LoomError("expected 1..8 table pairs")
   }
   for e in examples {
     validate_table(e.before)

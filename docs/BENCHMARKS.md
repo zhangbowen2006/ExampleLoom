@@ -96,3 +96,7 @@ node scripts/benchmark-strings.mjs --paired
 PowerShell 下可用 `$env:SYGUS_TRAIN_LIMIT="6"` 后重新导入来重放协议 1，完成后移除该变量再重新导入以恢复协议 2。两种运行的 JSON 都标记协议与训练上限。旧记录见 [v0.5.1 报告](https://github.com/zhangbowen2006/ExampleLoom/blob/v0.5.1/docs/BENCHMARKS.md)。
 
 pandas 的 36 组构造验证和 IANA/SQLite 工作流也已复测。72 次显式管道执行与参考实现一致，36 组构造任务在新输入上首候选正确。[实际运行记录](VALIDATION.md) · [pandas 语义对照](evidence/pandas-v0.6.0.json)
+
+## v0.12 补样辅助与候选覆盖
+
+原题无辅助首候选仍198/225，事后候选上界由209提高至211，无原通过任务回退；250题及25缺金标口径不变。另行预设意图、补充19对独立参考标签的13题辅助诊断为13/13，不能与自动成绩相加。逐题原因、额外信息与边界见 [本轮报告](V012.md#27题审计和评价口径)。

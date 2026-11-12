@@ -11,7 +11,8 @@ node bin/exampleloom.mjs learn --data input.csv --examples examples.json --out c
 node bin/exampleloom.mjs recipe --report candidates.json --choose 0 --name normalized --out recipe.json
 node bin/exampleloom.mjs apply --data next.csv --recipe recipe.json --out result.csv
 node bin/exampleloom.mjs learn-table --data input.csv --target target.csv --out candidates.json
-node bin/exampleloom.mjs learn-table --pairs batches.json --out candidates.json
+node bin/exampleloom.mjs learn-table --pairs batches.json --layouts layouts.json --out candidates.json
+node bin/exampleloom.mjs probe-table --data training.csv --report candidates.json --out input-suggestion.json
 node bin/exampleloom.mjs pipeline --report candidates.json --choose 0 --out pipeline.json
 node bin/exampleloom.mjs transform --data next.csv --pipeline pipeline.json --out result.csv
 node bin/exampleloom.mjs run request.json
@@ -36,7 +37,7 @@ try {
       if (!/^--[a-z]+$/.test(args[i]) || args[i + 1] == null || args[i + 1].startsWith('--')) throw new Error('Expected --flag value pairs');
       const key = args[i].slice(2);
       if (Object.hasOwn(flags, key)) throw new Error(`Duplicate flag: ${key}`);
-      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs','intent'].includes(key)) throw new Error(`Unknown flag: ${key}`);
+      if (!['data', 'examples', 'out', 'report', 'choose', 'name', 'recipe', 'format', 'separators','patterns','depth','target','pipeline','pairs','intent','layouts'].includes(key)) throw new Error(`Unknown flag: ${key}`);
       flags[key] = args[i + 1];
     }
   }
@@ -88,8 +89,12 @@ try {
     if (flags.separators) query.separators = await readJson(flags.separators);
     if (flags.patterns) query.patterns = await readJson(flags.patterns);
     if (flags.intent) query.intent = flags.intent;
+    if (flags.layouts) query.layouts = await readJson(flags.layouts);
     if (flags.depth) query.options = {max_depth:Number(flags.depth)};
     await emit(request(query));
+  } else if(command==='probe-table') {
+    const report=await readJson(requireFlag('report'));
+    await emit(request({op:'propose_table_input',pipelines:report.candidates.map(c=>c.pipeline),inputs:[await readTable()]}));
   } else if(command==='pipeline') {
     const report=await readJson(requireFlag('report')), choice=Number(requireFlag('choose'));
     if(!Number.isInteger(choice)||choice<0||!report.candidates?.[choice]?.pipeline)throw new Error('Invalid table candidate index');

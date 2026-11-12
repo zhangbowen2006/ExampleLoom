@@ -1,6 +1,6 @@
 name = "zhangbowen2006/exampleloom"
 
-version = "0.11.0"
+version = "0.12.0"
 
 readme = "README.md"
 

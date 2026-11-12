@@ -1,0 +1,130 @@
+{
+  "title": "混合日志到筛选排序结果",
+  "description": "显式拆分或独立列布局，学习筛选OK读数并按精确十进制排序，保留前导零。",
+  "layouts": [
+    {
+      "name": "joined",
+      "when": [
+        "matches",
+        [
+          "field",
+          0
+        ],
+        "^([A-Z]+):([[:digit:]]+)$",
+        true
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "record"
+        ],
+        "outputs": [
+          {
+            "name": "kind",
+            "expression": [
+              "capture",
+              [
+                "field",
+                0
+              ],
+              "^([A-Z]+):([[:digit:]]+)$",
+              1,
+              0
+            ]
+          },
+          {
+            "name": "value",
+            "expression": [
+              "capture",
+              [
+                "field",
+                0
+              ],
+              "^([A-Z]+):([[:digit:]]+)$",
+              2,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "split",
+      "when": [
+        "all",
+        [
+          [
+            "matches",
+            [
+              "field",
+              0
+            ],
+            "^[A-Z]+$",
+            true
+          ],
+          [
+            "matches",
+            [
+              "field",
+              1
+            ],
+            "^[[:digit:]]+$",
+            true
+          ]
+        ]
+      ],
+      "recipe": {
+        "version": 1,
+        "columns": [
+          "kind",
+          "value"
+        ],
+        "outputs": [
+          {
+            "name": "kind",
+            "expression": [
+              "field",
+              0
+            ]
+          },
+          {
+            "name": "value",
+            "expression": [
+              "field",
+              1
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "input": "record\nOK:10\nERR:1\nOK:2\nOK:3\n",
+  "target": "kind,value\nOK,2\nOK,3\nOK,10\n",
+  "additional": [
+    {
+      "input": "value,kind\n30,OK\n7,ERR\n4,OK\n",
+      "target": "kind,value\nOK,4\nOK,30\n"
+    }
+  ],
+  "next": "kind,record,value\n,OK:12,\nOK,,0005\nERR,,2\n,OK:999,\n",
+  "expected": {
+    "columns": [
+      "kind",
+      "value"
+    ],
+    "rows": [
+      [
+        "OK",
+        "0005"
+      ],
+      [
+        "OK",
+        "12"
+      ],
+      [
+        "OK",
+        "999"
+      ]
+    ]
+  }
+}

@@ -3,6 +3,7 @@
 /// duplicates in pivot cells are errors, never silently aggregated or discarded.
 pub(all) enum TableStep {
   PreserveExtraColumns
+  NormalizeLayouts(Array[LayoutRule])
   SortRows(Array[SortKey])
   Select(Array[String], Array[String])
   Filter(Condition)
@@ -78,6 +79,7 @@ fn apply_step_unchecked(
   table : Table,
 ) -> Table raise LoomError {
   match step {
+    NormalizeLayouts(rules) => normalize_layouts(table, rules)
     PreserveExtraColumns =>
       {
         columns: table.columns.copy(),

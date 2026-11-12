@@ -46,6 +46,10 @@ jobs:
           node scripts/intent-test.mjs
           node scripts/record-lists-test.mjs
           node scripts/table-comparison-test.mjs
+          node scripts/layouts-test.mjs
+          node scripts/table-probe-test.mjs
+          node scripts/assisted-diagnostic.mjs
+          node scripts/audit-remaining.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs
           node scripts/public-data-test.mjs
@@ -88,6 +92,7 @@ jobs:
           node scripts/advanced-browser-test.mjs
           node scripts/browser-recovery-test.mjs
           node scripts/table-comparison-browser-test.mjs
+          node scripts/table-probe-browser-test.mjs
           node scripts/sorting-browser-test.mjs
       - uses: actions/upload-artifact@v4
         if: always()

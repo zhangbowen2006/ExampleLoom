@@ -12,6 +12,7 @@ const controls=()=>{
   $('next-file').disabled=busy;
   $('cancel').hidden=!busy;
   $('compare-table').disabled=busy||!retained.length;
+  $('suggest-table').disabled=busy||!retained.length;
   $('refine-table').disabled=busy||comparedInput===null||$('extra-pairs').children.length>=7;
 };
 function startWorker(){
@@ -39,7 +40,7 @@ const call=request=>new Promise((resolve,reject)=>{
 });
 async function task(action){if(busy)return;busy=true;controls();try{await action();}catch(error){resetOutput();notice(error.message,true);}finally{busy=false;controls();}}
 const invalidate=()=>{revision++;chosen=false;retained=[];$('pipeline').value='';$('candidates').replaceChildren();$('stats').textContent='';resetComparison();resetOutput();controls();};
-for(const id of ['training','target','table-patterns','table-intent'])$(id).oninput=invalidate;
+for(const id of ['training','target','table-patterns','table-intent','layout-rules'])$(id).oninput=invalidate;
 const extraPairs = $('extra-pairs');
 function addPair(input = '', target = '') {
   if (extraPairs.children.length >= 7) return;
@@ -72,14 +73,14 @@ for(const button of document.querySelectorAll('[data-table-demo]'))button.onclic
   const response=await fetch(`examples/structures/${button.dataset.tableDemo}.json`);if(!response.ok)throw new Error('示例加载失败');const demo=await response.json();
   extraPairs.replaceChildren();$('add-pair').disabled=false;
   for (const pair of demo.additional ?? []) addPair(pair.input, pair.target);
-  $('table-intent').value=demo.intent??'infer';
+  $('table-intent').value=demo.intent??'infer';$('layout-rules').value=demo.layouts?JSON.stringify(demo.layouts,null,2):'';
   $('table-patterns').value=(demo.patterns ?? []).join('\n');
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;notice(`${demo.title}：${demo.description}`);
 });
 for(const button of document.querySelectorAll('[data-pipeline-demo]'))button.onclick=()=>task(async()=>{
   const response=await fetch(`examples/structures/${button.dataset.pipelineDemo}.json`);if(!response.ok)throw new Error('示例加载失败');
   const demo=await response.json();
-  extraPairs.replaceChildren();$('add-pair').disabled=false;$('table-patterns').value='';$('table-intent').value='infer';
+  extraPairs.replaceChildren();$('add-pair').disabled=false;$('table-patterns').value='';$('table-intent').value='infer';$('layout-rules').value='';
   invalidate();$('training').value=demo.input;$('target').value=demo.target;$('next').value=demo.next;
   $('pipeline').value=JSON.stringify(demo.pipeline,null,2);chosen=true;controls();
   notice(`${demo.title}：${demo.description}示例管道已经填好，请预览并核对。`);
@@ -89,13 +90,14 @@ $('learn').onclick=()=>task(async()=>{
   const generation = revision;
   const pairs = [[$('training').value, $('target').value],
     ...[...extraPairs.children].map(pair => [...pair.querySelectorAll('textarea')].map(x => x.value))];
+  const layouts = $('layout-rules').value.trim()?JSON.parse($('layout-rules').value):undefined;
   const patterns = $('table-patterns').value.split(/\r?\n/).filter(Boolean);
   const examples = [];
   for (const [input, target] of pairs) {
     if (!input.trim() || !target.trim()) throw new Error('请为每对训练表填写输入和期望输出。');
     examples.push({input: await parse(input), output: await parse(target)});
   }
-  const start=performance.now();const report=await call({op:'synthesize_table',examples,patterns,intent:$('table-intent').value});
+  const start=performance.now();const report=await call({op:'synthesize_table',examples,patterns,layouts,intent:$('table-intent').value});
   if(revision!==generation){notice('数据已修改，请重新搜索。');return;}
   retained=report.candidates.map(candidate=>candidate.pipeline);
   chosen=false;$('pipeline').value='';resetOutput();$('candidates').replaceChildren();
@@ -105,6 +107,18 @@ $('learn').onclick=()=>task(async()=>{
     choose.onclick=()=>{revision++;$('pipeline').value=JSON.stringify(candidate.pipeline,null,2);chosen=true;resetOutput();controls();notice('已选用管道。请在下一批数据上预览并核对。');};box.append(code,choose);$('candidates').append(box);
   }
   notice(report.candidates.length?`${report.candidates.length} 个训练一致候选。${report.truncated?'已触及限额，候选不完整。':''}请明确选择并检查下一批数据。`:'预算内没有找到程序；可补充或简化样例，也可明确编写管道。');
+});
+$('suggest-table').onclick=()=>task(async()=>{
+  const generation=revision,pipelines=retained.slice();
+  const sources=[$('training').value,...[...extraPairs.children].map(p=>p.querySelector('textarea').value)];
+  const inputs=[];for(const text of sources)inputs.push(await parse(text));
+  const result=await call({op:'propose_table_input',pipelines,inputs});
+  if(revision!==generation){notice('训练或候选已修改，请重新建议。');return;}
+  if(!result.suggestion){notice('有限探针中未找到可用分歧，不证明候选普遍等价。');return;}
+  revision++;resetComparison();resetOutput();chosen=false;$('pipeline').value='';
+  $('next').value=result.suggestion.csv;
+  const names={duplicate_rows:'重复整批行',reverse_rows:'反转行序',drop_first:'去掉首行',drop_last:'去掉末行',first_row:'仅取首行'};
+  notice(`这是构造的补样输入，可跳过（训练表 ${result.suggestion.source_index+1}：${names[result.suggestion.mutation]}）。请先确认符合业务格式，再比较候选；正确目标需由你独立填写。`);
 });
 $('compare-table').onclick=()=>task(async()=>{
   resetComparison();resetOutput();
