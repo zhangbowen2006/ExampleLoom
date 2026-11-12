@@ -14,6 +14,8 @@ pub fn attempt(Expr, Array[String]) -> Result[String, String]
 
 pub fn compare_table_candidates(Array[Pipeline], Table) -> TableComparison raise LoomError
 
+pub fn concat_tables(Array[NamedTable], UnionSpec) -> Table raise LoomError
+
 pub fn condition_from_json(Json) -> Condition raise LoomError
 
 pub fn condition_to_json(Condition) -> Json raise LoomError
@@ -27,6 +29,8 @@ pub fn default_join_spec(Array[String], Array[String]) -> JoinSpec
 pub fn default_options() -> SearchOptions
 
 pub fn default_table_options() -> TableSearchOptions
+
+pub fn default_union_spec() -> UnionSpec
 
 pub fn disagreements(Array[Candidate], Array[Array[String]], limit? : Int32) -> Array[Disagreement] raise LoomError
 
@@ -79,6 +83,10 @@ pub fn table_step_to_json(TableStep) -> Json raise LoomError
 pub fn test_condition(Condition, Array[String]) -> Bool raise LoomError
 
 pub fn transform_table(Table, Array[TableStep]) -> Table raise LoomError
+
+pub fn union_spec_from_json(Json) -> UnionSpec raise LoomError
+
+pub fn union_spec_to_json(UnionSpec) -> Json raise LoomError
 
 pub fn validate_table(Table) -> Unit raise LoomError
 
@@ -173,6 +181,11 @@ pub(all) struct LayoutRule {
 pub(all) struct Measure {
   name : String
   metric : GroupMetric
+}
+
+pub(all) struct NamedTable {
+  name : String
+  table : Table
 }
 
 pub(all) struct OutputField {
@@ -341,6 +354,12 @@ pub(all) enum TableStep {
   FillDown(Array[String])
   Deduplicate(Array[String])
   DropRows(Int32)
+}
+
+pub(all) struct UnionSpec {
+  mode : String
+  missing_value : String
+  source_column : String
 }
 
 // Type aliases
