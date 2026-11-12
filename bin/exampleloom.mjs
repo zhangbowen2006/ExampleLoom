@@ -13,6 +13,7 @@ node bin/exampleloom.mjs apply --data next.csv --recipe recipe.json --out result
 node bin/exampleloom.mjs learn-table --data input.csv --target target.csv --out candidates.json
 node bin/exampleloom.mjs learn-table --pairs batches.json --layouts layouts.json --out candidates.json
 node bin/exampleloom.mjs probe-table --data training.csv --report candidates.json --out input-suggestion.json
+node bin/exampleloom.mjs execute-table --data next.csv --report candidates.json --out checked.csv
 node bin/exampleloom.mjs pipeline --report candidates.json --choose 0 --out pipeline.json
 node bin/exampleloom.mjs transform --data next.csv --pipeline pipeline.json --out result.csv
 node bin/exampleloom.mjs run request.json
@@ -95,6 +96,13 @@ try {
   } else if(command==='probe-table') {
     const report=await readJson(requireFlag('report'));
     await emit(request({op:'propose_table_input',pipelines:report.candidates.map(c=>c.pipeline),inputs:[await readTable()]}));
+  } else if(command==='execute-table') {
+    const report=await readJson(requireFlag('report'));
+    const chosen=flags.choose===undefined?undefined:Number(flags.choose);
+    if(chosen!==undefined&&!Number.isInteger(chosen))throw new Error('Invalid candidate index');
+    const result=request({op:'execute_table',pipelines:report.candidates.map(c=>c.pipeline),table:await readTable(),chosen});
+    await emit(result.csv);
+    console.error(`Selection: ${result.selection}; this is not a correctness guarantee for unknown inputs.`);
   } else if(command==='pipeline') {
     const report=await readJson(requireFlag('report')), choice=Number(requireFlag('choose'));
     if(!Number.isInteger(choice)||choice<0||!report.candidates?.[choice]?.pipeline)throw new Error('Invalid table candidate index');

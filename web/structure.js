@@ -12,6 +12,7 @@ const controls=()=>{
   $('next-file').disabled=busy;
   $('cancel').hidden=!busy;
   $('compare-table').disabled=busy||!retained.length;
+  $('apply-consensus').disabled=busy||!retained.length;
   $('suggest-table').disabled=busy||!retained.length;
   $('refine-table').disabled=busy||comparedInput===null||$('extra-pairs').children.length>=7;
 };
@@ -167,12 +168,21 @@ $('refine-table').onclick=()=>{
   target.focus();target.scrollIntoView({block:'center',behavior:'smooth'});
   notice('已添加这批输入，请独立填写正确的期望输出，再搜索。');
 };
+function showTable(result){
+  output=result;const grid=el('table'),thead=el('thead'),head=el('tr'),body=el('tbody');for(const name of result.table.columns)head.append(el('th',name));thead.append(head);grid.append(thead);
+  for(const row of result.table.rows.slice(0,200)){const tr=el('tr');for(const value of row)tr.append(el('td',value));body.append(tr);}grid.append(body);$('results').replaceChildren(grid);
+  $('result-stats').textContent=`${result.table.rows.length} 行 · ${result.table.columns.length} 列；预览前 200 行，下载包含全部记录。`;$('export').disabled=false;
+}
 $('apply').onclick=()=>task(async()=>{
   resetOutput();const generation=revision;const pipeline=JSON.parse($('pipeline').value), table=await parse($('next').value);
   const result=await call({op:'transform',pipeline,table});if(revision!==generation){notice('数据或管道已修改，请重新预览。');return;}
-  output=result;const grid=el('table'),thead=el('thead'),head=el('tr'),body=el('tbody');for(const name of result.table.columns)head.append(el('th',name));thead.append(head);grid.append(thead);
-  for(const row of result.table.rows.slice(0,200)){const tr=el('tr');for(const value of row)tr.append(el('td',value));body.append(tr);}grid.append(body);$('results').replaceChildren(grid);
-  $('result-stats').textContent=`${result.table.rows.length} 行 · ${result.table.columns.length} 列；预览前 200 行，下载包含全部记录。`;$('export').disabled=false;notice('转换完成，请核对结果后下载。');
+  showTable(result);notice('转换完成，请核对结果后下载。');
+});
+$('apply-consensus').onclick=()=>task(async()=>{
+  resetOutput();const generation=revision,pipelines=retained.slice(),table=await parse($('next').value);
+  const result=await call({op:'execute_table',pipelines,table});
+  if(revision!==generation){notice('数据或候选已修改，请重新检查这一批。');return;}
+  showTable(result);notice('所有保留候选在这一整批数据上执行成功且结果相同。请核对后下载；新批次必须重新检查。');
 });
 $('save').onclick=()=>task(async()=>{
   const generation=revision;

@@ -58,6 +58,28 @@ fn options_from_json(value : Json) -> SearchOptions raise LoomError {
 fn dispatch(request : Json) -> Json raise LoomError {
   let obj = j_object(request)
   match j_text(required(obj, "op")) {
+    "execute_table" => {
+      fields_only(obj, ["op", "pipelines", "table", "chosen"])
+      let chosen = match obj.get("chosen") {
+        None => None
+        Some(v) => Some(j_int(v))
+      }
+      let result = execute_table_candidates(
+        j_array(required(obj, "pipelines")).map(pipeline_from_json),
+        table_from_json(required(obj, "table")),
+        chosen~,
+      )
+      Json::object({
+        "ok": Json(true),
+        "table": table_json(result.table),
+        "csv": Json(render_csv(result.table)),
+        "selection": Json(result.selection),
+        "chosen": match result.chosen {
+          None => Json::null()
+          Some(i) => Json(i)
+        },
+      })
+    }
     "concat_tables" => {
       fields_only(obj, ["op", "sources", "spec"])
       let sources = j_array(required(obj, "sources")).map(v => {
