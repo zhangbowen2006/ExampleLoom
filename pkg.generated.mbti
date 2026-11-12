@@ -287,6 +287,7 @@ pub(all) enum TableStep {
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
   PivotRecords(String, String, String)
+  PivotRecordLists(String, String, String)
   CombineColumns(Array[String], String, String)
   SegmentRows(Condition, Bool)
   CarryContext(Condition, Array[String])

@@ -1,0 +1,46 @@
+{
+  "title": "重复字段保留为列表",
+  "description": "显式管道将同记录重复字段保留为JSON数组字符串，缺失为[]，真实空值为[\"\"], 不执行自动学习。",
+  "input": "key,value\nname,A\ntag,red\ntag,blue\n",
+  "target": "c0,c1\nname,tag\n\"[\"\"A\"\"]\",\"[\"\"red\"\",\"\"blue\"\"]\"\n",
+  "next": "key,value\nname,B\ntag,\ntag,red\nname,C\nother,甲😀\n",
+  "pipeline": {
+    "version": 2,
+    "columns": [
+      "key",
+      "value"
+    ],
+    "steps": [
+      [
+        "pivot_record_lists",
+        "key",
+        "value",
+        "name"
+      ]
+    ]
+  },
+  "expected": {
+    "columns": [
+      "c0",
+      "c1",
+      "c2"
+    ],
+    "rows": [
+      [
+        "name",
+        "tag",
+        "other"
+      ],
+      [
+        "[\"B\"]",
+        "[\"\",\"red\"]",
+        "[]"
+      ],
+      [
+        "[\"C\"]",
+        "[]",
+        "[\"甲😀\"]"
+      ]
+    ]
+  }
+}

@@ -58,6 +58,13 @@ pub fn table_step_to_json(step : TableStep) -> Json raise LoomError {
         Json(value_name),
         Json(marker),
       ])
+    PivotRecordLists(variable, value_name, marker) =>
+      Json::array([
+        Json("pivot_record_lists"),
+        Json(variable),
+        Json(value_name),
+        Json(marker),
+      ])
     CombineColumns(names, separator, output_name) =>
       Json::array([
         Json("combine_columns"),
@@ -150,6 +157,7 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
     | "fold"
     | "pivot_grid"
     | "pivot_records"
+    | "pivot_record_lists"
     | "combine_columns" => 4
     "unpivot" | "pivot" => 5
     "transpose"
@@ -189,6 +197,8 @@ pub fn table_step_from_json(v : Json) -> TableStep raise LoomError {
       )
     "pivot_grid" => PivotGrid(json_strings(a[1]), j_text(a[2]), j_text(a[3]))
     "pivot_records" => PivotRecords(j_text(a[1]), j_text(a[2]), j_text(a[3]))
+    "pivot_record_lists" =>
+      PivotRecordLists(j_text(a[1]), j_text(a[2]), j_text(a[3]))
     "split_column_padded" =>
       SplitColumnPadded(j_text(a[1]), j_text(a[2]), json_strings(a[3]))
     "combine_columns" =>
@@ -298,7 +308,8 @@ fn validate_step_static(step : TableStep) -> Unit raise LoomError {
       names(keys, true)
       names(keys + [variable, value_name], false)
     }
-    PivotRecords(variable, value_name, marker) => {
+    PivotRecords(variable, value_name, marker)
+    | PivotRecordLists(variable, value_name, marker) => {
       names([variable, value_name], false)
       if marker.is_empty() || marker.length() > 256 {
         raise LoomError("pivot_records marker must contain 1..256 UTF-16 units")

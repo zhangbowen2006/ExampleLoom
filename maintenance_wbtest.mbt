@@ -42,6 +42,65 @@ test "whole table flattening uses the new batch size and preserves cells" {
 }
 
 ///|
+test "explicit record lists preserve repeated empty unicode and delimiter values" {
+  let t : Table = {
+    columns: ["key", "value"],
+    rows: [
+      ["name", "A"],
+      ["tag", "x,y"],
+      ["tag", ""],
+      ["name", "B"],
+      ["other", "😀"],
+    ],
+  }
+  let p : Pipeline = {
+    columns: t.columns,
+    steps: [PivotRecordLists("key", "value", "name")],
+  }
+  let out = apply_pipeline(pipeline_from_json(pipeline_to_json(p)), t)
+  assert_eq(out.rows[0], ["name", "tag", "other"])
+  assert_eq(out.rows[1], [
+    Json(["A"]).stringify(),
+    Json(["x,y", ""]).stringify(),
+    "[]",
+  ])
+  assert_eq(out.rows[2], [
+    Json(["B"]).stringify(),
+    "[]",
+    Json(["😀"]).stringify(),
+  ])
+  assert_true(
+    try {
+      ignore(transform_table(t, [PivotRecords("key", "value", "name")]))
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+  assert_true(
+    try {
+      ignore(apply_pipeline(p, { ..t, rows: [["tag", "orphan"]], }))
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+  assert_true(
+    try {
+      ignore(
+        apply_pipeline(p, {
+          ..t,
+          rows: [["name", "A"], ["tag", "a".repeat(65536)]],
+        }),
+      )
+      false
+    } catch {
+      LoomError(_) => true
+    },
+  )
+}
+
+///|
 test "padded split retains empty fields and rejects excess fields" {
   let t : Table = {
     columns: ["id", "parts"],

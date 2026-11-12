@@ -2,6 +2,8 @@
 
 **给出几个样例，生成可检查、可重用的数据转换程序。**
 
+v0.11 完成五轮维护：整批展平、空值状态字段分发、明确意图约束、可选字段补空拆列，以及显式重复字段列表。完整Foofah默认首候选198/225，比v0.10新增2题、无原成功题回退；仍有27题未通过。数据已参与开发，不是盲测。[五轮记录](docs/FIVE_ROUNDS.md) · [同类调研](docs/RESEARCH_2026_11_12.md) · [原生API迁移](docs/MIGRATION.md)
+
 v0.7 增加从样例学习的多字段稳定排序，支持 Unicode 文本序和精确十进制数值序，可与宽表展开等操作组合。执行支持八个排序键，学习至多三个键；相同键保留原始顺序，数值排序保留前导零和小数原文。在表格工作台选择「多字段金额排序」「商品目录排序」「读数展开与排序」可运行完整流程。[覆盖差异与借鉴范围](docs/GAP_ANALYSIS.md) · [排序协议和边界](docs/PROTOCOL.md#stable-row-ordering-v070)
 
 [在线工作台](https://zhangbowen2006.github.io/ExampleLoom/) · [Mooncakes](https://mooncakes.io/docs/zhangbowen2006/exampleloom) · [CI 与运行证据](https://github.com/zhangbowen2006/ExampleLoom/actions) · [版本下载](https://github.com/zhangbowen2006/ExampleLoom/releases)

@@ -74,6 +74,12 @@ try{
   assert.deepEqual(await page.locator('#results tbody tr').evaluateAll(rows=>rows.map(tr=>[...tr.children].map(td=>td.textContent))),preserved.expected.rows);
   assert.deepEqual(await page.locator('#results thead th').allTextContents(),preserved.expected.columns);
   checks.push('Opt-in extra input columns survive saving, reloading and rerunning the pipeline in the real browser');
+  const listDemo=JSON.parse(await readFile('examples/structures/record-lists.json','utf8'));
+  await page.locator('[data-pipeline-demo="record-lists"]').click();
+  await page.waitForFunction(()=>!document.querySelector('#apply').disabled);
+  await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);
+  assert.deepEqual(await page.locator('#results tbody tr').evaluateAll(rows=>rows.map(tr=>[...tr.children].map(td=>td.textContent))),listDemo.expected.rows);
+  checks.push('Explicit repeated-key lists preserve empty values and missing fields in the real Worker');
   const combined=JSON.parse(await readFile('examples/regex-extended/wide-table-regex.json','utf8'));
   await page.locator('#load').setInputFiles({name:'extended.pipeline.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(combined.pipeline))});
   await page.waitForFunction(()=>!document.querySelector('#apply').disabled);

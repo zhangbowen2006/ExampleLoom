@@ -1,4 +1,8 @@
-# v0.10.0 验证记录
+# v0.11.0 验证记录
+
+五轮本地JS、Wasm GC、Wasm测试数依次为148、149、150、152、153；各轮全部通过。最终完整Foofah198/225；高级浏览器28项，包含默认推导、明确意图选择、补空拆列及显式重复字段JSON列表。列表另有250组固定种子构造参考与真实CLI。PCRE2 88,852项仍通过。远程Linux native及持续集成以各提交的[CI](https://github.com/zhangbowen2006/ExampleLoom/actions)实际状态为准。[五轮记录](FIVE_ROUNDS.md)
+
+## v0.10.0 历史验证
 
 Windows 本地 JS、Wasm GC、Wasm 各运行 147 项 MoonBit 测试全部通过；完整 PCRE2 10.47 构造对照共 88,852 项，另有 24,624 项 JavaScript 共同语法对照、500 个正则边界构造、250 组记录构造和 5 个非法数据拒绝用例。浏览器实际执行新增学习示例，以及额外输入列管道的保存、载入和重放。[正则记录](evidence/pcre2-v0.10.0.json) · [记录转换](evidence/record-pivot-v0.10.0.json) · [浏览器记录](evidence/advanced-browser-v0.10.0.json)。这些不是生产采用证明，也不构成完整 PCRE 一致性证明。Linux native 结果以[对应提交的 CI](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。
 

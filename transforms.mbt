@@ -21,6 +21,7 @@ pub(all) enum TableStep {
   Pivot(Array[String], String, String, Array[String])
   PivotGrid(Array[String], String, String)
   PivotRecords(String, String, String)
+  PivotRecordLists(String, String, String)
   CombineColumns(Array[String], String, String)
   SegmentRows(Condition, Bool)
   CarryContext(Condition, Array[String])
@@ -88,6 +89,8 @@ fn apply_step_unchecked(
       pivot_grid(table, keys, variable, value_name)
     PivotRecords(variable, value_name, marker) =>
       pivot_records(table, variable, value_name, marker)
+    PivotRecordLists(variable, value_name, marker) =>
+      pivot_record_lists(table, variable, value_name, marker)
     CombineColumns(names, separator, output_name) =>
       combine_columns(table, names, separator, output_name)
     SegmentRows(condition, starts_record) =>

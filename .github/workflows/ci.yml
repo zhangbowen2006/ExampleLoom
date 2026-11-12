@@ -44,6 +44,7 @@ jobs:
           node scripts/regex-robustness-test.mjs
           node scripts/record-pivot-test.mjs
           node scripts/intent-test.mjs
+          node scripts/record-lists-test.mjs
           node scripts/table-comparison-test.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs
