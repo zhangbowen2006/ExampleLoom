@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-11-13T03:05:20.323Z",
+  "browser": "157.0.4341.46",
+  "checks": [
+    "warehouse: multi-batch learning, explicit choice, unseen batch, CSV download and portable job",
+    "settlement: multi-batch learning, explicit choice, unseen batch, CSV download and portable job",
+    "paid-orders: multi-batch learning, explicit choice, unseen batch, CSV download and portable job",
+    "A delayed search result cannot survive a training edit.",
+    "390px page fits and does not send data off-origin."
+  ]
+}

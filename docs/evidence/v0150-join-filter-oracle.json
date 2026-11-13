@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-11-13T03:06:29.698Z",
+  "engine_sha256": "a830603aecc346120022c354897ea771f3726e52e0f2930cb23b9f4ab25a7b70",
+  "sqlite_version": "3.50.4",
+  "cases": 40,
+  "all_passed": true,
+  "training_examples": 2,
+  "filter_evaluations": 1412,
+  "additional_checks": [
+    "A paid row with invalid amount fails without partial output.",
+    "A separately learned filter plus sum_decimal produces 0.3 for 0.1 + 0.2 and preserves a value beyond Int64."
+  ],
+  "methodology": "One job learned from two constructed examples; 40 separately generated constructed batches checked against a SQLite inner join, exact status predicate and integer SUM. Includes empty inputs, missing keys, filtered invalid numbers, negative values and reordered source columns. Not a blind benchmark, large-scale performance test or production dataset."
+}

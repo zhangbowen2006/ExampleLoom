@@ -22,6 +22,7 @@ pub fn default_join_search_options() -> JoinSearchOptions {
 pub(all) struct JoinSearchReport {
   candidates : Array[DataJob]
   evaluations : Int32
+  filter_evaluations : Int32
   rejected : Int32
   truncated : Bool
   status : String
@@ -38,6 +39,90 @@ priv struct RankedJoin {
 ///|
 priv struct JoinWork {
   mut bounded_skips : Int32
+  mut filter_evaluations : Int32
+}
+
+///|
+/// Explore a small set of value predicates before an aggregate. This is not
+/// general predicate synthesis: only exact equality and inequality on columns
+/// with at most eight distinct values in all demonstrations are attempted.
+fn join_filtered_aggregate(
+  tables : Array[Table],
+  targets : Array[Table],
+  work : JoinWork,
+) -> Array[TableStep]? {
+  if targets.all(t => t.rows.is_empty()) {
+    return None
+  }
+  let mut local_attempts = 0
+  for index in 0..<tables[0].columns.length() {
+    let values : Array[String] = []
+    for table in tables {
+      for row in table.rows {
+        if !values.contains(row[index]) && values.length() < 9 {
+          values.push(row[index])
+        }
+      }
+    }
+    if values.length() > 8 {
+      work.bounded_skips += 1
+      continue
+    }
+    if values.length() < 2 {
+      continue
+    }
+    values.sort()
+    for value in values {
+      for invert in [false, true] {
+        if local_attempts >= 32 || work.filter_evaluations >= 2048 {
+          work.bounded_skips += 1
+          return None
+        }
+        local_attempts += 1
+        work.filter_evaluations += 1
+        let base = Equals(Field(index), Literal(value))
+        let condition = if invert { Not(base) } else { base }
+        let filter = Filter(condition)
+        let filtered : Array[Table] = []
+        for t in tables {
+          match
+            (Some(transform_table(t, [filter])) catch { LoomError(_) => None }) {
+            Some(next) => filtered.push(next)
+            None => break
+          }
+        }
+        let mut did_filter = false
+        for i, table in filtered {
+          if table.rows.length() < tables[i].rows.length() {
+            did_filter = true
+          }
+        }
+        if filtered.length() != tables.length() || !did_filter {
+          continue
+        }
+        let (aggregates, clipped) = aggregate_witnesses(filtered, targets)
+        if clipped {
+          work.bounded_skips += 1
+        }
+        for aggregate in aggregates {
+          let mut matches = true
+          for i, table in filtered {
+            if (Some(transform_table(table, [aggregate])) catch {
+                LoomError(_) => None
+              }) !=
+              Some(targets[i]) {
+              matches = false
+              break
+            }
+          }
+          if matches {
+            return Some([filter, aggregate])
+          }
+        }
+      }
+    }
+  }
+  None
 }
 
 ///|
@@ -290,9 +375,12 @@ fn infer_job_hypothesis(
   if join_projection(joined, targets) is Some(step) {
     downstream.push(step)
   }
-  let (aggregates, _) = aggregate_witnesses(joined, targets)
+  let (aggregates, aggregate_clipped) = aggregate_witnesses(joined, targets)
   downstream.push_iter(aggregates.iter())
-  let (sorts, _) = sort_witnesses(joined, targets)
+  let (sorts, sort_clipped) = sort_witnesses(joined, targets)
+  if aggregate_clipped || sort_clipped {
+    work.bounded_skips += 1
+  }
   downstream.push_iter(sorts.iter())
   for step in downstream {
     let pipeline : Pipeline = { columns: joined[0].columns, steps: [step], }
@@ -325,12 +413,30 @@ fn infer_job_hypothesis(
       })
     }
   }
+  if join_filtered_aggregate(joined, targets, work) is Some(steps) {
+    let pipeline : Pipeline = { columns: joined[0].columns, steps, }
+    let job : DataJob = {
+      sources: names,
+      stages: [
+        prefix,
+        { name: output_name, operation: TransformSource(join_name, pipeline), },
+      ],
+      output: output_name,
+    }
+    if examples.all(e => {
+        (Some(run_data_job(job, e.sources)) catch { LoomError(_) => None }) ==
+        Some(e.after)
+      }) {
+      return Some(job)
+    }
+  }
   None
 }
 
 ///|
 /// Search a bounded language: two source tables; one- or two-column equijoin;
-/// inner/left/full/semi/anti; optional learned projection, aggregate or sort.
+/// inner/left/full/semi/anti; optional projection, aggregate, sort, or a
+/// low-cardinality equality filter followed by an aggregate.
 /// Every returned job is replayed on every demonstration. Candidate rank is a
 /// syntactic prior, never a confidence score or proof of unseen behavior.
 pub fn synthesize_join_jobs(
@@ -416,7 +522,7 @@ pub fn synthesize_join_jobs(
   let mut evaluations = 0
   let mut rejected = 0
   let mut truncated = options.max_evaluations < hypotheses.length() * 10
-  let work : JoinWork = { bounded_skips: 0, }
+  let work : JoinWork = { bounded_skips: 0, filter_evaluations: 0, }
   for (i, j, k, l) in hypotheses {
     for orientation in 0..<2 {
       let left_name = names[orientation]
@@ -528,6 +634,7 @@ pub fn synthesize_join_jobs(
   {
     candidates: ranked.map(c => c.job),
     evaluations,
+    filter_evaluations: work.filter_evaluations,
     rejected,
     truncated,
     status: if truncated {

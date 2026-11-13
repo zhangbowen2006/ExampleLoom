@@ -1,4 +1,4 @@
-# v0.14.0 迁移说明
+# v0.15.0 迁移说明
 
 旧行配方v1、表格管道v2编码继续可读，默认自动学习仍为`infer`。新增操作需新引擎执行；旧引擎会拒绝未知操作。
 
@@ -19,3 +19,7 @@ GroupMetric 增加 SumDecimal/MinDecimal/MaxDecimal；下游穷举匹配需加�
 ## v0.14 新增
 
 新增 JoinExample、JoinSearchOptions、JoinSearchReport 与 synthesize_join_jobs；不改变已有DataJob、旧JSON和单表学习的默认行为。多表学习仅支持两个源、有限键与一步后续操作，不保证候选完备。[使用与预算](JOIN_LEARNING.md)。
+
+## v0.15 新增
+
+`JoinSearchReport`增加`filter_evaluations`字段；如果下游手工构造该结构，需要补上该字段。JSON响应也增加同名计数。`evaluations`仍是连接假设数。新增有限的“连接后筛选再汇总”学习，输出仍使用原DataJob v1和Pipeline v2中的既有算子，执行端格式兼容。旧版只包含连接、选列、汇总或排序的已保存任务继续可用；新学习器可能返回更多训练一致的规则，不能假定候选编号跨版本保持一致。[范围与验证](V015.md)。

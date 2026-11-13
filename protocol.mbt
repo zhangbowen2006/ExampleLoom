@@ -100,6 +100,7 @@ fn dispatch(request : Json) -> Json raise LoomError {
         "status": Json(report.status),
         "truncated": Json(report.truncated),
         "evaluations": Json(report.evaluations),
+        "filter_evaluations": Json(report.filter_evaluations),
         "rejected": Json(report.rejected),
         "candidates": Json::array(
           report.candidates.map(job => {

@@ -56,6 +56,8 @@ jobs:
           node scripts/confirmed-test.mjs
           node scripts/data-job-test.mjs
           node scripts/join-learning-test.mjs
+          python3 scripts/generate-join-filter-oracle.py
+          node scripts/join-filter-oracle-test.mjs
           python3 scripts/generate-sort-oracle.py
           node scripts/sorting-test.mjs
           node scripts/public-data-test.mjs

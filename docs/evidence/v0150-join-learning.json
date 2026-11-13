@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-11-13T03:05:19.429Z",
+  "engine_sha256": "a830603aecc346120022c354897ea771f3726e52e0f2930cb23b9f4ab25a7b70",
+  "workflows": [
+    {
+      "name": "warehouse",
+      "examples": 2,
+      "candidates": 1,
+      "evaluations": 270,
+      "status": "join_search_limit",
+      "top1_new_batch": true
+    },
+    {
+      "name": "settlement",
+      "examples": 2,
+      "candidates": 6,
+      "evaluations": 60,
+      "status": "join_search_limit",
+      "top1_new_batch": true
+    },
+    {
+      "name": "paid-orders",
+      "examples": 2,
+      "candidates": 6,
+      "evaluations": 120,
+      "status": "join_search_limit",
+      "top1_new_batch": true
+    }
+  ],
+  "methodology": "Three constructed multi-batch examples; all candidate jobs replay training, and separately specified next batches test generalization. These demonstrations are not external or blind benchmarks."
+}

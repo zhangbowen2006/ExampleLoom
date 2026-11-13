@@ -7,7 +7,7 @@ const run=q=>{const r=call(q);assert.equal(r.ok,true,r.error);return r;};
 const parse=text=>run({op:'parse',format:'csv',text}).table;
 const cli=(...args)=>{const r=spawnSync(process.execPath,['bin/exampleloom.mjs',...args],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout;};
 await mkdir('artifacts/join-learning',{recursive:true});const workflows=[];
-for(const name of ['warehouse','settlement']){
+for(const name of ['warehouse','settlement','paid-orders']){
  const d=JSON.parse(await readFile(`examples/join-learning/${name}.json`,'utf8'));
  const examples=d.examples.map(e=>({sources:e.sources.map(s=>({name:s.name,table:parse(s.csv)})),output:parse(e.output)}));
  const before=JSON.stringify(examples);const report=run({op:'synthesize_join_jobs',examples});assert.ok(report.candidates.length,name);
@@ -15,6 +15,10 @@ for(const name of ['warehouse','settlement']){
  for(const candidate of report.candidates)for(const e of examples)assert.deepEqual(run({op:'run_data_job',job:candidate.job,sources:e.sources}).table,e.output);
  const sources=d.next.map(s=>({name:s.name,table:parse(s.csv)}));
  const chosen=run({op:'validate_data_job',job:report.candidates[0].job}).job;
+ if(name==='paid-orders'){
+  assert.deepEqual(chosen.stages[1].pipeline.steps.map(step=>step[0]),['filter','aggregate']);
+  assert.ok(report.filter_evaluations>0);
+ }
  assert.deepEqual(run({op:'run_data_job',job:chosen,sources}).table,d.expected,`${name} unseen batch`);
  const pairs=[];
  for(const [i,e] of d.examples.entries()){
@@ -40,5 +44,5 @@ const ambiguous=run({op:'synthesize_join_jobs',examples:[e]});
 assert.ok(ambiguous.candidates.length>1,'Under-specified examples must retain different plausible jobs');
 const contradicted=structuredClone(e);contradicted.output.rows[0][0]='not-in-any-input';
 assert.equal(run({op:'synthesize_join_jobs',examples:[e,contradicted]}).candidates.length,0);
-await writeFile('artifacts/join-learning-results.json',JSON.stringify({timestamp:new Date().toISOString(),engine_sha256:JSON.parse(await readFile('dist/BUILD.json','utf8')).engine_sha256,workflows,methodology:'Two constructed multi-batch examples; all candidate jobs replay training, and separately specified next batches test generalization. These demonstrations are not external or blind benchmarks.'},null,2)+'\n');
+await writeFile('artifacts/join-learning-results.json',JSON.stringify({timestamp:new Date().toISOString(),engine_sha256:JSON.parse(await readFile('dist/BUILD.json','utf8')).engine_sha256,workflows,methodology:'Three constructed multi-batch examples; all candidate jobs replay training, and separately specified next batches test generalization. These demonstrations are not external or blind benchmarks.'},null,2)+'\n');
 console.log(JSON.stringify({workflows,additional:['ambiguity retained','contradictions produce no job','limits and invalid requests rejected','real CLI save and replay']}));

@@ -33,7 +33,7 @@ $('learn-join').onclick=()=>task(async()=>{
  const snapshots=[...$('examples').children].map(e=>Object.fromEntries([...e.querySelectorAll('textarea')].map(t=>[t.dataset.part,t.value])));
  const examples=[];for(const pair of snapshots){if(!pair.left.trim()||!pair.right.trim()||!pair.output.trim())throw new Error('请填写每批的两张输入和期望输出');examples.push({sources:[{name:left,table:await parse(pair.left)},{name:right,table:await parse(pair.right)}],output:await parse(pair.output)});}
  const start=performance.now(),report=await call({op:'synthesize_join_jobs',examples});if(generation!==revision){notice('示例已修改，请重新搜索。');return;}
- $('stats').textContent=`${Math.round(performance.now()-start)} ms · 尝试 ${report.evaluations} 种连接假设 · ${report.truncated?'搜索或候选受限':'已检查有限假设'}`;
+ $('stats').textContent=`${Math.round(performance.now()-start)} ms · ${report.evaluations} 种连接假设 · ${report.filter_evaluations} 次筛选尝试 · ${report.truncated?'搜索或候选受限':'已检查有限假设'}`;
  for(const [i,c] of report.candidates.entries()){
   const box=el('div');box.className='candidate';const join=c.job.stages[0],code=el('code',JSON.stringify({left:join.left,right:join.right,keys:[join.spec.left_keys,join.spec.right_keys],kind:join.spec.kind,relationship:join.spec.relationship,after:c.job.stages.slice(1)}));
   const choose=el('button',`选用任务 ${i+1}`);choose.dataset.chooseJoin=String(i);choose.onclick=()=>{revision++;selected=c.job;resetOutput();controls();notice('已选用任务。请在下一批数据上检查后下载。');};box.append(code,choose);$('candidates').append(box);

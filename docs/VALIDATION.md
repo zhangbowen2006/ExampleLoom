@@ -1,4 +1,12 @@
-# 当前验证：v0.13 系列
+# 当前验证：v0.15 系列
+
+v0.15本机JS、Wasm、Wasm GC各183项MoonBit测试通过，`moon check --deny-warn --target all`通过。三个多表学习案例经API、真实CLI及浏览器Worker运行并核对全部新批次输出。连接/筛选/汇总的已保存任务另与SQLite的独立执行在40组构造批次上逐格一致；这些不是业务盲测。新增语义、限额及复现见[v0.15](V015.md)。四后端和完整持续集成以对应提交的[Actions](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。
+
+v0.14四后端和浏览器[CI已通过](https://github.com/zhangbowen2006/ExampleLoom/actions/runs/43262773715)。Foofah自动首候选198/225、事后候选上界211/225，仍27题未过；Auto-Tables单类别变行数探针的默认首选0/28，明确转置意图后23/28、5题尺寸超限。任务已在开发时查看，不能称为盲测。详见[Foofah逐题结果](evidence/v0140-benchmark.json)和[转置实验](TRANSPOSE_EVALUATION.md)。
+
+以下保留历史版本记录，其中“本轮”“当前”仅指相应历史版本，不是本页的最新统计。
+
+## v0.13 历史验证
 
 v0.13.1只修正文档，执行核心与v0.13.0相同。已核验的v0.13.0 [CI](https://github.com/zhangbowen2006/ExampleLoom/actions/runs/43241617005)在JS、Wasm GC、Wasm、native各175项测试全部通过；最新文档修订的CI以[运行记录](https://github.com/zhangbowen2006/ExampleLoom/actions)为准。全新Mooncakes消费项目在三个后端各29项测试通过。
 

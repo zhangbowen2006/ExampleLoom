@@ -213,6 +213,7 @@ pub(all) struct JoinSearchOptions {
 pub(all) struct JoinSearchReport {
   candidates : Array[DataJob]
   evaluations : Int32
+  filter_evaluations : Int32
   rejected : Int32
   truncated : Bool
   status : String

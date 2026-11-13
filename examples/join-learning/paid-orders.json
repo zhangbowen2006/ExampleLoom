@@ -1,0 +1,25 @@
+{
+  "title": "筛选已支付订单并按分类汇总",
+  "description": "从两批订单、商品目录和目标汇总学习连接、状态筛选及求和，待支付或取消订单不进入汇总。",
+  "examples": [
+    {
+      "sources": [
+        {"name":"orders","csv":"sku,status,amount\nA,paid,100\nA,pending,900\nA,paid,200\nB,paid,125\nB,canceled,800\n"},
+        {"name":"catalog","csv":"sku,category\nA,food\nB,book\n"}
+      ],
+      "output":"category,total\nfood,300\nbook,125\n"
+    },
+    {
+      "sources": [
+        {"name":"orders","csv":"amount,sku,status\n55,C,paid\n99,C,pending\n25,C,paid\n13,D,paid\n88,D,canceled\n"},
+        {"name":"catalog","csv":"category,sku\ntool,C\nart,D\n"}
+      ],
+      "output":"category,total\ntool,80\nart,13\n"
+    }
+  ],
+  "next": [
+    {"name":"orders","csv":"sku,status,amount\nE,paid,2\nE,pending,101\nE,paid,3\nF,paid,1250\nF,canceled,400\n"},
+    {"name":"catalog","csv":"sku,category\nE,toy\nF,media\n"}
+  ],
+  "expected":{"columns":["category","total"],"rows":[["toy","5"],["media","1250"]]}
+}

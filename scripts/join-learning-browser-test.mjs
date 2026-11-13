@@ -8,7 +8,7 @@ try{
  const page=await browser.newPage({acceptDownloads:true});page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(base).origin)remote.push(r.url());});
  await page.addInitScript(()=>{const Original=window.Worker;window.Worker=class extends Original{};const send=Worker.prototype.postMessage;window.holdJoin=false;window.heldJoin=[];Worker.prototype.postMessage=function(m,...args){if(window.holdJoin&&m.request?.op==='synthesize_join_jobs')window.heldJoin.push(()=>send.call(this,m,...args));else send.call(this,m,...args);};});
  await page.goto(base+'/join.html');
- for(const name of ['warehouse','settlement']){
+ for(const name of ['warehouse','settlement','paid-orders']){
   const demo=JSON.parse(await readFile(`examples/join-learning/${name}.json`,'utf8'));await page.locator(`[data-join-demo="${name}"]`).click();await page.waitForFunction(()=>!document.querySelector('#learn-join').disabled);
   assert.equal(await page.locator('#examples fieldset').count(),2);await page.locator('#learn-join').click();await page.locator('[data-choose-join="0"]').waitFor();await page.locator('[data-choose-join="0"]').click();
   await page.locator('#apply-join').click();await page.waitForFunction(()=>!document.querySelector('#export-join').disabled);
